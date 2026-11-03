@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CircleDonate } from "@/components/circle-donate";
 import { JoinCircleButton } from "@/components/admin-panel";
+import { StartLiveButton } from "@/components/start-live-button";
+import { readLiveKitCredentials } from "@/server/live-access";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
@@ -42,6 +44,8 @@ export default async function CirclePage({ params }: { params: Promise<{ id: str
     };
   });
   const joined = Boolean(user?.creatorProfile && circle.participants.some((participant) => participant.creatorId === user.creatorProfile?.id));
+  const live = await db.liveSession.findFirst({ where: { circleId: circle.id, status: "LIVE" } });
+  const liveConfigured = Boolean(readLiveKitCredentials());
 
   return (
     <div className="page stack" data-screen="circle">
@@ -53,6 +57,17 @@ export default async function CirclePage({ params }: { params: Promise<{ id: str
           <span className="pill">{messages.circles.everyone}</span>
         </p>
       </div>
+
+      <section className="card stack">
+        <h2>{messages.live.circle}</h2>
+        <p className="muted">{messages.live.together}</p>
+        {live ? (
+          <Link className="btn-primary" href={`/live/${live.id}`}>
+            {messages.live.watch}
+          </Link>
+        ) : null}
+        {joined ? <StartLiveButton circleId={circle.id} configured={liveConfigured} label={messages.live.circle} /> : null}
+      </section>
 
       <section className="stack">
         <h2>{messages.circles.participants}</h2>

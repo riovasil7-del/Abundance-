@@ -42,6 +42,7 @@ export async function recordDonation(input: {
   familyMembershipId?: string | null;
   holdDays: number;
   note?: string;
+  liveSessionId?: string | null;
 }): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
   const split = assertSplitMatchesPrice(input.priceCents, input.charge.split);
   const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
@@ -73,6 +74,7 @@ export async function recordDonation(input: {
       familyMembershipId: input.familyMembershipId ?? null,
       holdUntil: holdUntil(input.holdDays),
       note: input.note,
+      liveSessionId: input.liveSessionId ?? null,
       allocations: {
         create: input.shares.map((share) => ({
           creatorId: share.creatorId,

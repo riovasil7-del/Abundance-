@@ -39,11 +39,19 @@ export async function POST(request: Request) {
     circleId = circleIdRaw;
   }
 
-  const stored = await getVideoStorage().save({
-    data: Buffer.from(await file.arrayBuffer()),
-    contentType: file.type || "application/octet-stream",
-    filename: file.name || "video.mp4",
-  });
+  let stored;
+  try {
+    stored = await getVideoStorage().save({
+      data: Buffer.from(await file.arrayBuffer()),
+      contentType: file.type || "application/octet-stream",
+      filename: file.name || "video.mp4",
+    });
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "";
+    if (code === "STORAGE_NOT_CONFIGURED") return jsonError(503, code);
+    if (code === "UNSUPPORTED_MEDIA" || code === "FILE_TOO_LARGE") return jsonError(400, code);
+    throw error;
+  }
 
   const video = await db.video.create({
     data: {

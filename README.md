@@ -44,6 +44,8 @@ npm run build
 npm start
 ```
 
+Nasadenie na Vercel, Neon a LiveKit je krok za krokom v súbore [DEPLOY.md](DEPLOY.md). Je písaný pre človeka, ktorý nespúšťa terminál každý deň. Prázdne Stripe kľúče nechávajú dary v ukážkovom režime. Prázdne LiveKit kľúče ukážu vetu, že živé vysielanie ešte nie je zapnuté, a aplikácia nespadne.
+
 ### Ukážkové účty
 
 Heslo pre všetky: `DobrySkutok-1`
@@ -106,7 +108,7 @@ Pokryté sú presný podiel 15/85, hraničné zaokrúhlenie, invariant pre 0 až
 
 **Výplaty.** `src/server/payouts.ts` má rozhranie pre M-Pesa, Flutterwave, Paystack a Stripe Connect. Predvolená implementácia žiadosť len uloží ako `STUBBED` a zostatok nestrhne, lebo peniaze neodišli.
 
-**Živé vysielanie.** `src/server/live.ts` vie založiť stub miestnosť. LiveKit je pripravený ako trieda, ktorá bez konfigurácie odmietne spojenie. Agora a Mux sa napoja na to isté rozhranie. Plné vysielanie v tejto verzii nie je.
+**Živé vysielanie.** Keď sú nastavené `LIVEKIT_URL`, `LIVEKIT_API_KEY` a `LIVEKIT_API_SECRET`, tvorca ide naživo z prehliadača (kamera a mikrofón, simulcast, prepínač len zvuk). Diváci pozerajú, rozhovor ide cez filter láskavosti a dar naživo ide cez `splitDonation()`. Kruh má jednu spoločnú izbu. Bez kľúčov stránka povie, že živé vysielanie nie je zapnuté.
 
 **KYC.** Stav overenia a polia `kycProvider`, `kycReference`, `kycSubjectId` sú v schéme. Smile ID ani iný poskytovateľ nie je pripojený. Overenie v administrácii je ručné.
 
@@ -122,7 +124,7 @@ Pokryté sú presný podiel 15/85, hraničné zaokrúhlenie, invariant pre 0 až
 2. **Stripe v ostrej prevádzke:** live kľúče, webhook, Stripe Connect účty tvorcov, prípadne samostatný účet pre kruhy.
 3. **Výplaty** do Kene: M-Pesa, Flutterwave alebo Paystack. Až potom sa zostatok po držbe smie odpísať.
 4. **KYC** (napríklad Smile ID), aby jeden človek naozaj znamenal jeden účet a výplata šla overenému tvorcovi.
-5. **Poskytovateľ videa a živého vysielania** (Cloudflare Stream, Mux, LiveKit alebo Agora), keď lokálny disk prestane stačiť.
+5. **Úložisko nahratých videí** na Vercel Blob alebo Cloudflare R2. Rozhranie je v `src/server/storage.ts`. Živé vysielanie je LiveKit, návod je v `DEPLOY.md`.
 6. **Svahilčina:** súbor `src/i18n/sw.ts` podľa typu `Messages`, pridať `"sw"` do `LOCALES`.
 7. **Plánovač** mesačnej rodiny a uvoľnenia držby (dnes sa držba počíta pri čítaní peňaženky).
 

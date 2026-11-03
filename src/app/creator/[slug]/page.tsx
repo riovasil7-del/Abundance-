@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { FamilyJoin, LiveButton } from "@/components/creator-actions";
+import { FamilyJoin } from "@/components/creator-actions";
+import { StartLiveButton } from "@/components/start-live-button";
+import { readLiveKitCredentials } from "@/server/live-access";
 import { FAMILY_TIERS_CENTS } from "@/config/app";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
@@ -72,7 +74,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      {self ? <LiveButton /> : null}
+      {self ? <StartLiveButton configured={Boolean(readLiveKitCredentials())} /> : null}
       {user && !self ? <FamilyJoin creatorId={creator.id} tiers={tiers} already={membership?.status === "ACTIVE"} /> : null}
       {!user ? (
         <Link className="btn-primary" href="/login">

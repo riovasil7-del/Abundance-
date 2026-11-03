@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { hashSync } from "bcryptjs";
+import { pathToFileURL } from "node:url";
 import { GIFT_CATALOG } from "../src/config/app";
 import { allocateEvenly, splitDonation } from "../src/server/fees";
 
@@ -14,14 +15,21 @@ function daysAhead(days: number): Date {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 }
 
-async function main() {
+export async function seedDatabase(options: { reset?: boolean } = {}) {
+  const reset = options.reset !== false;
+  if (!reset) {
+    const existing = await prisma.user.count();
+    if (existing > 0) throw new Error("ALREADY_SEEDED");
+  }
   await prisma.payoutRequest.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.report.deleteMany();
   await prisma.blessing.deleteMany();
   await prisma.comment.deleteMany();
+  await prisma.liveMessage.deleteMany();
   await prisma.ledgerAllocation.deleteMany();
   await prisma.ledgerTransaction.deleteMany();
+  await prisma.liveSession.deleteMany();
   await prisma.familyMembership.deleteMany();
   await prisma.circleParticipant.deleteMany();
   await prisma.video.deleteMany();
@@ -422,12 +430,17 @@ async function main() {
   });
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (error) => {
-    console.error(error);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+const invokedDirectly =
+  typeof process.argv[1] === "string" && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (invokedDirectly) {
+  seedDatabase({ reset: true })
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (error) => {
+      console.error(error);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
+}

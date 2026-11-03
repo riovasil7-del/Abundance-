@@ -60,28 +60,6 @@ export function FamilyJoin({
   );
 }
 
-export function LiveButton() {
-  const { messages: m } = useI18n();
-  const [note, setNote] = useState<string | null>(null);
-
-  async function open() {
-    const response = await fetch("/api/live/rooms", { method: "POST" });
-    const data = await response.json().catch(() => ({}));
-    setNote(response.ok ? `${m.creator.liveStub} (${data.roomId ?? "stub"})` : m.common.error);
-  }
-
-  return (
-    <div className="card stack">
-      <h2>{m.creator.live}</h2>
-      <p className="muted">{m.creator.liveStub}</p>
-      <button type="button" className="btn-ghost" onClick={open}>
-        {m.creator.live}
-      </button>
-      {note ? <p className="muted">{note}</p> : null}
-    </div>
-  );
-}
-
 export function PayoutButton() {
   const { messages: m, locale } = useI18n();
   const [note, setNote] = useState<string | null>(null);

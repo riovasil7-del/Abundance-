@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// Supporter gives. Creator shares good-deed videos and receives the net.
@@ -72,6 +73,7 @@ model User {
   reports           Report[]
   auditLogs         AuditLog[]
   familyMemberships FamilyMembership[]  @relation("SupporterFamily")
+  liveMessages      LiveMessage[]
 }
 
 model CreatorProfile {
@@ -103,6 +105,7 @@ model CreatorProfile {
   participations CircleParticipant[]
   familyMembers  FamilyMembership[] @relation("CreatorFamily")
   payouts        PayoutRequest[]
+  hostedLive     LiveSession[]
 }
 
 model Video {
@@ -193,6 +196,8 @@ model LedgerTransaction {
   familyMembership      FamilyMembership? @relation(fields: [familyMembershipId], references: [id])
   holdUntil             DateTime?
   note                  String?
+  liveSessionId         String?
+  liveSession           LiveSession?  @relation(fields: [liveSessionId], references: [id])
   createdAt             DateTime      @default(now())
 
   allocations LedgerAllocation[]
@@ -200,6 +205,7 @@ model LedgerTransaction {
   @@index([donorId, createdAt])
   @@index([circleId])
   @@index([status, holdUntil])
+  @@index([liveSessionId])
 }
 
 /// A creator's share of a transaction's net. Circle gifts have one row per verified participant.
@@ -246,6 +252,7 @@ model BlessingCircle {
   participants CircleParticipant[]
   videos       Video[]
   transactions LedgerTransaction[]
+  liveSessions LiveSession[]
 }
 
 model CircleParticipant {
@@ -285,6 +292,38 @@ model AuditLog {
 
   @@index([createdAt])
   @@index([entityType, entityId])
+}
+
+model LiveSession {
+  id        String    @id @default(cuid())
+  roomName  String    @unique
+  hostId    String
+  host      CreatorProfile @relation(fields: [hostId], references: [id])
+  circleId  String?
+  circle    BlessingCircle? @relation(fields: [circleId], references: [id])
+  title     String
+  status    String    @default("LIVE")
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  messages     LiveMessage[]
+  transactions LedgerTransaction[]
+
+  @@index([status, startedAt])
+}
+
+model LiveMessage {
+  id               String           @id @default(cuid())
+  sessionId        String
+  session          LiveSession      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User             @relation(fields: [userId], references: [id])
+  body             String
+  moderationStatus ModerationStatus @default(VISIBLE)
+  moderationNote   String?
+  createdAt        DateTime         @default(now())
+
+  @@index([sessionId, createdAt])
 }
 
 model PayoutRequest {

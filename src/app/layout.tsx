@@ -54,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <span className="brand-tag">{messages.tagline}</span>
                 </Link>
                 <div className="header-actions">
+                  <Link href="/live">{messages.live.title}</Link>
                   {user ? <span className="who">{user.name.split(" ")[0]}</span> : <Link href="/login">{messages.auth.login}</Link>}
                   <LangSwitch locale={locale} />
                 </div>

@@ -260,6 +260,14 @@ textarea { min-height: 96px; resize: vertical; }
   .frame { min-height: calc(100dvh - 32px); margin: 16px auto; border-radius: 32px; overflow: hidden; }
   .bottom-nav { bottom: 16px; border-radius: 0 0 32px 32px; }
 }
+.live-stage { background: #241c16; border-radius: 24px; overflow: hidden; min-height: 240px; }
+.live-grid { display: grid; gap: 6px; }
+.live-grid.many { grid-template-columns: 1fr 1fr; }
+.live-stage video { width: 100%; max-height: 52dvh; object-fit: cover; background: #241c16; }
+.live-audio-only { min-height: 160px; display: grid; place-items: center; color: #f6ead7; font-size: 2rem; }
+.live-chat { max-height: 240px; overflow: auto; }
+.live-banner { display: flex; justify-content: space-between; gap: 8px; align-items: center; text-decoration: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .feed { scroll-behavior: auto; }
 }
