@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Supporter gives. Creator shares good-deed videos and receives the net.
+/// Moderator and admin review reports. One person is one account (unique email, unique phone, later KYC subject).
+enum Role {
+  SUPPORTER
+  CREATOR
+  MODERATOR
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ModerationStatus {
+  VISIBLE
+  FLAGGED
+  HIDDEN
+  REMOVED
+}
+
+/// PENDING waits for Stripe. HELD is paid and inside the payout hold.
+/// AVAILABLE has cleared the hold. PAID_OUT is reserved for a real payout provider.
+enum LedgerStatus {
+  PENDING
+  HELD
+  AVAILABLE
+  PAID_OUT
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMode {
+  DEMO
+  STRIPE
+}
+
+enum DonationKind {
+  GIFT
+  CIRCLE
+  FAMILY
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(SUPPORTER)
+  locale       String   @default("sk")
+  phone        String?  @unique
+  /// Filled by a future KYC provider (Smile ID or similar). Null until then.
+  kycSubjectId String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  creatorProfile    CreatorProfile?
+  blessings         Blessing[]
+  comments          Comment[]
+  donations         LedgerTransaction[] @relation("DonorTransactions")
+  reports           Report[]
+  auditLogs         AuditLog[]
+  familyMemberships FamilyMembership[]  @relation("SupporterFamily")
+}
+
+model CreatorProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug               String             @unique
+  displayName        String
+  bio                String
+  bioEn              String?
+  city               String
+  countryCode        String             @default("KE")
+  avatarUrl          String
+  craftKey           String
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  /// Future provider id, for example "smile_id".
+  kycProvider        String?
+  kycReference       String?
+  /// Stripe Connect account. When set, charges use application_fee_amount + transfer_data.
+  stripeAccountId    String?
+  payoutProvider     String             @default("stub")
+  payoutDestination  String?
+  payoutHoldDays     Int                @default(7)
+  createdAt          DateTime           @default(now())
+
+  videos         Video[]
+  allocations    LedgerAllocation[]
+  circlesHosted  BlessingCircle[]   @relation("CircleHost")
+  participations CircleParticipant[]
+  familyMembers  FamilyMembership[] @relation("CreatorFamily")
+  payouts        PayoutRequest[]
+}
+
+model Video {
+  id               String           @id @default(cuid())
+  creatorId        String
+  creator          CreatorProfile   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  title            String
+  titleEn          String?
+  caption          String
+  captionEn        String?
+  storageKey       String
+  playbackUrl      String
+  posterUrl        String?
+  durationSec      Int              @default(8)
+  deedKind         String
+  circleId         String?
+  circle           BlessingCircle?  @relation(fields: [circleId], references: [id])
+  moderationStatus ModerationStatus @default(VISIBLE)
+  consentConfirmed Boolean          @default(false)
+  rulesVersion     Int              @default(1)
+  createdAt        DateTime         @default(now())
+
+  blessings    Blessing[]
+  comments     Comment[]
+  transactions LedgerTransaction[]
+}
+
+model Blessing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, videoId])
+}
+
+model Comment {
+  id               String           @id @default(cuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId          String
+  video            Video            @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  body             String
+  moderationStatus ModerationStatus @default(VISIBLE)
+  moderationNote   String?
+  createdAt        DateTime         @default(now())
+}
+
+model Gift {
+  id           String              @id @default(cuid())
+  slug         String              @unique
+  nameSk       String
+  nameEn       String
+  priceCents   Int
+  symbol       String
+  sortOrder    Int                 @default(0)
+  transactions LedgerTransaction[]
+}
+
+/// One donor charge. grossCents is the amount paid.
+/// feeCents is the platform share (15%). netCents is what creators share (85%).
+/// feeCents + netCents = grossCents is also enforced in SQL.
+model LedgerTransaction {
+  id                    String        @id @default(cuid())
+  donorId               String
+  donor                 User          @relation("DonorTransactions", fields: [donorId], references: [id])
+  videoId               String?
+  video                 Video?        @relation(fields: [videoId], references: [id])
+  circleId              String?
+  circle                BlessingCircle? @relation(fields: [circleId], references: [id])
+  giftId                String?
+  gift                  Gift?         @relation(fields: [giftId], references: [id])
+  kind                  DonationKind
+  grossCents            Int
+  feeCents              Int
+  netCents              Int
+  currency              String        @default("usd")
+  status                LedgerStatus
+  paymentMode           PaymentMode
+  stripePaymentIntentId String?       @unique
+  anonymous             Boolean       @default(false)
+  payItForwardFromId    String?
+  payItForwardFrom      LedgerTransaction?  @relation("PayItForward", fields: [payItForwardFromId], references: [id])
+  forwards              LedgerTransaction[] @relation("PayItForward")
+  familyMembershipId    String?
+  familyMembership      FamilyMembership? @relation(fields: [familyMembershipId], references: [id])
+  holdUntil             DateTime?
+  note                  String?
+  createdAt             DateTime      @default(now())
+
+  allocations LedgerAllocation[]
+
+  @@index([donorId, createdAt])
+  @@index([circleId])
+  @@index([status, holdUntil])
+}
+
+/// A creator's share of a transaction's net. Circle gifts have one row per verified participant.
+model LedgerAllocation {
+  id            String            @id @default(cuid())
+  transactionId String
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  creatorId     String
+  creator       CreatorProfile    @relation(fields: [creatorId], references: [id])
+  netCents      Int
+  createdAt     DateTime          @default(now())
+
+  @@index([creatorId])
+}
+
+model FamilyMembership {
+  id           String   @id @default(cuid())
+  supporterId  String
+  supporter    User     @relation("SupporterFamily", fields: [supporterId], references: [id], onDelete: Cascade)
+  creatorId    String
+  creator      CreatorProfile @relation("CreatorFamily", fields: [creatorId], references: [id], onDelete: Cascade)
+  monthlyCents Int
+  anonymous    Boolean  @default(false)
+  status       String   @default("ACTIVE")
+  nextChargeAt DateTime?
+  createdAt    DateTime @default(now())
+
+  charges LedgerTransaction[]
+
+  @@unique([supporterId, creatorId])
+}
+
+model BlessingCircle {
+  id            String   @id @default(cuid())
+  hostId        String
+  host          CreatorProfile @relation("CircleHost", fields: [hostId], references: [id])
+  title         String
+  titleEn       String?
+  description   String
+  descriptionEn String?
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+
+  participants CircleParticipant[]
+  videos       Video[]
+  transactions LedgerTransaction[]
+}
+
+model CircleParticipant {
+  id        String         @id @default(cuid())
+  circleId  String
+  circle    BlessingCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  creatorId String
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime       @default(now())
+
+  @@unique([circleId, creatorId])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  reporterId String
+  reporter   User     @relation(fields: [reporterId], references: [id])
+  targetType String
+  targetId   String
+  reason     String
+  details    String?
+  status     String   @default("OPEN")
+  createdAt  DateTime @default(now())
+
+  @@index([status, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
+
+model PayoutRequest {
+  id          String         @id @default(cuid())
+  creatorId   String
+  creator     CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  amountCents Int
+  currency    String         @default("usd")
+  provider    String
+  status      String
+  reference   String?
+  createdAt   DateTime       @default(now())
+}
