@@ -25,13 +25,21 @@ export default async function LiveIndexPage() {
         <p className="lede">{messages.live.together}</p>
       </div>
       {!configured ? <div className="notice">{messages.live.notConfigured}</div> : null}
-      {user?.creatorProfile ? <StartLiveButton configured={configured} /> : null}
+      {user?.creatorProfile ? <StartLiveButton configured={configured} /> : <p className="notice">{messages.live.supporters}</p>}
+      {!user ? (
+        <Link className="btn-primary" href="/login">
+          {messages.auth.login}
+        </Link>
+      ) : null}
       {sessions.length === 0 ? <p className="empty">{messages.live.empty}</p> : null}
       {sessions.map((session) => (
-        <Link key={session.id} href={`/live/${session.id}`} className="card stack" style={{ textDecoration: "none" }}>
-          <span className="pill">{session.circleId ? messages.live.circle : messages.live.title}</span>
-          <h2>{session.title}</h2>
-          <p className="muted">{session.host.displayName}</p>
+        <Link key={session.id} href={`/live/${session.id}`} className="card person" style={{ textDecoration: "none" }}>
+          <img src={session.host.avatarUrl} alt="" />
+          <div>
+            <span className="pill">{messages.live.title}</span>
+            <h2>{session.host.displayName}</h2>
+            <p className="muted">{session.circleId ? messages.live.circle : session.title}</p>
+          </div>
         </Link>
       ))}
     </div>

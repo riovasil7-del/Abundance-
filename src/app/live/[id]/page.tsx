@@ -29,17 +29,22 @@ export default async function LiveRoomPage({ params }: { params: Promise<{ id: s
 
   const gifts = await loadGiftChoices(locale);
   const title = session.circle ? pickLocalized(locale, session.circle.title, session.circle.titleEn) : session.title;
+  const blessing = await db.ledgerTransaction.aggregate({
+    where: { liveSessionId: session.id, status: { in: ["HELD", "AVAILABLE", "PAID_OUT"] } },
+    _sum: { netCents: true },
+  });
 
   return (
     <LiveRoomClient
       sessionId={session.id}
       title={title}
-      circle={Boolean(session.circleId)}
       hostName={session.host.displayName}
+      hostAvatar={session.host.avatarUrl}
       configured={Boolean(readLiveKitCredentials())}
       loggedIn={Boolean(user)}
       isHost={user?.creatorProfile?.id === session.hostId}
       gifts={gifts}
+      blessingNetCents={blessing._sum.netCents ?? 0}
     />
   );
 }

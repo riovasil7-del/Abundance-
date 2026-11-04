@@ -63,9 +63,10 @@ test("viewer tokens subscribe only; the creator token can publish", async () => 
   assert.equal(hostGrant?.roomJoin, true);
   assert.equal(hostGrant?.canPublish, true);
   assert.equal(hostGrant?.canSubscribe, true);
-  assert.equal(hostGrant?.canPublishData, false);
+  assert.equal(hostGrant?.canPublishData, true);
 
   assert.deepEqual(viewerGrant, videoGrant(room, false));
   assert.equal(viewerGrant?.canPublish, false);
   assert.equal(viewerGrant?.canSubscribe, true);
+  assert.equal(viewerGrant?.canPublishData, true);
 });

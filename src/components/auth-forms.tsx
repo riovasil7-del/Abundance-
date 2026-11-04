@@ -6,11 +6,26 @@ import { useState } from "react";
 import { APP_NAME, CRAFT_KEYS } from "@/config/app";
 import { useI18n } from "./providers";
 
-const DEMOS = [
-  { email: "elena@hojnost.local", label: "Elena" },
-  { email: "amina@hojnost.local", label: "Amina" },
-  { email: "admin@hojnost.local", label: "Admin" },
-];
+function authMessage(code: string | undefined, messages: { auth: Record<string, string>; common: { error: string } }): string {
+  switch (code) {
+    case "ACCOUNT_EXISTS":
+      return messages.auth.taken;
+    case "AUTH_NOT_CONFIGURED":
+      return messages.auth.authNotConfigured;
+    case "SESSION_NOT_STARTED":
+      return messages.auth.sessionNotStarted;
+    case "CREATOR_FIELDS":
+      return messages.auth.creatorFields;
+    case "INVALID":
+      return messages.auth.invalidForm;
+    case "INVALID_LOGIN":
+      return messages.auth.invalid;
+    case "RATE_LIMITED":
+      return messages.auth.rateLimited;
+    default:
+      return messages.common.error;
+  }
+}
 
 export function LoginForm() {
   const { messages: m } = useI18n();
@@ -29,8 +44,9 @@ export function LoginForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       });
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setError(response.status === 401 ? m.auth.invalid : m.common.error);
+        setError(authMessage(data.error, m));
         return;
       }
       router.push("/");
@@ -63,8 +79,13 @@ export function LoginForm() {
       <div className="card">
         <strong>{m.auth.demoTitle}</strong>
         <p className="muted">{m.auth.demoPassword}</p>
+        <p className="muted">{m.auth.demoHint}</p>
         <div className="demo-grid">
-          {DEMOS.map((demo) => (
+          {[
+            { email: "elena@hojnost.local", label: m.auth.demoElena },
+            { email: "amina@hojnost.local", label: m.auth.demoAmina },
+            { email: "admin@hojnost.local", label: m.auth.demoAdmin },
+          ].map((demo) => (
             <button
               key={demo.email}
               type="button"
@@ -112,9 +133,13 @@ export function RegisterForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
       });
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        setError(data.error === "ACCOUNT_EXISTS" ? m.auth.taken : m.common.error);
+        setError(authMessage(data.error, m));
+        return;
+      }
+      if (data.needsLogin) {
+        setError(m.auth.sessionNotStarted);
         return;
       }
       router.push("/");

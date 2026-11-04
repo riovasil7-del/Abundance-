@@ -23,7 +23,8 @@ export function videoGrant(room: string, canPublish: boolean): VideoGrant {
     roomJoin: true,
     canPublish,
     canSubscribe: true,
-    canPublishData: false,
+    // Hearts travel as data. Video publish stays limited to the room's creators.
+    canPublishData: true,
   };
 }
 
