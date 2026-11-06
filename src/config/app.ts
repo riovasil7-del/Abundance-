@@ -60,14 +60,28 @@ export type CraftKey = (typeof CRAFT_KEYS)[number];
 export const REPORT_REASONS = ["begging", "humiliation", "consent", "spam", "other"] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
 
-export const LOCALES = ["sk", "en"] as const;
+export const LOCALES = [
+  "sk",
+  "en",
+  "cs",
+  "de",
+  "fr",
+  "es",
+  "pt",
+  "it",
+  "pl",
+  "sw",
+  "am",
+  "ha",
+  "yo",
+  "ig",
+  "zu",
+  "ar",
+] as const;
 export type Locale = (typeof LOCALES)[number];
 
-/** Future locale. Dictionaries can be added without changing call sites. */
-export const PLANNED_LOCALES = ["sw"] as const;
-
 export function isLocale(value: string | undefined | null): value is Locale {
-  return value === "sk" || value === "en";
+  return !!value && (LOCALES as readonly string[]).includes(value);
 }
 
 export function payoutHoldDays(): number {

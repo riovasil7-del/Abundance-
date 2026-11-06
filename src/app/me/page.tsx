@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReopenIntroButton } from "@/components/intro-tour";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { formatMoney } from "@/lib/format";
@@ -16,6 +17,7 @@ export default async function MePage() {
         <Link className="btn-primary" href="/login">
           {messages.auth.login}
         </Link>
+        <ReopenIntroButton />
       </div>
     );
   }
@@ -52,6 +54,7 @@ export default async function MePage() {
           </Link>
         ))}
       </section>
+      <ReopenIntroButton />
       <form action="/api/auth/logout" method="post">
         <button className="btn-ghost" type="submit">
           {messages.auth.logout}

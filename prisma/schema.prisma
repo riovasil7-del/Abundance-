@@ -60,6 +60,8 @@ model User {
   name         String
   role         Role     @default(SUPPORTER)
   locale       String   @default("sk")
+  /// True only after the person chooses a language. Device detection does not set this.
+  localeChosen Boolean @default(false)
   phone        String?  @unique
   /// Filled by a future KYC provider (Smile ID or similar). Null until then.
   kycSubjectId String?  @unique

@@ -269,6 +269,39 @@ export const sk = {
     VERIFIED: "Overený",
     REJECTED: "Zamietnuté",
   },
+  giftNames: {
+    candle: "Sviečka",
+    bread: "Chlieb",
+    dove: "Holubica",
+    heart: "Srdce",
+    star: "Hviezda",
+  },
+  language: {
+    label: "Jazyk",
+    choose: "Vyberte jazyk",
+  },
+  tour: {
+    skip: "Preskočiť",
+    next: "Ďalej",
+    back: "Späť",
+    done: "Vstúpiť",
+    reopen: "Znova ukázať úvod",
+    welcomeTitle: "Vitajte v Hojnosti",
+    welcomeBody:
+      "Sme z jednej matky a jedného Boha. Toto je tiché miesto pre dobré skutky, remeslá, piesne a vďaku. Nie sú tu súboje ani rebríčky, ktoré niekoho zahanbia.",
+    giftsTitle: "Ako putuje dar",
+    giftsBody:
+      "Z každého daru ide 85 % človeku, ktorý skutok zdieľa. 15 % necháva bežať túto spoločnú strechu: servery a starostlivosť o miesto. Hovoríme to nahlas, lebo dôvera patrí k láske.",
+    deedTitle: "Video dobrého skutku",
+    deedBody:
+      "Na oplátku uvidíte krátke video. Košík pre susedu, záhrada, pieseň, vďaka. Dar a skutok sa stretnú a dobro sa dá poslať ďalej.",
+    liveTitle: "Byť spolu naživo",
+    liveBody:
+      "Tvorca môže začať vysielanie z telefónu. Vy môžete byť s ním slovom, srdcom a darom. V kruhu požehnania je viac ľudí spolu a každý je požehnaný.",
+    dignityTitle: "Dôstojnosť",
+    dignityBody:
+      "Nežobríme a nikoho neponižujeme. Koho natočíme, musí súhlasiť. Pri deťoch súhlasí rodič. Ak niečo bolí, dá sa to nahlásiť.",
+  },
   common: {
     loading: "Načítavam…",
     error: "Niečo sa nepodarilo. Skúste to znova.",

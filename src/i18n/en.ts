@@ -271,6 +271,39 @@ export const en: Messages = {
     VERIFIED: "Verified",
     REJECTED: "Rejected",
   },
+  giftNames: {
+    candle: "Candle",
+    bread: "Bread",
+    dove: "Dove",
+    heart: "Heart",
+    star: "Star",
+  },
+  language: {
+    label: "Language",
+    choose: "Choose a language",
+  },
+  tour: {
+    skip: "Skip",
+    next: "Next",
+    back: "Back",
+    done: "Enter",
+    reopen: "Show the welcome again",
+    welcomeTitle: "Welcome to Hojnosť",
+    welcomeBody:
+      "We are all from one mother and one God. This is a quiet place for good deeds, crafts, songs, and gratitude. There are no battles and no rankings that shame anyone.",
+    giftsTitle: "How a gift travels",
+    giftsBody:
+      "85% of every gift goes to the person who shared the deed. 15% keeps this shared roof standing: the servers and the care of the place. We say it plainly, because trust belongs with love.",
+    deedTitle: "A video of the good deed",
+    deedBody:
+      "In return you see a short video. A basket for a neighbour, a garden, a song, gratitude. The gift and the deed meet, and the good can be passed on.",
+    liveTitle: "Being together, live",
+    liveBody:
+      "A creator can start a broadcast from the phone. You can be with them by a word, a heart, and a gift. In a blessing circle several people share one room, and everyone is blessed.",
+    dignityTitle: "Dignity",
+    dignityBody:
+      "We do not beg and we humiliate no one. Anyone who is filmed must agree. For a child, a parent agrees. If something hurts, it can be reported.",
+  },
   common: {
     loading: "Loading…",
     error: "Something went wrong. Please try again.",
