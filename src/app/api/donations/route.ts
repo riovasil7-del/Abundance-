@@ -4,8 +4,9 @@ import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { holdDaysFor } from "@/server/catalog";
-import { recordDonation } from "@/server/ledger";
-import { createCharge } from "@/server/payments";
+import { randomUUID } from "node:crypto";
+import { CreditError, spendLights } from "@/server/credits";
+import { splitDonation } from "@/server/fees";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
@@ -31,37 +32,42 @@ export async function POST(request: Request) {
     if (!prior) return jsonError(400, "UNKNOWN_CHAIN");
   }
 
-  const charge = await createCharge({
-    priceCents: gift.priceCents,
-    creatorStripeAccountId: video.creator.stripeAccountId,
-    metadata: { kind: "GIFT", creatorId: video.creatorId, giftSlug: gift.slug, videoId: video.id },
-  });
+  let spent;
+  try {
+    spent = await spendLights({
+      donorId: user.id,
+      priceCents: gift.priceCents,
+      token: body.token ?? randomUUID(),
+      kind: "GIFT",
+      shares: [{ creatorId: video.creatorId, netCents: splitDonation(gift.priceCents).netCents }],
+      videoId: video.id,
+      giftId: gift.id,
+      anonymous: Boolean(body.anonymous),
+      payItForwardFromId: body.payItForwardFromId ?? null,
+      holdDays: holdDaysFor([video.creator]),
+    });
+  } catch (error) {
+    if (error instanceof CreditError) {
+      return jsonError(error.code === "INSUFFICIENT_LIGHTS" ? 402 : 400, error.code);
+    }
+    throw error;
+  }
+  const transaction = spent.transaction;
 
-  const transaction = await recordDonation({
-    donorId: user.id,
-    priceCents: gift.priceCents,
-    charge,
-    kind: "GIFT",
-    shares: [{ creatorId: video.creatorId, netCents: charge.split.netCents }],
-    videoId: video.id,
-    giftId: gift.id,
-    anonymous: Boolean(body.anonymous),
-    payItForwardFromId: body.payItForwardFromId ?? null,
-    holdDays: holdDaysFor([video.creator]),
-  });
-
-  await audit({
-    actorId: user.id,
-    action: "DONATION",
-    entityType: "LedgerTransaction",
-    entityId: transaction.id,
-    metadata: {
-      grossCents: transaction.grossCents,
-      feeCents: transaction.feeCents,
-      netCents: transaction.netCents,
-      mode: charge.mode,
-    },
-  });
+  if (!spent.replayed) {
+    await audit({
+      actorId: user.id,
+      action: "DONATION",
+      entityType: "LedgerTransaction",
+      entityId: transaction.id,
+      metadata: {
+        grossCents: transaction.grossCents,
+        feeCents: transaction.feeCents,
+        netCents: transaction.netCents,
+        mode: "credits",
+      },
+    });
+  }
 
   return NextResponse.json({
     transactionId: transaction.id,
@@ -69,9 +75,9 @@ export async function POST(request: Request) {
     feeCents: transaction.feeCents,
     netCents: transaction.netCents,
     currency: transaction.currency,
-    paymentMode: charge.mode,
+    paymentMode: "credits",
     status: transaction.status,
+    lightBalance: spent.balance,
     shares: [{ name: video.creator.displayName, netCents: transaction.netCents }],
-    clientSecret: charge.clientSecret,
   });
 }

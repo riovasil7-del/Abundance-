@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
+import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
 export function FeedExperience({
@@ -11,11 +12,13 @@ export function FeedExperience({
   gifts,
   loggedIn,
   viewerName,
+  lightBalance = 0,
 }: {
   videos: FeedVideo[];
   gifts: GiftChoice[];
   loggedIn: boolean;
   viewerName?: string | null;
+  lightBalance?: number;
 }) {
   const { locale, messages: m } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -34,6 +37,7 @@ export function FeedExperience({
   const [commentNote, setCommentNote] = useState<string | null>(null);
   const [reason, setReason] = useState("other");
   const [reportNote, setReportNote] = useState<string | null>(null);
+  const [lights, setLights] = useState(lightBalance);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -99,13 +103,15 @@ export function FeedExperience({
           videoId: current.id,
           anonymous,
           payItForwardFromId: forwardId || null,
+          token: crypto.randomUUID(),
         }),
       });
       const data = await response.json();
       if (!response.ok) {
-        setError(m.common.error);
+        setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
         return;
       }
+      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
       setReceipt(data as Receipt);
     } finally {
       setBusy(false);
@@ -276,7 +282,7 @@ export function FeedExperience({
                       <span>{formatMoney(receipt.netCents, locale)}</span>
                     </div>
                   </div>
-                  <p className="muted">{receipt.paymentMode === "stripe" ? m.gifts.stripe : m.gifts.demo}</p>
+                  <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
                   <button type="button" className="btn-primary" onClick={() => setSheet(null)}>
                     {m.gifts.close}
                   </button>
@@ -337,10 +343,13 @@ export function FeedExperience({
                       </select>
                     </label>
                   ) : null}
+                  <LightsStatus balance={lights} priceCents={chosen.priceCents} />
                   {error ? <p className="error-text">{error}</p> : null}
-                  <button type="button" className="btn-primary" disabled={busy} onClick={sendGift}>
-                    {busy ? m.gifts.sending : m.gifts.send}
-                  </button>
+                  {lights >= chosen.priceCents ? (
+                    <button type="button" className="btn-primary" disabled={busy} onClick={sendGift}>
+                      {busy ? m.gifts.sending : m.gifts.send}
+                    </button>
+                  ) : null}
                 </div>
               )
             ) : null}

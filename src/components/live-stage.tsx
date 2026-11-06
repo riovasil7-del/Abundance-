@@ -5,6 +5,7 @@ import { RoomEvent, Track, type RoomOptions } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
+import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
 const roomOptions: RoomOptions = {
@@ -36,6 +37,7 @@ export function LiveStage({
   loggedIn,
   gifts,
   initialBlessingNetCents,
+  initialLightBalance,
   onEnded,
   onError,
 }: {
@@ -49,6 +51,7 @@ export function LiveStage({
   loggedIn: boolean;
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
+  initialLightBalance: number;
   onEnded: () => void;
   onError: () => void;
 }) {
@@ -72,6 +75,7 @@ export function LiveStage({
         loggedIn={loggedIn}
         gifts={gifts}
         initialBlessingNetCents={initialBlessingNetCents}
+        initialLightBalance={initialLightBalance}
         onEnded={onEnded}
       />
     </LiveKitRoom>
@@ -87,6 +91,7 @@ function Broadcast({
   loggedIn,
   gifts,
   initialBlessingNetCents,
+  initialLightBalance,
   onEnded,
 }: {
   canPublish: boolean;
@@ -97,6 +102,7 @@ function Broadcast({
   loggedIn: boolean;
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
+  initialLightBalance: number;
   onEnded: () => void;
 }) {
   const { locale, messages: m } = useI18n();
@@ -118,6 +124,7 @@ function Broadcast({
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [blessingNet, setBlessingNet] = useState(initialBlessingNetCents);
+  const [lights, setLights] = useState(initialLightBalance);
   const [blocked, setBlocked] = useState<string[]>([]);
   const seenGifts = useRef(new Set<string>());
   const primed = useRef(false);
@@ -278,13 +285,14 @@ function Broadcast({
       const response = await fetch(`/api/live/sessions/${sessionId}/gifts`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ giftSlug: chosen.slug, anonymous }),
+        body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token: crypto.randomUUID() }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setChatNote(m.common.error);
+        setChatNote(response.status === 402 ? m.gifts.notEnough : m.common.error);
         return;
       }
+      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
       setReceipt(data as Receipt);
       showGift({
         id: data.transactionId,
@@ -497,7 +505,7 @@ function Broadcast({
                     <span>{formatMoney(receipt.netCents, locale)}</span>
                   </div>
                 </div>
-                <p className="muted">{receipt.paymentMode === "stripe" ? m.gifts.stripe : m.gifts.demo}</p>
+                <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
                 <button type="button" className="btn-primary" onClick={() => setGiftOpen(false)}>
                   {m.gifts.close}
                 </button>
@@ -527,9 +535,12 @@ function Broadcast({
                   <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
                   <span>{m.gifts.anonymous}</span>
                 </label>
-                <button type="button" className="btn-primary" disabled={busy} onClick={() => void sendGift()}>
-                  {busy ? m.gifts.sending : m.gifts.send}
-                </button>
+                <LightsStatus balance={lights} priceCents={chosen.priceCents} />
+                {lights >= chosen.priceCents ? (
+                  <button type="button" className="btn-primary" disabled={busy} onClick={() => void sendGift()}>
+                    {busy ? m.gifts.sending : m.gifts.send}
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </div>

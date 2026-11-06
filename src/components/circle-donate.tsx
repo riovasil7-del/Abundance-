@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
+import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
 export type CircleGift = GiftChoice & { shares: { name: string; netCents: number }[] };
@@ -11,10 +12,12 @@ export function CircleDonate({
   circleId,
   gifts,
   enabled,
+  lightBalance = 0,
 }: {
   circleId: string;
   gifts: CircleGift[];
   enabled: boolean;
+  lightBalance?: number;
 }) {
   const { locale, messages: m } = useI18n();
   const [slug, setSlug] = useState(gifts[0]?.slug ?? "");
@@ -22,6 +25,7 @@ export function CircleDonate({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [lights, setLights] = useState(lightBalance);
   const chosen = gifts.find((gift) => gift.slug === slug) ?? gifts[0];
 
   async function send() {
@@ -32,13 +36,14 @@ export function CircleDonate({
       const response = await fetch(`/api/circles/${circleId}/donations`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ giftSlug: chosen.slug, anonymous }),
+        body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token: crypto.randomUUID() }),
       });
       const data = await response.json();
       if (!response.ok) {
-        setError(m.common.error);
+        setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
         return;
       }
+      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
       setReceipt(data as Receipt);
     } finally {
       setBusy(false);
@@ -74,7 +79,7 @@ export function CircleDonate({
             <span>{formatMoney(share.netCents, locale)}</span>
           </div>
         ))}
-        <p className="muted">{receipt.paymentMode === "stripe" ? m.gifts.stripe : m.gifts.demo}</p>
+        <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
       </div>
     );
   }
@@ -112,11 +117,14 @@ export function CircleDonate({
         <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
         <span>{m.gifts.anonymous}</span>
       </label>
+      <LightsStatus balance={lights} priceCents={chosen.priceCents} />
       {error ? <p className="error-text">{error}</p> : null}
       {!enabled ? <p className="muted">{m.circles.noVerified}</p> : null}
-      <button type="button" className="btn-primary" disabled={!enabled || busy} onClick={send}>
-        {busy ? m.gifts.sending : m.circles.donate}
-      </button>
+      {enabled && lights >= chosen.priceCents ? (
+        <button type="button" className="btn-primary" disabled={busy} onClick={send}>
+          {busy ? m.gifts.sending : m.circles.donate}
+        </button>
+      ) : null}
     </div>
   );
 }

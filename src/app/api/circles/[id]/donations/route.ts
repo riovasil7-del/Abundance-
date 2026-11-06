@@ -4,8 +4,10 @@ import { getCurrentUser } from "@/server/auth";
 import { orderedVerified, holdDaysFor } from "@/server/catalog";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
-import { recordDonation, sharesFromNet } from "@/server/ledger";
-import { createCharge } from "@/server/payments";
+import { randomUUID } from "node:crypto";
+import { CreditError, spendLights } from "@/server/credits";
+import { splitDonation } from "@/server/fees";
+import { sharesFromNet } from "@/server/ledger";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
@@ -40,41 +42,48 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     if (!prior) return jsonError(400, "UNKNOWN_CHAIN");
   }
 
-  const charge = await createCharge({
-    priceCents: gift.priceCents,
-    metadata: { kind: "CIRCLE", circleId: circle.id, giftSlug: gift.slug },
-  });
   const shares = sharesFromNet(
     recipients.map((recipient) => recipient.creatorId),
-    charge.split.netCents,
+    splitDonation(gift.priceCents).netCents,
   );
 
-  const transaction = await recordDonation({
-    donorId: user.id,
-    priceCents: gift.priceCents,
-    charge,
-    kind: "CIRCLE",
-    shares,
-    circleId: circle.id,
-    giftId: gift.id,
-    anonymous: Boolean(body.anonymous),
-    payItForwardFromId: body.payItForwardFromId ?? null,
-    holdDays: holdDaysFor(recipients),
-    note: "circle",
-  });
+  let spent;
+  try {
+    spent = await spendLights({
+      donorId: user.id,
+      priceCents: gift.priceCents,
+      token: body.token ?? randomUUID(),
+      kind: "CIRCLE",
+      shares,
+      circleId: circle.id,
+      giftId: gift.id,
+      anonymous: Boolean(body.anonymous),
+      payItForwardFromId: body.payItForwardFromId ?? null,
+      holdDays: holdDaysFor(recipients),
+      note: "circle",
+    });
+  } catch (error) {
+    if (error instanceof CreditError) {
+      return jsonError(error.code === "INSUFFICIENT_LIGHTS" ? 402 : 400, error.code);
+    }
+    throw error;
+  }
+  const transaction = spent.transaction;
 
-  await audit({
-    actorId: user.id,
-    action: "CIRCLE_DONATION",
-    entityType: "LedgerTransaction",
-    entityId: transaction.id,
-    metadata: {
-      grossCents: transaction.grossCents,
-      feeCents: transaction.feeCents,
-      netCents: transaction.netCents,
-      shares: shares.length,
-    },
-  });
+  if (!spent.replayed) {
+    await audit({
+      actorId: user.id,
+      action: "CIRCLE_DONATION",
+      entityType: "LedgerTransaction",
+      entityId: transaction.id,
+      metadata: {
+        grossCents: transaction.grossCents,
+        feeCents: transaction.feeCents,
+        netCents: transaction.netCents,
+        shares: shares.length,
+      },
+    });
+  }
 
   return NextResponse.json({
     transactionId: transaction.id,
@@ -82,12 +91,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     feeCents: transaction.feeCents,
     netCents: transaction.netCents,
     currency: transaction.currency,
-    paymentMode: charge.mode,
+    paymentMode: "credits",
     status: transaction.status,
+    lightBalance: spent.balance,
     shares: shares.map((share) => ({
       name: recipients.find((recipient) => recipient.creatorId === share.creatorId)?.displayName ?? "",
       netCents: share.netCents,
     })),
-    clientSecret: charge.clientSecret,
   });
 }

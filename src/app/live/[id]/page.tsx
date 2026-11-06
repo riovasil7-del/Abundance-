@@ -5,6 +5,7 @@ import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { loadGiftChoices } from "@/server/catalog";
+import { lightBalance } from "@/server/credits";
 import { db } from "@/server/db";
 import { readLiveKitCredentials } from "@/server/live-access";
 
@@ -45,6 +46,7 @@ export default async function LiveRoomPage({ params }: { params: Promise<{ id: s
       isHost={user?.creatorProfile?.id === session.hostId}
       gifts={gifts}
       blessingNetCents={blessing._sum.netCents ?? 0}
+      lightBalance={user ? await lightBalance(user.id) : 0}
     />
   );
 }

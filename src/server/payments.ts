@@ -4,7 +4,7 @@ import { splitDonation, type MoneySplit } from "./fees";
 export type ChargeDraft = {
   split: MoneySplit;
   currency: string;
-  mode: "demo" | "stripe";
+  mode: "demo" | "stripe" | "credits";
   stripePaymentIntentId: string | null;
   clientSecret: string | null;
 };

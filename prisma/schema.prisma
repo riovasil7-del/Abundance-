@@ -45,6 +45,7 @@ enum LedgerStatus {
 enum PaymentMode {
   DEMO
   STRIPE
+  CREDITS
 }
 
 enum DonationKind {
@@ -78,6 +79,7 @@ model User {
   liveMessages      LiveMessage[]
   blocksGiven       UserBlock[]         @relation("BlocksGiven")
   blocksReceived    UserBlock[]         @relation("BlocksReceived")
+  creditEntries     CreditEntry[]
 }
 
 model CreatorProfile {
@@ -339,6 +341,23 @@ model UserBlock {
   createdAt  DateTime @default(now())
 
   @@unique([blockerId, blockedId])
+}
+
+/// Supporter lights (svetielka). amount is positive for a pack and negative for a gift.
+/// The balance is the sum. A gift spend also writes the 15/85 ledger row.
+model CreditEntry {
+  id                      String   @id @default(cuid())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount                  Int
+  kind                    String
+  packSlug                String?
+  idempotencyKey          String   @unique
+  stripeCheckoutSessionId String?  @unique
+  ledgerTransactionId     String?  @unique
+  createdAt               DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model PayoutRequest {
