@@ -3,17 +3,17 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { CreatorProfile, Role, User } from "@prisma/client";
 import { db } from "./db";
+import { sessionSecretProblem } from "./session-secret";
 
 export const SESSION_COOKIE = "hojnost_session";
 
 export type SessionUser = User & { creatorProfile: CreatorProfile | null };
 
 function secretKey(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 16) {
+  if (sessionSecretProblem(process.env.AUTH_SECRET)) {
     throw new Error("AUTH_SECRET is missing");
   }
-  return new TextEncoder().encode(secret);
+  return new TextEncoder().encode(process.env.AUTH_SECRET!.trim());
 }
 
 export async function hashPassword(password: string): Promise<string> {

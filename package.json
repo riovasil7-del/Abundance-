@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "prisma migrate deploy && next build",
     "start": "next start",
-    "test": "tsx --test src/server/*.test.ts",
+    "test": "tsx --test src/server/*.test.ts src/i18n/*.test.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",

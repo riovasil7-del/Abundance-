@@ -1,14 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Noto_Sans_Arabic, Noto_Sans_Ethiopic, Outfit } from "next/font/google";
 import Link from "next/link";
 import { APP_NAME } from "@/config/app";
 import { BottomNav } from "@/components/bottom-nav";
+import { IntroTour } from "@/components/intro-tour";
 import { LangSwitch } from "@/components/lang-switch";
+import { LocaleSync } from "@/components/locale-sync";
 import { I18nProvider } from "@/components/providers";
 import { RegisterSw } from "@/components/register-sw";
 import { getCurrentUser } from "@/server/auth";
-import { messagesFor } from "@/i18n";
-import { getLocale } from "@/i18n/get-locale";
+import { LANGUAGE_META, messagesFor } from "@/i18n";
+import { followsDeviceLanguage, getLocale } from "@/i18n/get-locale";
 import "./globals.css";
 
 const display = Fraunces({
@@ -20,6 +22,18 @@ const sans = Outfit({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
   weight: ["400", "500", "600", "700"],
+});
+
+const arabic = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-arabic",
+  weight: ["400", "600"],
+});
+
+const ethiopic = Noto_Sans_Ethiopic({
+  subsets: ["ethiopic"],
+  variable: "--font-ethiopic",
+  weight: ["400", "600"],
 });
 
 export const metadata: Metadata = {
@@ -38,14 +52,18 @@ export const viewport: Viewport = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-  const messages = messagesFor(locale);
   const user = await getCurrentUser();
+  const locale = await getLocale(user);
+  const followDevice = await followsDeviceLanguage(user);
+  const messages = messagesFor(locale);
+  const dir = LANGUAGE_META[locale].dir;
 
   return (
-    <html lang={locale} className={`${display.variable} ${sans.variable}`}>
+    <html lang={locale} dir={dir} className={`${display.variable} ${sans.variable} ${arabic.variable} ${ethiopic.variable}`}>
       <body>
         <I18nProvider locale={locale} messages={messages}>
+          <LocaleSync locale={locale} followDevice={followDevice} />
+          <IntroTour />
           <div className="sky">
             <div className="frame">
               <header className="site-header">

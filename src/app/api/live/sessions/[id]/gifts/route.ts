@@ -5,7 +5,8 @@ import { holdDaysFor, orderedVerified } from "@/server/catalog";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { sharesFromNet, recordDonation } from "@/server/ledger";
-import { settleLiveGift } from "@/server/live-gifts";
+import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
+import { publishRoomEvent } from "@/server/live-events";
 import { createCharge } from "@/server/payments";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -92,6 +93,17 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       liveSessionId: session.id,
     },
   });
+
+  const burst = liveGiftBurst({
+    catalogPriceCents: gift.priceCents,
+    untrustedClientAmount: raw,
+    verifiedRecipientCount: recipients.length,
+    transactionId: transaction.id,
+    symbol: gift.symbol,
+    name: gift.nameSk,
+    donorName: parsed.data.anonymous ? "" : user.name,
+  });
+  await publishRoomEvent(session.roomName, burst);
 
   return NextResponse.json({
     transactionId: transaction.id,

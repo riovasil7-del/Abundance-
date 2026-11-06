@@ -1,15 +1,18 @@
 import type { Locale } from "../config/app";
+import { messagesFor } from "../i18n";
 import type { GiftChoice } from "../lib/types";
 import { db } from "./db";
 import { splitDonation } from "./fees";
 
 export async function loadGiftChoices(locale: Locale): Promise<GiftChoice[]> {
   const gifts = await db.gift.findMany({ orderBy: { sortOrder: "asc" } });
+  const names = messagesFor(locale).giftNames;
   return gifts.map((gift) => {
     const split = splitDonation(gift.priceCents);
+    const named = names[gift.slug as keyof typeof names];
     return {
       slug: gift.slug,
-      name: locale === "en" ? gift.nameEn : gift.nameSk,
+      name: named ?? (locale === "sk" ? gift.nameSk : gift.nameEn),
       symbol: gift.symbol,
       priceCents: split.grossCents,
       feeCents: split.feeCents,

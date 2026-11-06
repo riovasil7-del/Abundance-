@@ -50,9 +50,7 @@ export async function loadWallet(input: {
       const transaction = allocation.transaction;
       const bucket = classify(transaction.status, transaction.holdUntil);
       const giftName = transaction.gift
-        ? input.locale === "en"
-          ? transaction.gift.nameEn
-          : transaction.gift.nameSk
+        ? (messages.giftNames[transaction.gift.slug as keyof typeof messages.giftNames] ?? transaction.gift.nameEn)
         : transaction.kind === "FAMILY"
           ? messages.wallet.family
           : messages.wallet.circle;
@@ -93,9 +91,7 @@ export async function loadWallet(input: {
   });
   const lines: WalletLine[] = donations.map((transaction) => {
     const giftName = transaction.gift
-      ? input.locale === "en"
-        ? transaction.gift.nameEn
-        : transaction.gift.nameSk
+      ? (messages.giftNames[transaction.gift.slug as keyof typeof messages.giftNames] ?? transaction.gift.nameEn)
       : messages.wallet.family;
     const names = transaction.allocations.map((allocation) => allocation.creator.displayName).join(", ");
     const circleTitle = transaction.circle

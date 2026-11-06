@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { CRAFT_KEYS, payoutHoldDays } from "@/config/app";
 import { audit } from "@/server/audit";
 import { hashPassword, setSessionCookie } from "@/server/auth";
+import { sessionSecretProblem } from "@/server/session-secret";
 import { db } from "@/server/db";
 import { jsonError, requestIp } from "@/server/http";
 import { memoryRateLimiter } from "@/server/ratelimit";
@@ -17,6 +18,10 @@ export async function POST(request: Request) {
   const body = parsed.data;
   const phone = body.phone?.trim() || null;
 
+  if (sessionSecretProblem(process.env.AUTH_SECRET)) {
+    return jsonError(503, "AUTH_NOT_CONFIGURED");
+  }
+
   if (body.role === "CREATOR") {
     if (!body.displayName?.trim() || !body.city?.trim() || !body.bio?.trim() || !body.craftKey) {
       return jsonError(400, "CREATOR_FIELDS");
@@ -24,8 +29,9 @@ export async function POST(request: Request) {
     if (!(CRAFT_KEYS as readonly string[]).includes(body.craftKey)) return jsonError(400, "INVALID");
   }
 
+  let user;
   try {
-    const user = await db.$transaction(async (tx) => {
+    user = await db.$transaction(async (tx) => {
       const created = await tx.user.create({
         data: {
           email: body.email.toLowerCase(),
@@ -59,19 +65,27 @@ export async function POST(request: Request) {
       }
       return created;
     });
-    await audit({
-      actorId: user.id,
-      action: "REGISTER",
-      entityType: "User",
-      entityId: user.id,
-      metadata: { role: user.role },
-    });
-    await setSessionCookie(user.id);
-    return NextResponse.json({ ok: true });
   } catch (error) {
     if (typeof error === "object" && error && "code" in error && error.code === "P2002") {
       return jsonError(409, "ACCOUNT_EXISTS");
     }
-    throw error;
+    console.error(error);
+    return jsonError(500, "SERVER");
   }
+
+  await audit({
+    actorId: user.id,
+    action: "REGISTER",
+    entityType: "User",
+    entityId: user.id,
+    metadata: { role: user.role },
+  }).catch(() => undefined);
+
+  try {
+    await setSessionCookie(user.id);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ ok: true, needsLogin: true, error: "SESSION_NOT_STARTED" });
+  }
+  return NextResponse.json({ ok: true });
 }

@@ -60,6 +60,8 @@ model User {
   name         String
   role         Role     @default(SUPPORTER)
   locale       String   @default("sk")
+  /// True only after the person chooses a language. Device detection does not set this.
+  localeChosen Boolean @default(false)
   phone        String?  @unique
   /// Filled by a future KYC provider (Smile ID or similar). Null until then.
   kycSubjectId String?  @unique
@@ -74,6 +76,8 @@ model User {
   auditLogs         AuditLog[]
   familyMemberships FamilyMembership[]  @relation("SupporterFamily")
   liveMessages      LiveMessage[]
+  blocksGiven       UserBlock[]         @relation("BlocksGiven")
+  blocksReceived    UserBlock[]         @relation("BlocksReceived")
 }
 
 model CreatorProfile {
@@ -324,6 +328,17 @@ model LiveMessage {
   createdAt        DateTime         @default(now())
 
   @@index([sessionId, createdAt])
+}
+
+model UserBlock {
+  id         String   @id @default(cuid())
+  blockerId  String
+  blockedId  String
+  blocker    User     @relation("BlocksGiven", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked    User     @relation("BlocksReceived", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
 }
 
 model PayoutRequest {

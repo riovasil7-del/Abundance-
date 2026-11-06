@@ -21,3 +21,41 @@ export function settleLiveGift(input: {
   }
   return splitCircleDonation(input.catalogPriceCents, input.verifiedRecipientCount);
 }
+
+export type LiveGiftBurst = {
+  type: "gift";
+  transactionId: string;
+  symbol: string;
+  name: string;
+  donorName: string;
+  grossCents: number;
+  feeCents: number;
+  netCents: number;
+};
+
+/** The animation everyone sees. Amounts come only from settleLiveGift. */
+export function liveGiftBurst(input: {
+  catalogPriceCents: number;
+  untrustedClientAmount?: unknown;
+  verifiedRecipientCount: number;
+  transactionId: string;
+  symbol: string;
+  name: string;
+  donorName: string;
+}): LiveGiftBurst {
+  const settled = settleLiveGift({
+    catalogPriceCents: input.catalogPriceCents,
+    untrustedClientAmount: input.untrustedClientAmount,
+    verifiedRecipientCount: input.verifiedRecipientCount,
+  });
+  return {
+    type: "gift",
+    transactionId: input.transactionId,
+    symbol: input.symbol,
+    name: input.name,
+    donorName: input.donorName,
+    grossCents: settled.grossCents,
+    feeCents: settled.feeCents,
+    netCents: settled.netCents,
+  };
+}

@@ -64,7 +64,9 @@ export async function loadFeed(locale: Locale, userId: string | null): Promise<F
       },
       recentGifts: video.transactions.map((transaction) => ({
         id: transaction.id,
-        label: transaction.gift ? (locale === "en" ? transaction.gift.nameEn : transaction.gift.nameSk) : messages.wallet.family,
+        label: transaction.gift
+          ? (messages.giftNames[transaction.gift.slug as keyof typeof messages.giftNames] ?? transaction.gift.nameEn)
+          : messages.wallet.family,
         anonymous: transaction.anonymous,
         donorName: transaction.anonymous ? null : transaction.donor.name,
       })),

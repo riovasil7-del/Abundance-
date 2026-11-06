@@ -26,6 +26,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
   await prisma.report.deleteMany();
   await prisma.blessing.deleteMany();
   await prisma.comment.deleteMany();
+  await prisma.userBlock.deleteMany();
   await prisma.liveMessage.deleteMany();
   await prisma.ledgerAllocation.deleteMany();
   await prisma.ledgerTransaction.deleteMany();
