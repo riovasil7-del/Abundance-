@@ -43,7 +43,7 @@ export type Receipt = {
   feeCents: number;
   netCents: number;
   currency: string;
-  paymentMode: "DEMO" | "STRIPE" | "demo" | "stripe";
+  paymentMode: "DEMO" | "STRIPE" | "CREDITS" | "demo" | "stripe" | "credits";
   status: string;
   shares: { name: string; netCents: number }[];
 };

@@ -24,6 +24,7 @@ export const giftBody = z.object({
   circleId: z.string().trim().min(1).max(80).optional(),
   anonymous: z.boolean().optional(),
   payItForwardFromId: z.string().trim().min(1).max(80).nullable().optional(),
+  token: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9_.:-]+$/).optional(),
 });
 
 export const commentBody = z.object({

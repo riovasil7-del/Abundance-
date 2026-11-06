@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FeedExperience } from "@/components/feed-experience";
 import { loadGiftChoices } from "@/server/catalog";
+import { lightBalance } from "@/server/credits";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { loadFeed } from "@/server/feed";
@@ -11,10 +12,11 @@ export default async function HomePage() {
   const locale = await getLocale();
   const messages = messagesFor(locale);
   const user = await getCurrentUser();
-  const [videos, gifts, liveNow] = await Promise.all([
+  const [videos, gifts, liveNow, lights] = await Promise.all([
     loadFeed(locale, user?.id ?? null),
     loadGiftChoices(locale),
     db.liveSession.findMany({ where: { status: "LIVE" }, include: { host: true }, orderBy: { startedAt: "desc" }, take: 3 }),
+    user ? lightBalance(user.id) : Promise.resolve(0),
   ]);
 
   return (
@@ -32,7 +34,7 @@ export default async function HomePage() {
           ))}
         </div>
       ) : null}
-      <FeedExperience videos={videos} gifts={gifts} loggedIn={Boolean(user)} viewerName={user?.name ?? null} />
+      <FeedExperience videos={videos} gifts={gifts} loggedIn={Boolean(user)} viewerName={user?.name ?? null} lightBalance={lights} />
     </div>
   );
 }

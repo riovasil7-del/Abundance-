@@ -4,10 +4,11 @@ import { getCurrentUser } from "@/server/auth";
 import { holdDaysFor, orderedVerified } from "@/server/catalog";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
-import { sharesFromNet, recordDonation } from "@/server/ledger";
+import { randomUUID } from "node:crypto";
+import { CreditError, catalogPriceCents, spendLights } from "@/server/credits";
+import { sharesFromNet } from "@/server/ledger";
 import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
 import { publishRoomEvent } from "@/server/live-events";
-import { createCharge } from "@/server/payments";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
@@ -49,51 +50,58 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return jsonError(400, "SELF_GIFT");
   }
 
+  const priceCents = catalogPriceCents(gift.priceCents, raw);
   const settled = settleLiveGift({
-    catalogPriceCents: gift.priceCents,
+    catalogPriceCents: priceCents,
     untrustedClientAmount: raw,
     verifiedRecipientCount: recipients.length,
   });
-  const charge = await createCharge({
-    priceCents: gift.priceCents,
-    creatorStripeAccountId: recipients.length === 1 ? recipients[0]?.stripeAccountId : null,
-    metadata: { kind: session.circle ? "CIRCLE" : "GIFT", liveSessionId: session.id, giftSlug: gift.slug },
-  });
-  if (charge.split.feeCents !== settled.feeCents || charge.split.netCents !== settled.netCents) {
+  const shares = sharesFromNet(
+    recipients.map((recipient) => recipient.creatorId),
+    settled.netCents,
+  );
+  let spent;
+  try {
+    spent = await spendLights({
+      donorId: user.id,
+      priceCents,
+      token: parsed.data.token ?? randomUUID(),
+      kind: session.circle ? "CIRCLE" : "GIFT",
+      shares,
+      circleId: session.circleId,
+      giftId: gift.id,
+      anonymous: Boolean(parsed.data.anonymous),
+      holdDays: holdDaysFor(recipients),
+      liveSessionId: session.id,
+      note: "live",
+    });
+  } catch (error) {
+    if (error instanceof CreditError) {
+      return jsonError(error.code === "INSUFFICIENT_LIGHTS" ? 402 : 400, error.code);
+    }
+    throw error;
+  }
+  const transaction = spent.transaction;
+  if (transaction.feeCents !== settled.feeCents || transaction.netCents !== settled.netCents) {
     return jsonError(500, "SPLIT_MISMATCH");
   }
 
-  const shares = sharesFromNet(
-    recipients.map((recipient) => recipient.creatorId),
-    charge.split.netCents,
-  );
-  const transaction = await recordDonation({
-    donorId: user.id,
-    priceCents: gift.priceCents,
-    charge,
-    kind: session.circle ? "CIRCLE" : "GIFT",
-    shares,
-    circleId: session.circleId,
-    giftId: gift.id,
-    anonymous: Boolean(parsed.data.anonymous),
-    holdDays: holdDaysFor(recipients),
-    liveSessionId: session.id,
-    note: "live",
-  });
+  if (!spent.replayed) {
+    await audit({
+      actorId: user.id,
+      action: "LIVE_GIFT",
+      entityType: "LedgerTransaction",
+      entityId: transaction.id,
+      metadata: {
+        grossCents: transaction.grossCents,
+        feeCents: transaction.feeCents,
+        netCents: transaction.netCents,
+        liveSessionId: session.id,
+      },
+    });
+  }
 
-  await audit({
-    actorId: user.id,
-    action: "LIVE_GIFT",
-    entityType: "LedgerTransaction",
-    entityId: transaction.id,
-    metadata: {
-      grossCents: transaction.grossCents,
-      feeCents: transaction.feeCents,
-      netCents: transaction.netCents,
-      liveSessionId: session.id,
-    },
-  });
-
+  if (!spent.replayed) {
   const burst = liveGiftBurst({
     catalogPriceCents: gift.priceCents,
     untrustedClientAmount: raw,
@@ -104,6 +112,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     donorName: parsed.data.anonymous ? "" : user.name,
   });
   await publishRoomEvent(session.roomName, burst);
+  }
 
   return NextResponse.json({
     transactionId: transaction.id,
@@ -111,8 +120,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     feeCents: transaction.feeCents,
     netCents: transaction.netCents,
     currency: transaction.currency,
-    paymentMode: charge.mode,
+    paymentMode: "credits",
     status: transaction.status,
+    lightBalance: spent.balance,
     shares: shares.map((share) => ({
       name: recipients.find((recipient) => recipient.creatorId === share.creatorId)?.displayName ?? "",
       netCents: share.netCents,

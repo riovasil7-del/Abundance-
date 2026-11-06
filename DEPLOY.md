@@ -58,7 +58,9 @@ Vložte presne tieto mená. Hodnotu prilepte bez úvodzoviek.
 | `LIVEKIT_API_KEY` | z kroku 5 |
 | `LIVEKIT_API_SECRET` | z kroku 5 |
 
-Prázdny Stripe je v poriadku. Tlačidlo daru zapíše ukážkovú platbu a na obrazovke bude vidieť 15 % a 85 %.
+Prázdny Stripe je v poriadku. Peňaženka potom predá svetielka jedným ťuknutím (ukážkový režim) a dar sa strhne z nich. Na obrazovke ostáva 15 % a 85 %.
+
+Keď Stripe kľúče vyplníte, nákup balíčka ide cez Stripe Checkout. Svetielka sa pripíšu až po zaplatení, na existujúcej adrese webhooku `https://vaša-doména/api/stripe/webhook`. V Stripe dashboarde pri tejto adrese zapnite udalosť `checkout.session.completed` (a ponechajte aj `payment_intent.succeeded` pre staršie dary). Novú premennú prostredia netreba. `STRIPE_WEBHOOK_SECRET` je ten istý podpis, ktorý už tabuľka vyššie spomína.
 
 ## 4. Kam sa ukladajú videá
 

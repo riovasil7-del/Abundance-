@@ -43,6 +43,24 @@ export const FAMILY_TIERS_CENTS = [500, 1000, 2500] as const;
 
 export type FamilyTierCents = (typeof FAMILY_TIERS_CENTS)[number];
 
+/**
+ * Svetielka / lights. One light is one cent of gift value.
+ * A pack's dollar price is the number of lights, said in the open.
+ * The 15/85 split happens when a light is given, not when a pack is bought.
+ */
+export const LIGHT_PACKS = [
+  { slug: "small", priceCents: 500, lights: 500 },
+  { slug: "medium", priceCents: 1000, lights: 1000 },
+  { slug: "large", priceCents: 2500, lights: 2500 },
+  { slug: "blessing", priceCents: 5000, lights: 5000 },
+] as const;
+
+export type LightPackSlug = (typeof LIGHT_PACKS)[number]["slug"];
+
+export function lightPack(slug: string | undefined | null) {
+  return LIGHT_PACKS.find((pack) => pack.slug === slug) ?? null;
+}
+
 export const GIFT_CATALOG = [
   { slug: "candle", nameSk: "Sviečka", nameEn: "Candle", priceCents: 100, symbol: "🕯️", sortOrder: 1 },
   { slug: "bread", nameSk: "Chlieb", nameEn: "Bread", priceCents: 300, symbol: "🍞", sortOrder: 2 },

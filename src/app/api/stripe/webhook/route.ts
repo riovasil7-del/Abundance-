@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { audit } from "@/server/audit";
+import { creditPackFromCheckout } from "@/server/credits";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 
@@ -16,11 +17,36 @@ export async function POST(request: Request) {
 
   const { default: Stripe } = await import("stripe");
   const stripe = new Stripe(secret);
-  let event: { type: string; data: { object: { id?: string; amount?: number; metadata?: Record<string, string> } } };
+  let event: {
+    type: string;
+    data: {
+      object: {
+        id?: string;
+        amount?: number;
+        amount_total?: number | null;
+        payment_status?: string;
+        metadata?: Record<string, string> | null;
+      };
+    };
+  };
   try {
     event = stripe.webhooks.constructEvent(raw, signature, webhookSecret) as typeof event;
   } catch {
     return jsonError(400, "BAD_SIGNATURE");
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const credited = await creditPackFromCheckout(event.data.object);
+    if (!credited.ok) return jsonError(credited.status, credited.error);
+    if (!credited.replayed && event.data.object.metadata?.purpose === "LIGHT_PACK" && event.data.object.payment_status === "paid") {
+      await audit({
+        actorId: event.data.object.metadata.userId,
+        action: "LIGHT_PACK",
+        entityType: "CreditEntry",
+        entityId: event.data.object.id,
+        metadata: { packSlug: event.data.object.metadata.packSlug, priceCents: event.data.object.amount_total },
+      });
+    }
   }
 
   if (event.type === "payment_intent.succeeded") {

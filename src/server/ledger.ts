@@ -1,4 +1,4 @@
-import type { DonationKind, PaymentMode, Prisma } from "@prisma/client";
+import { Prisma, type DonationKind, type PaymentMode, type PrismaClient } from "@prisma/client";
 import { LEDGER_CURRENCY } from "../config/app";
 import { db } from "./db";
 import { allocateEvenly, splitDonation, type MoneySplit } from "./fees";
@@ -43,7 +43,7 @@ export async function recordDonation(input: {
   holdDays: number;
   note?: string;
   liveSessionId?: string | null;
-}): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
+}, writer: Prisma.TransactionClient | PrismaClient = db): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
   const split = assertSplitMatchesPrice(input.priceCents, input.charge.split);
   const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
   if (allocated !== split.netCents) throw new Error("ALLOCATION_IMBALANCE");
@@ -53,9 +53,10 @@ export async function recordDonation(input: {
   }
 
   const status = input.charge.mode === "stripe" ? "PENDING" : "HELD";
-  const paymentMode: PaymentMode = input.charge.mode === "stripe" ? "STRIPE" : "DEMO";
+  const paymentMode: PaymentMode =
+    input.charge.mode === "stripe" ? "STRIPE" : input.charge.mode === "credits" ? "CREDITS" : "DEMO";
 
-  return db.ledgerTransaction.create({
+  return writer.ledgerTransaction.create({
     data: {
       donorId: input.donorId,
       kind: input.kind,

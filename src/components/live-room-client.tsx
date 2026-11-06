@@ -17,6 +17,7 @@ export function LiveRoomClient({
   isHost,
   gifts,
   blessingNetCents,
+  lightBalance,
 }: {
   sessionId: string;
   title: string;
@@ -27,6 +28,7 @@ export function LiveRoomClient({
   isHost: boolean;
   gifts: GiftChoice[];
   blessingNetCents: number;
+  lightBalance: number;
 }) {
   const { messages: m } = useI18n();
   const [connection, setConnection] = useState<{ url: string; token: string; canPublish: boolean } | null>(null);
@@ -92,6 +94,7 @@ export function LiveRoomClient({
           loggedIn={loggedIn}
           gifts={gifts}
           initialBlessingNetCents={blessingNetCents}
+          initialLightBalance={lightBalance}
           onEnded={() => setEnded(true)}
           onError={() => setConnectError(m.live.failed)}
         />

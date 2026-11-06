@@ -8,6 +8,7 @@ import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { loadGiftChoices, orderedVerified } from "@/server/catalog";
+import { lightBalance } from "@/server/credits";
 import { db } from "@/server/db";
 import { sharesFromNet } from "@/server/ledger";
 
@@ -102,7 +103,12 @@ export default async function CirclePage({ params }: { params: Promise<{ id: str
       </section>
 
       {user ? (
-        <CircleDonate circleId={circle.id} gifts={gifts} enabled={recipients.length > 0 && !recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)} />
+        <CircleDonate
+          circleId={circle.id}
+          gifts={gifts}
+          lightBalance={await lightBalance(user.id)}
+          enabled={recipients.length > 0 && !recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)}
+        />
       ) : (
         <Link className="btn-primary" href="/login">
           {messages.auth.login}
