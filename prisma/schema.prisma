@@ -91,6 +91,9 @@ model User {
   notesSent         Encouragement[]    @relation("EncouragementFrom")
   notesReceived     Encouragement[]    @relation("EncouragementTo")
   liveInvites       LiveInvite[]
+  topicPreferences  TopicPreference[]
+  feedHides         FeedHide[]
+  feedTaste         FeedTaste?
 }
 
 model CreatorProfile {
@@ -124,6 +127,7 @@ model CreatorProfile {
   payouts        PayoutRequest[]
   hostedLive     LiveSession[]
   payoutHolds    PayoutReservation[]
+  feedHides      FeedHide[]
 }
 
 model Video {
@@ -139,6 +143,8 @@ model Video {
   posterUrl        String?
   durationSec      Int              @default(8)
   deedKind         String
+  /// Language of the picture and the words. Not a device location.
+  language         String           @default("en")
   circleId         String?
   circle           BlessingCircle?  @relation(fields: [circleId], references: [id])
   moderationStatus ModerationStatus @default(VISIBLE)
@@ -149,6 +155,10 @@ model Video {
   blessings    Blessing[]
   comments     Comment[]
   transactions LedgerTransaction[]
+
+  @@index([moderationStatus, createdAt])
+  @@index([deedKind, createdAt])
+  @@index([creatorId, createdAt])
 }
 
 model Blessing {
@@ -564,4 +574,38 @@ model LiveInvite {
 
   @@unique([sessionId, inviteeId])
   @@index([inviteeId, status])
+}
+
+/// One row per person and topic. Interested or not. Nothing here is a payment.
+model TopicPreference {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic      String
+  interested Boolean
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, topic])
+  @@index([userId])
+}
+
+/// Hides one creator from this person's feed. Separate from a block.
+model FeedHide {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creatorId String
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+
+  @@unique([userId, creatorId])
+  @@index([userId])
+}
+
+/// Optional language list and a country, never a precise location.
+model FeedTaste {
+  userId     String  @id
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  languages  String[]
+  regionCode String?
 }
