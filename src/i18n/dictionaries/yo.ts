@@ -58,6 +58,13 @@ const yo: Messages = {
   },
   wallet: {
     lightsTitle: "Ìmọ́lẹ̀",
+    earned: "Tí a ti jèrè",
+    frozen: "Tí a dá dúró",
+    paid: "Tí a ti san",
+    paidNone: "Kò tí ì sí ohun tó jáde. Iṣẹ́ ìsanwó kò so pọ̀, nítorí náà èyí kì í ṣe owó tí a ti fi ránṣẹ́.",
+    processingNote: "Owó káàdì, bí bánkì bá gbà á, jáde láti inú 15 % pẹpẹ. Kì í ṣe láti inú 85 % ẹni náà. Èyí kì í ṣe ìlérí èrè.",
+    demoNotRevenue: "Ìmọ́lẹ̀ àdánwò kì í ṣe owó gidi, a kò sì lè san án.",
+    review: "Apá kan ìdápadà ń dúró fún àyẹ̀wò. Ìmọ́lẹ̀ kò lọ sí ìsàlẹ̀ òdo, a kò sì gba owó tó wà padà.",
     lightsLead: "Ìmọ́lẹ̀ kan jẹ́ kobo kan ti ẹ̀bùn. O ra àpò ní dọ́là, o sì tẹ̀síwájú ìmọ́lẹ̀. Nígbà tí o bá fúnni, ọgọ́rin-márùn-ún nínú ọgọ́rùn lọ sí ẹni náà, mẹ́ẹ̀dógún sì ń tọ́jú ibi.",
     unit: "ìmọ́lẹ̀",
     shop: "Àwọn àpò ìmọ́lẹ̀",

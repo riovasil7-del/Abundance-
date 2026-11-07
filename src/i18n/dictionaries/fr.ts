@@ -58,6 +58,13 @@ const fr: Messages = {
   },
   wallet: {
     lightsTitle: "Lumières",
+    earned: "Gagné",
+    frozen: "Gelé",
+    paid: "Versé",
+    paidNone: "Rien n'est encore parti. Aucun service de versement n'est relié, ce n'est donc pas de l'argent envoyé.",
+    processingNote: "Les frais de carte, s'il y en a, sortent des 15 % de la plateforme. Pas des 85 % de la personne. Ce n'est pas une promesse de bénéfice.",
+    demoNotRevenue: "Les lumières d'essai ne sont pas un revenu réel et ne peuvent pas être versées.",
+    review: "Une partie du remboursement attend une revue. Les lumières ne sont pas passées sous zéro, et l'argent disponible n'a pas été repris.",
     lightsLead: "Une lumière est un centime de don. Vous achetez un paquet en dollars et vous passez la lumière. Quand vous donnez, 85 % vont à la personne et 15 % font vivre le lieu.",
     unit: "lumières",
     shop: "Paquets de lumières",

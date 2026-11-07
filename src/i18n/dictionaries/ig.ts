@@ -58,6 +58,13 @@ const ig: Messages = {
   },
   wallet: {
     lightsTitle: "Ọkụ",
+    earned: "Enwetara",
+    frozen: "E kwụsịtụrụ",
+    paid: "A kwụrụ",
+    paidNone: "Ọ dịbeghị ihe pụrụ. Ọrụ ịkwụ ụgwọ ejikọtaghị, ya mere nke a abụghị ego e zigara.",
+    processingNote: "Ụgwọ kaadị, ọ bụrụ na ụlọ akụ na-ana ya, si na pasent 15 nke ikpo apụta. Ọ bụghị site na pasent 85 nke onye ahụ. Nke a abụghị nkwa uru.",
+    demoNotRevenue: "Ọkụ nnwale abụghị ego n'ezie, enweghịkwa ike ịkwụ ya.",
+    review: "Akụkụ nke nkwụghachi na-eche nyocha. Ọkụ agafeghị ala efu, ego dị njikere ewepụghịkwa.",
     lightsLead: "Otu ọkụ bụ otu senti nke onyinye. Ị na-azụta ngwugwu na dollar ma zipu ìhè gaa n'ihu. Mgbe ị nye, pasent 85 na-aga onye ahụ, pasent 15 na-edobe ebe a.",
     unit: "ọkụ",
     shop: "Ngwugwu ọkụ",

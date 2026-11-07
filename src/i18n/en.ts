@@ -101,6 +101,13 @@ export const en: Messages = {
   },
   wallet: {
     lightsTitle: "Lights",
+    earned: "Earned",
+    frozen: "Frozen",
+    paid: "Paid out",
+    paidNone: "Nothing has been paid out. No payout provider is connected, so this is not money sent.",
+    processingNote: "Card processing, when a bank charges it, comes out of the platform's 15%. It is not taken from the person's 85%. That is not a promise of profit.",
+    demoNotRevenue: "Demo lights are not real revenue and cannot be paid out.",
+    review: "Part of a refund is waiting for review. Lights did not go below zero, and available creator money was not taken back.",
     lightsLead: "One light is one cent of a gift. You buy a pack in dollars and pass the light on. When you give, 85% goes to the person and 15% keeps the place running.",
     unit: "lights",
     shop: "Light packs",

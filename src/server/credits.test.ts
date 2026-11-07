@@ -105,6 +105,7 @@ test("buying a pack is idempotent, and a gift spends lights at 15/85", { skip: !
     assert.equal(await lightBalance(donor.id), 500 - price);
   } finally {
     await db.creditEntry.deleteMany({ where: { userId: donor.id } });
+    await db.moneyEvent.deleteMany({ where: { transaction: { donorId: donor.id } } });
     await db.ledgerAllocation.deleteMany({ where: { creatorId: creator.id } });
     await db.ledgerTransaction.deleteMany({ where: { donorId: donor.id } });
     await db.creatorProfile.delete({ where: { id: creator.id } });

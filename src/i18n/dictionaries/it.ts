@@ -58,6 +58,13 @@ const it: Messages = {
   },
   wallet: {
     lightsTitle: "Luci",
+    earned: "Guadagnato",
+    frozen: "Congelato",
+    paid: "Pagato",
+    paidNone: "Non è uscito ancora nulla. Nessun servizio di pagamento è collegato, quindi questi non sono soldi inviati.",
+    processingNote: "Il costo della carta, se la banca lo addebita, esce dal 15 % della piattaforma. Non dall'85 % della persona. Non è una promessa di profitto.",
+    demoNotRevenue: "Le luci di prova non sono un incasso reale e non si possono pagare.",
+    review: "Parte del rimborso attende un controllo. Le luci non sono scese sotto zero e i soldi disponibili non sono stati ripresi.",
     lightsLead: "Una luce è un centesimo di dono. Compri un pacchetto in dollari e passi la luce. Quando doni, l'85 % va alla persona e il 15 % tiene vivo il luogo.",
     unit: "luci",
     shop: "Pacchetti di luci",

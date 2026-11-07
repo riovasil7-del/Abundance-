@@ -40,6 +40,8 @@ enum LedgerStatus {
   PAID_OUT
   FAILED
   REFUNDED
+  /// Creator share is held for a refund or dispute. It is not payable and it is not a negative balance.
+  FROZEN
 }
 
 enum PaymentMode {
@@ -80,6 +82,7 @@ model User {
   blocksGiven       UserBlock[]         @relation("BlocksGiven")
   blocksReceived    UserBlock[]         @relation("BlocksReceived")
   creditEntries     CreditEntry[]
+  accountReviews    AccountReview[]
 }
 
 model CreatorProfile {
@@ -207,6 +210,7 @@ model LedgerTransaction {
   createdAt             DateTime      @default(now())
 
   allocations LedgerAllocation[]
+  moneyEvents MoneyEvent[]
 
   @@index([donorId, createdAt])
   @@index([circleId])
@@ -354,10 +358,58 @@ model CreditEntry {
   packSlug                String?
   idempotencyKey          String   @unique
   stripeCheckoutSessionId String?  @unique
+  stripePaymentIntentId   String?  @unique
   ledgerTransactionId     String?  @unique
   createdAt               DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+/// Immutable note of a monetary fact. Amounts on LedgerTransaction are not a second ledger.
+model MoneyEvent {
+  id            String             @id @default(cuid())
+  transactionId String?
+  transaction   LedgerTransaction? @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  kind          String
+  grossCents    Int
+  feeCents      Int
+  netCents      Int
+  stripeEventId String?            @unique
+  note          String?
+  createdAt     DateTime           @default(now())
+
+  @@index([transactionId])
+}
+
+/// One row per Stripe event id. A replay finds this row and does not move money again.
+model WebhookDelivery {
+  id        String   @id
+  eventType String
+  outcome   String
+  createdAt DateTime @default(now())
+}
+
+/// Notices that can arrive before the credit or the gift row exists.
+model PaymentMarker {
+  key       String   @id
+  kind      String
+  createdAt DateTime @default(now())
+}
+
+/// Spent lights that cannot be pulled back without driving a balance below zero.
+model AccountReview {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  kind          String
+  reversedCents Int
+  frozenCents   Int
+  reviewCents   Int
+  stripeEventId String?  @unique
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+
+  @@index([userId, status])
 }
 
 model PayoutRequest {

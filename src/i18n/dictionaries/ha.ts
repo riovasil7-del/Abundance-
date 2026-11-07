@@ -58,6 +58,13 @@ const ha: Messages = {
   },
   wallet: {
     lightsTitle: "Fitilu",
+    earned: "An samu",
+    frozen: "An daskarar",
+    paid: "An biya",
+    paidNone: "Babu abin da ya fita tukuna. Ba a haɗa sabis na biya ba, don haka wannan ba kuɗin da aka tura ba ne.",
+    processingNote: "Kuɗin kati, idan banki ya caje, yana fitowa daga kashi 15 na dandali. Ba daga kashi 85 na mutum ba. Wannan ba alƙawarin riba ba ne.",
+    demoNotRevenue: "Fitilun gwaji ba kuɗin gaske ba ne kuma ba za a iya biya su ba.",
+    review: "Wani bangare na mayarwa yana jiran duba. Fitilu ba su sauka ƙasa da sifili ba, kuma ba a cire kuɗin da ake da su ba.",
     lightsLead: "Fitila ɗaya tana dafa senti ɗaya na kyauta. Kana sayen fakiti da dala, kana tura haske gaba. Idan ka bayar, kashi 85 yana zuwa ga mutum, kashi 15 yana kiyaye wurin.",
     unit: "fitilu",
     shop: "Fakitocin fitila",

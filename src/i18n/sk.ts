@@ -99,6 +99,13 @@ export const sk = {
   },
   wallet: {
     lightsTitle: "Svetielka",
+    earned: "Zarobené",
+    frozen: "Zmrazené",
+    paid: "Vyplatené",
+    paidNone: "Zatiaľ nič neodišlo. Výplata nie je pripojená, takže toto nie sú odoslané peniaze.",
+    processingNote: "Poplatok karty, ak ho banka účtuje, ide z 15 % platformy. Neberie sa z 85 % pre človeka. To nesľubuje zisk platformy.",
+    demoNotRevenue: "Ukážkové svetielka nie sú skutočný príjem a nedajú sa vyplatiť.",
+    review: "Časť vrátenia čaká na kontrolu. Svetielka neklesli pod nulu a dostupné peniaze tvorcu sme nestrhli.",
     lightsLead: "Svetielko je jeden cent daru. Balíček kúpite v dolároch a svetlo pošlete ďalej. Keď darujete, 85 % ide človeku a 15 % necháva miesto bežať.",
     unit: "svetielok",
     shop: "Balíčky svetielok",

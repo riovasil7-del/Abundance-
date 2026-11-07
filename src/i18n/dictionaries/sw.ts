@@ -61,6 +61,13 @@ const sw: Messages = {
   },
   wallet: {
     lightsTitle: "Taa",
+    earned: "Kilichopatikana",
+    frozen: "Kilichogandishwa",
+    paid: "Kilicholipwa",
+    paidNone: "Bado hakuna kilichotoka. Huduma ya malipo haijaunganishwa, kwa hiyo hii si pesa zilizotumwa.",
+    processingNote: "Ada ya kadi, ikitozwa, hutoka kwenye asilimia 15 ya jukwaa. Sio kwenye asilimia 85 ya mtu. Hii si ahadi ya faida.",
+    demoNotRevenue: "Taa za majaribio si mapato halisi na haziwezi kulipwa.",
+    review: "Sehemu ya kurudisha inasubiri ukaguzi. Taa hazikushuka chini ya sifuri, na pesa zilizopo hazikuchukuliwa.",
     lightsLead: "Taa moja ni senti moja ya sadaka. Unanunua kifurushi kwa dola na kupeleka mwanga mbele. Unapotoa, asilimia 85 huenda kwa mtu na 15 % huendesha mahali.",
     unit: "taa",
     shop: "Vifurushi vya taa",

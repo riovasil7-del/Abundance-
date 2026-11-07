@@ -58,6 +58,13 @@ const zu: Messages = {
   },
   wallet: {
     lightsTitle: "Izibani",
+    earned: "Okuzuziwe",
+    frozen: "Okumisiwe",
+    paid: "Okukhokhelwe",
+    paidNone: "Akukabi khona okuphumile. Ayikho inkonzo yokukhokha exhunyiwe, ngakho lokhu akuyona imali ethunyelwe.",
+    processingNote: "Izindleko zekhadi, uma ibhange lizikhokhisa, ziphuma ku-15% wenkundla. Hhayi ku-85% yomuntu. Lokhu akusilo isithembiso senzuzo.",
+    demoNotRevenue: "Izibani zokuhlola akuyona imali yangempela futhi azikwazi ukukhokhwa.",
+    review: "Ingxenye yokubuyisela ilinde ukubuyekezwa. Izibani azizange zehle ngaphansi kuka-zero, futhi imali etholakalayo ayizange ithathwe.",
     lightsLead: "Isibani sinye yisenti eyodwa yesipho. Uthenga iphakethe ngamadola udlulise ukukhanya. Uma unika, angama-85 aya kumuntu, angu-15 agcina indawo.",
     unit: "izibani",
     shop: "Amaphakethe ezibani",

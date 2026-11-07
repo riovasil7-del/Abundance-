@@ -58,6 +58,13 @@ const de: Messages = {
   },
   wallet: {
     lightsTitle: "Lichter",
+    earned: "Verdient",
+    frozen: "Eingefroren",
+    paid: "Ausgezahlt",
+    paidNone: "Noch nichts ist hinausgegangen. Es ist kein Auszahldienst verbunden, also ist das kein gesendetes Geld.",
+    processingNote: "Kartenkosten, falls eine Bank sie berechnet, kommen aus den 15 % der Plattform. Nicht aus den 85 % des Menschen. Das verspricht keinen Gewinn.",
+    demoNotRevenue: "Probelichter sind kein echtes Einkommen und können nicht ausgezahlt werden.",
+    review: "Ein Teil der Rückzahlung wartet auf Prüfung. Lichter fielen nicht unter null, und verfügbares Geld wurde nicht zurückgebucht.",
     lightsLead: "Ein Licht ist ein Cent einer Gabe. Du kaufst ein Päckchen in Dollar und gibst das Licht weiter. Beim Geben gehen 85 % an den Menschen und 15 % halten den Ort am Leben.",
     unit: "Lichter",
     shop: "Lichtpäckchen",

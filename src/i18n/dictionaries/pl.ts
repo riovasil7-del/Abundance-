@@ -58,6 +58,13 @@ const pl: Messages = {
   },
   wallet: {
     lightsTitle: "Światełka",
+    earned: "Zarobione",
+    frozen: "Zamrożone",
+    paid: "Wypłacone",
+    paidNone: "Jeszcze nic nie wyszło. Wypłata nie jest podłączona, więc to nie są wysłane pieniądze.",
+    processingNote: "Opłata karty, jeśli bank ją naliczy, idzie z 15 % platformy. Nie z 85 % człowieka. To nie obietnica zysku.",
+    demoNotRevenue: "Próbne światełka nie są prawdziwym przychodem i nie można ich wypłacić.",
+    review: "Część zwrotu czeka na sprawdzenie. Światełka nie spadły poniżej zera i dostępnych pieniędzy nie zabrano.",
     lightsLead: "Jedno światełko to jeden cent daru. Kupujesz paczkę w dolarach i przekazujesz światło dalej. Gdy dajesz, 85 % idzie do człowieka, a 15 % utrzymuje to miejsce.",
     unit: "światełek",
     shop: "Paczki światełek",

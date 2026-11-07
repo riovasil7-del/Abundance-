@@ -94,6 +94,13 @@ const cs: Messages = {
   },
   wallet: {
     lightsTitle: "Světýlka",
+    earned: "Vydělané",
+    frozen: "Zmrazené",
+    paid: "Vyplacené",
+    paidNone: "Zatím nic neodešlo. Výplata není připojená, takže tohle nejsou odeslané peníze.",
+    processingNote: "Poplatek karty, pokud ho banka účtuje, jde z 15 % platformy. Ne z 85 % člověka. Není to slib zisku.",
+    demoNotRevenue: "Ukázková světýlka nejsou skutečný příjem a nedají se vyplatit.",
+    review: "Část vrácení čeká na kontrolu. Světýlka neklesla pod nulu a dostupné peníze tvůrce jsme nestrhli.",
     lightsLead: "Jedno světýlko je jeden cent daru. Balíček koupíte v dolarech a světlo pošlete dál. Když darujete, 85 % jde člověku a 15 % nechává místo běžet.",
     unit: "světýlek",
     shop: "Balíčky světýlek",

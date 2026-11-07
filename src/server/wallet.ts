@@ -2,7 +2,7 @@ import type { Locale } from "../config/app";
 import { formatWhen, pickLocalized } from "../lib/format";
 import { messagesFor } from "../i18n";
 import { db } from "./db";
-import { allocationBucket } from "./ledger";
+import { earningBucket } from "./ledger";
 
 export type WalletLine = {
   id: string;
@@ -19,13 +19,19 @@ export type WalletLine = {
 
 export type WalletSnapshot = {
   mode: "creator" | "supporter";
+  earnedCents: number;
   availableCents: number;
   pendingCents: number;
+  frozenCents: number;
+  paidCents: number;
+  reviewCents: number;
   lines: WalletLine[];
 };
 
 function classify(status: string, holdUntil: Date | null): WalletLine["bucket"] {
-  return allocationBucket(status, holdUntil) ?? "other";
+  const earned = earningBucket(status, holdUntil);
+  if (earned === "pending" || earned === "available") return earned;
+  return "other";
 }
 
 export async function loadWallet(input: {
@@ -76,12 +82,13 @@ export async function loadWallet(input: {
               : null,
       };
     });
-    return {
-      mode: "creator",
-      availableCents: lines.reduce((sum, line) => (line.bucket === "available" ? sum + line.shareCents : sum), 0),
-      pendingCents: lines.reduce((sum, line) => (line.bucket === "pending" ? sum + line.shareCents : sum), 0),
-      lines,
-    };
+    const totals = totalsFrom(allocations.map((allocation) => ({
+      status: allocation.transaction.status,
+      holdUntil: allocation.transaction.holdUntil,
+      netCents: allocation.netCents,
+    })));
+    const review = await openReviewCents(input.userId);
+    return { mode: "creator", ...totals, reviewCents: review, lines };
   }
 
   const donations = await db.ledgerTransaction.findMany({
@@ -110,5 +117,36 @@ export async function loadWallet(input: {
       holdLabel: null,
     };
   });
-  return { mode: "supporter", availableCents: 0, pendingCents: 0, lines };
+  return {
+    mode: "supporter",
+    earnedCents: 0,
+    availableCents: 0,
+    pendingCents: 0,
+    frozenCents: 0,
+    paidCents: 0,
+    reviewCents: await openReviewCents(input.userId),
+    lines,
+  };
+}
+
+function totalsFrom(rows: { status: string; holdUntil: Date | null; netCents: number }[]) {
+  const totals = { earnedCents: 0, pendingCents: 0, availableCents: 0, frozenCents: 0, paidCents: 0 };
+  for (const row of rows) {
+    const bucket = earningBucket(row.status, row.holdUntil);
+    if (!bucket) continue;
+    totals.earnedCents += row.netCents;
+    if (bucket === "pending") totals.pendingCents += row.netCents;
+    if (bucket === "available") totals.availableCents += row.netCents;
+    if (bucket === "frozen") totals.frozenCents += row.netCents;
+    if (bucket === "paid") totals.paidCents += row.netCents;
+  }
+  return totals;
+}
+
+async function openReviewCents(userId: string): Promise<number> {
+  const sum = await db.accountReview.aggregate({
+    where: { userId, status: "OPEN", reviewCents: { gt: 0 } },
+    _sum: { reviewCents: true },
+  });
+  return sum._sum.reviewCents ?? 0;
 }

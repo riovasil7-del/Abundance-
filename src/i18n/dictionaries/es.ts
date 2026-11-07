@@ -58,6 +58,13 @@ const es: Messages = {
   },
   wallet: {
     lightsTitle: "Luces",
+    earned: "Ganado",
+    frozen: "Congelado",
+    paid: "Pagado",
+    paidNone: "Todavía no salió nada. No hay un servicio de pago conectado, así que esto no es dinero enviado.",
+    processingNote: "El costo de la tarjeta, si el banco lo cobra, sale del 15 % de la plataforma. No del 85 % de la persona. No promete ganancia.",
+    demoNotRevenue: "Las luces de prueba no son ingreso real y no se pueden pagar.",
+    review: "Parte del reembolso espera revisión. Las luces no bajaron de cero y no se quitó el dinero disponible.",
     lightsLead: "Una luz es un centavo de don. Compras un paquete en dólares y pasas la luz. Al dar, el 85 % va a la persona y el 15 % mantiene el lugar.",
     unit: "luces",
     shop: "Paquetes de luces",
