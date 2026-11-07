@@ -58,6 +58,8 @@ const ig: Messages = {
   },
   wallet: {
     lightsTitle: "Ọkụ",
+    reserved: "Ejidere maka nyocha",
+    demoEarnings: "Ego nnwale, anaghị akwụ",
     earned: "Enwetara",
     frozen: "E kwụsịtụrụ",
     paid: "A kwụrụ",
@@ -140,6 +142,12 @@ const ig: Messages = {
     disabled: "Edobeghị SEED_SECRET, yabụ nju site na ihe nchọgharị gbanyụrụ.",
   },
   admin: {
+    money: "Ego na nyocha",
+    moneyNote: "Naanị ndị otu na-ewepụ njide ụgwọ. Onye anaghị eweghachi onwe ya ọkụ.",
+    restore: "Weghachi ọkụ",
+    release: "Hapụ ụgwọ",
+    retain: "Jide",
+    reversed: "Ọkụ e weghachiri",
     title: "Nlekọta", intro: "N'udo na ikpe ziri ezi. Enweghị ihere n'ihu ọha — naanị mkpebi ihe na-anọ na obodo.",
     reports: "Akụkọ", comments: "Okwu ejidere", creators: "Nkwenye", audit: "Akwụkwọ",
     verify: "Kwenye", reject: "Jụ", hide: "Zoo", show: "Gosi", dismiss: "Dobe", review: "E lere",
@@ -180,6 +188,11 @@ const ig: Messages = {
     liveBody: "Onye na-ekesa nwere ike ịmalite mgbasa site na ekwentị. Ị nwere ike ịnọnyere ya site n'okwu, obi na onyinye. N'okirikiri ngozi, ọtụtụ mmadụ na-ekere ụlọ otu, onye ọ bụla na-enweta ngozi.",
     dignityTitle: "Ugwu",
     dignityBody: "Anyị anaghị arịọ arịrịọ, anyị anaghị eme ihere onye ọ bụla. Onye e sere ga-ekwenyerịrị. Maka nwa, nne na nna na-ekwenye. Ọ bụrụ na ihe na-ewute, enwere ike ịkọ ya.",
+  },
+  age: {
+    need: "Iji gbasaa ma ọ bụ nata, kwenye na ị dịkarịa afọ 18. Nke a abụghị nnyocha njirimara ma ọ bụ afọ.",
+    declared: "I kwuru na ị dịkarịa afọ 18. Nke a abụghị afọ ma ọ bụ njirimara e mere nnyocha.",
+    button: "Adị m karịa afọ 18",
   },
   common: { loading: "Na-ebu…", error: "Ihe adịghị mma. Nwaa ọzọ.", anonymous: "Onye na-enweghị aha", back: "Laghachi", save: "Chekwaa", admin: "Nlekọta" },
 };

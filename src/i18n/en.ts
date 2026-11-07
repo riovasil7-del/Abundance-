@@ -101,6 +101,8 @@ export const en: Messages = {
   },
   wallet: {
     lightsTitle: "Lights",
+    reserved: "Held for review",
+    demoEarnings: "Demo earnings, not payable",
     earned: "Earned",
     frozen: "Frozen",
     paid: "Paid out",
@@ -237,6 +239,12 @@ export const en: Messages = {
     disabled: "SEED_SECRET is not set, so filling from the browser is off.",
   },
   admin: {
+    money: "Money under review",
+    moneyNote: "Only the team can release a payout hold. A person cannot give lights back to themselves.",
+    restore: "Restore lights",
+    release: "Release payout",
+    retain: "Keep hold",
+    reversed: "Lights reversed",
     title: "Moderation",
     intro: "Quiet and fair. No public shaming — only a decision about what stays in the community.",
     reports: "Reports",
@@ -330,6 +338,11 @@ export const en: Messages = {
     dignityTitle: "Dignity",
     dignityBody:
       "We do not beg and we humiliate no one. Anyone who is filmed must agree. For a child, a parent agrees. If something hurts, it can be reported.",
+  },
+  age: {
+    need: "To broadcast or receive gifts, confirm that you are at least 18. This is not an identity or age check.",
+    declared: "You declared that you are at least 18. This is not a verified age or identity.",
+    button: "I am at least 18",
   },
   common: {
     loading: "Loading…",

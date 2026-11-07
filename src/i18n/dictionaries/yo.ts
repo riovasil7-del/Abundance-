@@ -58,6 +58,8 @@ const yo: Messages = {
   },
   wallet: {
     lightsTitle: "Ìmọ́lẹ̀",
+    reserved: "Dídúró fún àyẹ̀wò",
+    demoEarnings: "Èrè àdánwò, kò ṣe é san",
     earned: "Tí a ti jèrè",
     frozen: "Tí a dá dúró",
     paid: "Tí a ti san",
@@ -140,6 +142,12 @@ const yo: Messages = {
     disabled: "A kò ṣètò SEED_SECRET, nítorí náà ìkún láti inú aṣàwákiri ti kú.",
   },
   admin: {
+    money: "Owó ní àyẹ̀wò",
+    moneyNote: "Ẹgbẹ́ nìkan ló le tú ìdádúró ìsanwó. Ẹnikẹ́ni kò lè dá ìmọ́lẹ̀ padà fún ara rẹ̀.",
+    restore: "Dá ìmọ́lẹ̀ padà",
+    release: "Tú ìsanwó",
+    retain: "Dá dúró",
+    reversed: "Ìmọ́lẹ̀ tí a dá padà",
     title: "Ìtọ́jú", intro: "Ní ìtura àti òdodo. Kò sí ìtẹ̀já ní gbangba — ìpinnu nìkan nípa ohun tó ń dúró nínú àjọṣe.",
     reports: "Àwọn ìjábọ̀", comments: "Ọ̀rọ̀ tí a dá dúró", creators: "Ìjẹ́rìísí", audit: "Ìwé",
     verify: "Jẹ́rìí", reject: "Kọ̀", hide: "Fi pamọ́", show: "Fi hàn", dismiss: "Gbé sí ẹ̀gbẹ́", review: "A ti wo",
@@ -180,6 +188,11 @@ const yo: Messages = {
     liveBody: "Ẹni tó ń pín lè bẹ̀rẹ̀ ìgbóhùn láti inú fóònù. O lè wà pẹ̀lú rẹ̀ ní ọ̀rọ̀, ní ọkàn, àti ní ẹ̀bùn. Nínú òòrè ìbùkún, ọ̀pọ̀ ènìyàn ń pín yàrá kan, gbogbo wọn sì ń gba ìbùkún.",
     dignityTitle: "Ọlá",
     dignityBody: "A kì í bẹ̀bẹ̀, a kì í sì í tẹ ẹnikẹ́ni. Ẹni tí a yàwòrán gbọ́dọ̀ gbà. Fún ọmọdé, òbí ni ó ń gbà. Bí nǹkan bá dunni, a lè jábọ̀.",
+  },
+  age: {
+    need: "Láti gbóhùn tàbí gba, jẹ́wọ́ pé o ti pé ọdún 18. Èyí kì í ṣe ìjẹ́rìí ìdánimọ̀ tàbí ọjọ́ orí.",
+    declared: "O ti jẹ́wọ́ pé o ti pé ọdún 18. Èyí kì í ṣe ọjọ́ orí tàbí ìdánimọ̀ tí a ti jẹ́rìí.",
+    button: "Mo ti pé ọdún 18",
   },
   common: { loading: "Ń kó…", error: "Nǹkan kan kò ṣe. Gbìyànjú lẹ́ẹ̀kan sí i.", anonymous: "Ènìyàn aláìlorúkọ", back: "Padà", save: "Fi pamọ́", admin: "Ìtọ́jú" },
 };

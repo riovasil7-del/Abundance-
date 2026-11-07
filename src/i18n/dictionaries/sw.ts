@@ -61,6 +61,8 @@ const sw: Messages = {
   },
   wallet: {
     lightsTitle: "Taa",
+    reserved: "Imeshikiliwa kwa ukaguzi",
+    demoEarnings: "Mapato ya majaribio, hayalipwi",
     earned: "Kilichopatikana",
     frozen: "Kilichogandishwa",
     paid: "Kilicholipwa",
@@ -143,6 +145,12 @@ const sw: Messages = {
     disabled: "SEED_SECRET haijawekwa, hivyo ujazo kutoka kwa kivinjari umezimwa.",
   },
   admin: {
+    money: "Pesa zinakaguliwa",
+    moneyNote: "Timu pekee hufungua kizuizi cha malipo. Mtu hajiurudishii taa.",
+    restore: "Rudisha taa",
+    release: "Fungua malipo",
+    retain: "Shikilia",
+    reversed: "Taa zilizorudishwa",
     title: "Usimamizi", intro: "Kwa utulivu na haki. Hakuna aibu ya hadharani — uamuzi tu wa kinachobaki katika jumuiya.",
     reports: "Ripoti", comments: "Maneno yaliyozuiliwa", creators: "Uthibitisho", audit: "Daftari",
     verify: "Thibitisha", reject: "Kataa", hide: "Ficha", show: "Onyesha", dismiss: "Weka kando", review: "Imekaguliwa",
@@ -183,6 +191,11 @@ const sw: Messages = {
     liveBody: "Anayeshiriki anaweza kuanza matangazo kutoka kwa simu. Wewe unaweza kuwa naye kwa neno, moyo na sadaka. Katika duara la baraka watu kadhaa wanashiriki chumba kimoja, na kila mtu anabarikiwa.",
     dignityTitle: "Heshima",
     dignityBody: "Hatuombi omba wala hatumdhalilishi mtu. Anayepigwa picha lazima akubali. Kwa mtoto, mzazi anakubali. Ikiwa kitu kinaumiza, kinaweza kuripotiwa.",
+  },
+  age: {
+    need: "Ili kutangaza au kupokea, thibitisha una angalau miaka 18. Hii si ukaguzi wa utambulisho wala umri.",
+    declared: "Ulijitangaza kuwa na angalau miaka 18. Huu si umri wala utambulisho uliothibitishwa.",
+    button: "Nina angalau miaka 18",
   },
   common: { loading: "Inapakia…", error: "Kitu hakikufaulu. Jaribu tena.", anonymous: "Mtu bila jina", back: "Rudi", save: "Hifadhi", admin: "Usimamizi" },
 };

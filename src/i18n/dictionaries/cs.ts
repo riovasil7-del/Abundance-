@@ -94,6 +94,8 @@ const cs: Messages = {
   },
   wallet: {
     lightsTitle: "Světýlka",
+    reserved: "Podržené ke kontrole",
+    demoEarnings: "Ukázkové příjmy, nelze vyplatit",
     earned: "Vydělané",
     frozen: "Zmrazené",
     paid: "Vyplacené",
@@ -226,6 +228,12 @@ const cs: Messages = {
     disabled: "SEED_SECRET není nastavené, takže naplnění z prohlížeče je vypnuté.",
   },
   admin: {
+    money: "Peníze v kontrole",
+    moneyNote: "Zmrazení výplaty řeší jen tým. Člověk si světýlka sám nevrátí.",
+    restore: "Vrátit světýlka",
+    release: "Uvolnit výplatu",
+    retain: "Podržet",
+    reversed: "Vrácená světýlka",
     title: "Moderování",
     intro: "Tiše a spravedlivě. Žádné veřejné zahanbení — jen rozhodnutí, co ve společenství zůstane.",
     reports: "Nahlášení",
@@ -282,6 +290,11 @@ const cs: Messages = {
     liveBody: "Tvůrce může začít vysílání z telefonu. Vy můžete být s ním slovem, srdcem a darem. V kruhu požehnání je víc lidí spolu a každý je požehnán.",
     dignityTitle: "Důstojnost",
     dignityBody: "Nežebráme a nikoho neponižujeme. Koho natáčíme, musí souhlasit. U dětí souhlasí rodič. Když něco bolí, dá se to nahlásit.",
+  },
+  age: {
+    need: "Chcete-li vysílat nebo přijímat dary, potvrďte, že je vám aspoň 18. Není to ověření totožnosti ani věku.",
+    declared: "Sami jste uvedli, že je vám aspoň 18. Toto není ověřený věk ani totožnost.",
+    button: "Je mi aspoň 18",
   },
   common: { loading: "Načítám…", error: "Něco se nepodařilo. Zkuste to znovu.", anonymous: "Anonymní dárce", back: "Zpět", save: "Uložit", admin: "Moderování" },
 };

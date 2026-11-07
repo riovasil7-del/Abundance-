@@ -59,7 +59,7 @@ export async function creditPack(input: {
   stripePaymentIntentId?: string | null;
   /** When Stripe tells us what was paid, it must match the pack. Demo omits this. */
   paidCents?: number | null;
-}): Promise<{ balance: number; lights: number; replayed: boolean; suppressed: boolean }> {
+}): Promise<{ balance: number; lights: number; replayed: boolean; suppressed: boolean; entryId: string | null }> {
   const pack = lightPack(input.packSlug);
   if (!pack) throw new CreditError("UNKNOWN_PACK");
   if (input.paidCents != null && input.paidCents !== pack.priceCents) throw new CreditError("AMOUNT_MISMATCH");
@@ -78,7 +78,7 @@ export async function creditPackOn(
     stripeCheckoutSessionId?: string | null;
     stripePaymentIntentId?: string | null;
   },
-): Promise<{ balance: number; lights: number; replayed: boolean; suppressed: boolean }> {
+): Promise<{ balance: number; lights: number; replayed: boolean; suppressed: boolean; entryId: string | null }> {
   await lockUser(tx, input.userId);
   const noticeKeys = [
     input.stripeCheckoutSessionId ? `cs:${input.stripeCheckoutSessionId}` : null,
@@ -86,15 +86,28 @@ export async function creditPackOn(
   ].filter((key): key is string => Boolean(key));
   if (noticeKeys.length > 0) {
     const notices = await tx.paymentMarker.findMany({ where: { key: { in: noticeKeys } } });
-    if (creditBlockedByEarlierNotice(notices.map((notice) => notice.kind))) {
-      return { balance: await balanceOf(tx, input.userId), lights: 0, replayed: false, suppressed: true };
+    const paymentCase = await tx.paymentCase.findFirst({
+      where: {
+        OR: [
+          input.stripeCheckoutSessionId ? { sessionId: input.stripeCheckoutSessionId } : undefined,
+          input.stripePaymentIntentId ? { paymentIntentId: input.stripePaymentIntentId } : undefined,
+        ].filter((item): item is { sessionId: string } | { paymentIntentId: string } => Boolean(item)),
+      },
+    });
+    const kinds = notices.map((notice) => notice.kind);
+    const disputeStillOpen = kinds.includes("DISPUTE") && paymentCase?.dispute !== "won" && !kinds.includes("WON");
+    const caseBlocks = Boolean(
+      paymentCase && (paymentCase.refunded || paymentCase.dispute === "open" || paymentCase.dispute === "lost"),
+    );
+    if (caseBlocks || kinds.includes("REFUND_FIRST") || disputeStillOpen) {
+      return { balance: await balanceOf(tx, input.userId), lights: 0, replayed: false, suppressed: true, entryId: null };
     }
   }
   const existing = await tx.creditEntry.findUnique({ where: { idempotencyKey: input.key } });
   if (existing) {
-    return { balance: await balanceOf(tx, input.userId), lights: input.pack.lights, replayed: true, suppressed: false };
+    return { balance: await balanceOf(tx, input.userId), lights: input.pack.lights, replayed: true, suppressed: false, entryId: existing.id };
   }
-  await tx.creditEntry.create({
+  const created = await tx.creditEntry.create({
     data: {
       userId: input.userId,
       amount: input.pack.lights,
@@ -105,7 +118,7 @@ export async function creditPackOn(
       stripePaymentIntentId: input.stripePaymentIntentId ?? null,
     },
   });
-  return { balance: await balanceOf(tx, input.userId), lights: input.pack.lights, replayed: false, suppressed: false };
+  return { balance: await balanceOf(tx, input.userId), lights: input.pack.lights, replayed: false, suppressed: false, entryId: created.id };
 }
 
 type DonationWrite = Parameters<typeof recordDonation>[0];
@@ -134,8 +147,12 @@ export async function spendLights(
     }
     const balance = await balanceOf(tx, input.donorId);
     if (balance < priceCents) throw new CreditError("INSUFFICIENT_LIGHTS");
-    const transaction = await recordDonation({ ...input, priceCents, charge: lightsCharge(priceCents) }, tx);
-    await tx.creditEntry.create({
+    const funding = await allocatePackLots(tx, input.donorId, priceCents);
+    const transaction = await recordDonation(
+      { ...input, priceCents, sandbox: funding.sandbox, charge: lightsCharge(priceCents) },
+      tx,
+    );
+    const spend = await tx.creditEntry.create({
       data: {
         userId: input.donorId,
         amount: -priceCents,
@@ -144,8 +161,39 @@ export async function spendLights(
         ledgerTransactionId: transaction.id,
       },
     });
+    for (const lot of funding.lots) {
+      await tx.creditAllocation.create({
+        data: { packEntryId: lot.packEntryId, spendEntryId: spend.id, lights: lot.lights },
+      });
+    }
     return { transaction, balance: balance - priceCents, replayed: false };
   });
+}
+
+async function allocatePackLots(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  lights: number,
+): Promise<{ lots: { packEntryId: string; lights: number }[]; sandbox: boolean }> {
+  const packs = await tx.creditEntry.findMany({
+    where: { userId, kind: "PACK" },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    include: { allocations: true, releases: true },
+  });
+  let need = lights;
+  const lots: { packEntryId: string; lights: number; sandbox: boolean }[] = [];
+  for (const pack of packs) {
+    const used = pack.allocations.reduce((sum, row) => sum + row.lights, 0);
+    const released = pack.releases.reduce((sum, row) => sum + row.lights, 0);
+    const remaining = pack.amount - used + released;
+    if (remaining <= 0) continue;
+    const take = Math.min(remaining, need);
+    lots.push({ packEntryId: pack.id, lights: take, sandbox: !pack.stripeCheckoutSessionId });
+    need -= take;
+    if (need === 0) break;
+  }
+  if (need !== 0) throw new CreditError("INSUFFICIENT_LIGHTS");
+  return { lots, sandbox: lots.some((lot) => lot.sandbox) };
 }
 
 export function stripeConfigured(): boolean {

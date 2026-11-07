@@ -3,13 +3,24 @@ import test from "node:test";
 import "./load-env";
 import { splitDonation } from "./fees";
 import {
+  adultDecision,
+  attributeRecordedNet,
   creditBlockedByEarlierNotice,
+  distributeExact,
   financialDenial,
   liveEndDecision,
+  payableCents,
+  payoutDecision,
   planRefund,
   platformBearsProcessing,
+  reducePaymentCase,
+  reviewResolveDecision,
   staffVerificationDecision,
 } from "./money";
+import { clawbackPack } from "./holds";
+import { consumeDurableLimit } from "./ratelimit";
+import { creatorMoney } from "./wallet";
+import { resolveAccountReview } from "./reviews";
 import { earningBucket } from "./ledger";
 import { applyStripeFact } from "./stripe-events";
 import { creditPack, lightBalance, spendLights } from "./credits";
@@ -69,6 +80,62 @@ test("unauthorized financial, staff, and live actions are refused", () => {
   assert.equal(liveEndDecision({ role: "SUPPORTER", creatorId: "someone" }, "host"), "FORBIDDEN");
   assert.equal(liveEndDecision({ role: "CREATOR", creatorId: "host" }, "host"), "OK");
   assert.equal(liveEndDecision({ role: "MODERATOR", creatorId: null }, "host"), "OK");
+});
+
+test("provider events do not restore twice, and a large gift is only partly reserved", () => {
+  const fresh = { refunded: false, held: false, restored: false, dispute: null };
+  const refunded = reducePaymentCase(fresh, "refund");
+  assert.equal(refunded.effect, "clawback");
+  const refundAgain = reducePaymentCase(refunded.state, "refund");
+  assert.equal(refundAgain.effect, "none");
+  const wonAfterRefund = reducePaymentCase(refunded.state, "dispute_won");
+  assert.equal(wonAfterRefund.effect, "none");
+
+  const disputed = reducePaymentCase(fresh, "dispute_open");
+  const won = reducePaymentCase(disputed.state, "dispute_won");
+  assert.equal(won.effect, "restore");
+  const wonAgain = reducePaymentCase(won.state, "dispute_won");
+  assert.equal(wonAgain.effect, "none");
+  const refundAfterWin = reducePaymentCase(won.state, "refund");
+  assert.equal(refundAfterWin.effect, "clawback");
+  assert.equal(refundAfterWin.state.restored, false);
+
+  const wonFirst = reducePaymentCase(fresh, "dispute_won");
+  const disputeAfterWon = reducePaymentCase(wonFirst.state, "dispute_open");
+  assert.equal(disputeAfterWon.effect, "none");
+  assert.equal(wonFirst.effect, "none");
+
+  assert.equal(attributeRecordedNet(850, 1000, 1000), 850);
+  assert.equal(attributeRecordedNet(850, 100, 1000), 85);
+  assert.deepEqual(distributeExact(85, [850]), [85]);
+  assert.equal(payableCents({ realAvailable: 850, reserved: 85 }), 765);
+  assert.equal(payableCents({ realAvailable: 50, reserved: 85 }), 0);
+  assert.deepEqual(
+    payoutDecision({ staffVerified: false, realAvailable: 850, sandboxAvailable: 0, reserved: 0 }),
+    { payable: 0, reason: "NOT_VERIFIED" },
+  );
+  assert.deepEqual(
+    payoutDecision({ staffVerified: true, realAvailable: 0, sandboxAvailable: 400, reserved: 0 }),
+    { payable: 0, reason: "DEMO_ONLY" },
+  );
+  assert.equal(adultDecision({ adultAttestedAt: null }), "AGE_REQUIRED");
+  assert.equal(adultDecision({ adultAttestedAt: new Date() }), "OK");
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "ADMIN" }, "donor", "restore", { refunded: true, dispute: null }),
+    "RESTORED_BLOCKED",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "donor", role: "ADMIN" }, "donor", "release", { refunded: false, dispute: "won" }),
+    "SELF_REVIEW",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "person", role: "SUPPORTER" }, "donor", "retain", { refunded: false, dispute: null }),
+    "FORBIDDEN",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "MODERATOR" }, "donor", "release", { refunded: true, dispute: null }),
+    "OK",
+  );
 });
 
 test("earned, pending, frozen, and paid stay distinct", () => {
@@ -169,7 +236,7 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
       paymentIntentId,
       amountCents: 500,
     });
-    assert.equal(refund.outcome, "reversed-with-review");
+    assert.equal(refund.outcome, "reversed-with-hold");
     assert.equal(await lightBalance(donor.id), 0);
     const refundAgain = await applyStripeFact({
       eventId: `evt_refund_${stamp}`,
@@ -179,13 +246,27 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
       amountCents: 500,
     });
     assert.equal(refundAgain.replayed, true);
+    const refundOtherId = await applyStripeFact({
+      eventId: `evt_refund_other_${stamp}`,
+      type: "charge.refunded",
+      sessionId,
+      paymentIntentId,
+      amountCents: 500,
+    });
+    assert.equal(refundOtherId.replayed, false);
+    assert.equal(refundOtherId.outcome, "already-applied");
     assert.equal(await lightBalance(donor.id), 0);
-    const frozen = await db.ledgerTransaction.findUnique({ where: { id: spent.transaction.id } });
-    assert.equal(frozen?.status, "FROZEN");
-    assert.equal(frozen?.grossCents, 100);
-    assert.equal(frozen?.netCents, 85);
+    const giftRow = await db.ledgerTransaction.findUnique({ where: { id: spent.transaction.id } });
+    assert.equal(giftRow?.status, "HELD");
+    assert.equal(giftRow?.grossCents, 100);
+    assert.equal(giftRow?.feeCents, 15);
+    assert.equal(giftRow?.netCents, 85);
+    const reserved = await db.payoutReservation.aggregate({
+      where: { transactionId: spent.transaction.id, status: "ACTIVE" },
+      _sum: { amountCents: true },
+    });
+    assert.equal(reserved._sum.amountCents, 85);
     const review = await db.accountReview.findUnique({ where: { stripeEventId: `evt_refund_${stamp}` } });
-    assert.equal(review?.reviewCents, 0);
     assert.equal(review?.frozenCents, 85);
     assert.equal(review?.reversedCents, 400);
 
@@ -203,7 +284,8 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
     });
     assert.equal(disputeAgain.replayed, true);
     assert.equal(await lightBalance(donor.id), 0);
-    assert.ok(dispute.outcome === "reversed" || dispute.outcome === "reversed-with-review");
+    assert.equal(dispute.outcome, "already-applied");
+    assert.equal(disputeAgain.replayed, true);
 
     await creditPack({ userId: donor.id, packSlug: "small", token: `race-${stamp}` });
     const race = await Promise.allSettled([
@@ -268,9 +350,13 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
     );
     assert.equal((await db.ledgerTransaction.findUnique({ where: { id: direct.id } }))?.grossCents, 100);
   } finally {
-    await db.creditEntry.deleteMany({ where: { userId: donor.id } });
+    await db.creditRelease.deleteMany({ where: { packEntry: { userId: donor.id } } });
+    await db.creditAllocation.deleteMany({ where: { packEntry: { userId: donor.id } } });
+    await db.payoutReservation.deleteMany({ where: { transaction: { donorId: donor.id } } });
+    await db.paymentCase.deleteMany({ where: { userId: donor.id } });
     await db.accountReview.deleteMany({ where: { userId: donor.id } });
     await db.moneyEvent.deleteMany({ where: { transaction: { donorId: donor.id } } });
+    await db.creditEntry.deleteMany({ where: { userId: donor.id } });
     await db.ledgerAllocation.deleteMany({ where: { creatorId: creator.id } });
     await db.ledgerTransaction.deleteMany({ where: { donorId: donor.id } });
     await db.webhookDelivery.deleteMany({
@@ -281,5 +367,118 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
     });
     await db.creatorProfile.delete({ where: { id: creator.id } });
     await db.user.deleteMany({ where: { id: { in: [donor.id, creatorUser.id] } } });
+  }
+});
+
+test("partial hold on a large gift, shared packs, and staff review", { skip: !process.env.DATABASE_URL }, async () => {
+  const stamp = `part${Date.now().toString(36)}`;
+  const donor = await db.user.create({
+    data: { email: `${stamp}@test.local`, passwordHash: "x", name: "Donor", adultAttestedAt: new Date() },
+  });
+  const creatorUser = await db.user.create({
+    data: { email: `c-${stamp}@test.local`, passwordHash: "x", name: "Creator", role: "CREATOR", adultAttestedAt: new Date() },
+  });
+  const creator = await db.creatorProfile.create({
+    data: {
+      userId: creatorUser.id,
+      slug: `c-${stamp}`,
+      displayName: "Creator",
+      bio: "Shop",
+      city: "Nairobi",
+      avatarUrl: "/placeholder.svg",
+      craftKey: "weaving",
+      verificationStatus: "VERIFIED",
+    },
+  });
+  const staff = await db.user.create({
+    data: { email: `s-${stamp}@test.local`, passwordHash: "x", name: "Staff", role: "ADMIN" },
+  });
+  try {
+    await db.creditEntry.create({
+      data: {
+        userId: donor.id,
+        amount: 500,
+        kind: "PACK",
+        packSlug: "small",
+        idempotencyKey: `real-a-${stamp}`,
+        stripeCheckoutSessionId: `cs_mock_a_${stamp}`,
+      },
+    });
+    await db.creditEntry.create({
+      data: {
+        userId: donor.id,
+        amount: 500,
+        kind: "PACK",
+        packSlug: "small",
+        idempotencyKey: `real-b-${stamp}`,
+        stripeCheckoutSessionId: `cs_mock_b_${stamp}`,
+      },
+    });
+    const big = splitDonation(1000);
+    const spent = await spendLights({
+      donorId: donor.id,
+      priceCents: 1000,
+      token: `big-${stamp}`,
+      kind: "GIFT",
+      shares: [{ creatorId: creator.id, netCents: big.netCents }],
+      anonymous: false,
+      holdDays: -1,
+    });
+    assert.equal(spent.transaction.netCents, big.netCents);
+    assert.equal(spent.transaction.sandbox, false);
+    const firstPack = await db.creditEntry.findFirst({
+      where: { userId: donor.id, kind: "PACK" },
+      orderBy: { createdAt: "asc" },
+    });
+    const moved = await db.$transaction((tx) => clawbackPack(tx, firstPack!.id, 1));
+    assert.equal(moved.reverseLights, 0);
+    assert.equal(moved.reservedCents, attributeRecordedNet(big.netCents, 500, 1000));
+    assert.equal(moved.reservedCents, 425);
+    assert.notEqual(moved.reservedCents, big.netCents);
+    const still = await db.ledgerTransaction.findUnique({ where: { id: spent.transaction.id } });
+    assert.equal(still?.feeCents, big.feeCents);
+    assert.equal(still?.netCents, big.netCents);
+    const money = await creatorMoney(creator.id);
+    assert.equal(money.realAvailable, big.netCents);
+    assert.equal(money.payable, big.netCents - 425);
+    assert.equal(money.payable, 425);
+
+    const denied = await resolveAccountReview({ actor: { id: donor.id, role: "SUPPORTER" }, reviewId: "missing", action: "release" });
+    assert.equal(denied.ok, false);
+    const unauth = await resolveAccountReview({ actor: null, reviewId: "missing", action: "retain" });
+    assert.equal(unauth.ok && false, false);
+    assert.equal(unauth.ok ? "" : unauth.error, "NOT_FOUND");
+
+    const first = await consumeDurableLimit(`lights-${stamp}`, donor.id, 1, 60_000);
+    const second = await consumeDurableLimit(`lights-${stamp}`, donor.id, 1, 60_000);
+    assert.equal(first.ok, true);
+    assert.equal(second.ok, false);
+
+    await db.report.create({
+      data: { reporterId: donor.id, targetType: "USER", targetId: creatorUser.id, reason: "other", details: "test" },
+    });
+    await db.userBlock.upsert({
+      where: { blockerId_blockedId: { blockerId: donor.id, blockedId: creatorUser.id } },
+      update: {},
+      create: { blockerId: donor.id, blockedId: creatorUser.id },
+    });
+    const report = await db.report.findFirst({ where: { reporterId: donor.id } });
+    assert.ok(report);
+    assert.equal(liveEndDecision({ role: "SUPPORTER", creatorId: null }, creator.id), "FORBIDDEN");
+    assert.equal(liveEndDecision({ role: "ADMIN", creatorId: null }, creator.id), "OK");
+    assert.equal(staff.role, "ADMIN");
+  } finally {
+    await db.rateLimitHit.deleteMany({ where: { key: { contains: stamp } } });
+    await db.report.deleteMany({ where: { reporterId: donor.id } });
+    await db.userBlock.deleteMany({ where: { blockerId: donor.id } });
+    await db.creditRelease.deleteMany({ where: { packEntry: { userId: donor.id } } });
+    await db.creditAllocation.deleteMany({ where: { packEntry: { userId: donor.id } } });
+    await db.payoutReservation.deleteMany({ where: { creatorId: creator.id } });
+    await db.moneyEvent.deleteMany({ where: { transaction: { donorId: donor.id } } });
+    await db.creditEntry.deleteMany({ where: { userId: donor.id } });
+    await db.ledgerAllocation.deleteMany({ where: { creatorId: creator.id } });
+    await db.ledgerTransaction.deleteMany({ where: { donorId: donor.id } });
+    await db.creatorProfile.delete({ where: { id: creator.id } });
+    await db.user.deleteMany({ where: { id: { in: [donor.id, creatorUser.id, staff.id] } } });
   }
 });

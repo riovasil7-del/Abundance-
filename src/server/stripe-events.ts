@@ -2,7 +2,8 @@ import { Prisma } from "@prisma/client";
 import { lightPack } from "../config/app";
 import { creditPackOn } from "./credits";
 import { db } from "./db";
-import { planRefund } from "./money";
+import { clawbackPack, restorePack } from "./holds";
+import { reducePaymentCase, type PaymentSnapshot } from "./money";
 
 export class StripeFactError extends Error {
   constructor(public code: "AMOUNT_MISMATCH" | "FEE_MISMATCH") {
@@ -33,6 +34,13 @@ export type StripeFact =
       type: "charge.dispute.created";
       sessionId?: string | null;
       paymentIntentId?: string | null;
+    }
+  | {
+      eventId: string;
+      type: "charge.dispute.closed";
+      sessionId?: string | null;
+      paymentIntentId?: string | null;
+      status: string;
     }
   | {
       eventId: string;
@@ -76,8 +84,11 @@ export async function applyStripeFact(fact: StripeFact): Promise<{ outcome: stri
 
 async function applyFresh(tx: Prisma.TransactionClient, fact: StripeFact): Promise<string> {
   if (fact.type === "checkout.session.completed") return applyCheckout(tx, fact);
-  if (fact.type === "charge.refunded") return applyClawback(tx, fact, "REFUND", "REFUND_FIRST");
-  if (fact.type === "charge.dispute.created") return applyClawback(tx, fact, "DISPUTE", "DISPUTE");
+  if (fact.type === "charge.refunded") return applyProviderEvent(tx, fact, "refund");
+  if (fact.type === "charge.dispute.created") return applyProviderEvent(tx, fact, "dispute_open");
+  if (fact.type === "charge.dispute.closed") {
+    return applyProviderEvent(tx, fact, fact.status === "won" ? "dispute_won" : "dispute_lost");
+  }
   return applySettlement(tx, fact);
 }
 
@@ -100,96 +111,119 @@ async function applyCheckout(
     stripeCheckoutSessionId: fact.sessionId,
     stripePaymentIntentId: fact.paymentIntentId,
   });
+  if (credited.entryId) {
+    const paymentCase = await ensurePaymentCase(tx, fact.sessionId, fact.paymentIntentId);
+    await tx.paymentCase.update({
+      where: { id: paymentCase.id },
+      data: { userId: fact.userId, packEntryId: credited.entryId, sessionId: fact.sessionId, paymentIntentId: fact.paymentIntentId },
+    });
+  }
   if (credited.suppressed) return "suppressed";
   if (credited.replayed) return "already-credited";
   return "credited";
 }
 
-async function applyClawback(
+async function applyProviderEvent(
   tx: Prisma.TransactionClient,
-  fact: Extract<StripeFact, { type: "charge.refunded" | "charge.dispute.created" }>,
-  reviewKind: "REFUND" | "DISPUTE",
-  markerKind: "REFUND_FIRST" | "DISPUTE",
+  fact: Extract<StripeFact, { type: "charge.refunded" | "charge.dispute.created" | "charge.dispute.closed" }>,
+  event: "refund" | "dispute_open" | "dispute_won" | "dispute_lost",
 ): Promise<string> {
   const keys = [
     fact.sessionId ? `cs:${fact.sessionId}` : null,
     fact.paymentIntentId ? `pi:${fact.paymentIntentId}` : null,
   ].filter((key): key is string => Boolean(key));
   for (const key of keys) await lockKey(tx, key);
-  const or: Prisma.CreditEntryWhereInput[] = [];
-  if (fact.sessionId) or.push({ stripeCheckoutSessionId: fact.sessionId });
-  if (fact.paymentIntentId) or.push({ stripePaymentIntentId: fact.paymentIntentId });
-  const entry = or.length
-    ? await tx.creditEntry.findFirst({ where: { kind: "PACK", OR: or } })
-    : null;
-  if (!entry) {
-    for (const key of keys) await rememberNotice(tx, key, markerKind);
-    if (keys.length === 0) return "unmatched";
-    return "deferred";
-  }
-  await tx.$executeRaw`SELECT "id" FROM "User" WHERE "id" = ${entry.userId} FOR UPDATE`;
-  const already = await tx.creditEntry.findUnique({ where: { idempotencyKey: `reversal:${fact.eventId}` } });
-  if (already) return "already-reversed";
-  const sum = await tx.creditEntry.aggregate({ where: { userId: entry.userId }, _sum: { amount: true } });
-  const spendable = sum._sum.amount ?? 0;
-  const claimed =
-    fact.type === "charge.refunded" && fact.amountCents != null
-      ? Math.min(entry.amount, Math.max(fact.amountCents, 0))
-      : entry.amount;
-  const pending = await tx.ledgerTransaction.findMany({
-    where: { donorId: entry.userId, status: "HELD", holdUntil: { gt: new Date() } },
-    orderBy: { createdAt: "asc" },
-    select: { id: true, netCents: true },
-  });
-  const plan = planRefund({
-    packLights: claimed,
-    spendable,
-    pendingNetsOldestFirst: pending.map((row) => row.netCents),
-  });
-  if (plan.reverseLights > 0) {
-    await tx.creditEntry.create({
-      data: {
-        userId: entry.userId,
-        amount: -plan.reverseLights,
-        kind: reviewKind === "DISPUTE" ? "DISPUTE_HOLD" : "REVERSAL",
-        packSlug: entry.packSlug,
-        idempotencyKey: `reversal:${fact.eventId}`,
+  let paymentCase = await ensurePaymentCase(tx, fact.sessionId, fact.paymentIntentId);
+  if (!paymentCase.packEntryId && (fact.sessionId || fact.paymentIntentId)) {
+    const entry = await tx.creditEntry.findFirst({
+      where: {
+        kind: "PACK",
+        OR: [
+          fact.sessionId ? { stripeCheckoutSessionId: fact.sessionId } : undefined,
+          fact.paymentIntentId ? { stripePaymentIntentId: fact.paymentIntentId } : undefined,
+        ].filter((item): item is { stripeCheckoutSessionId: string } | { stripePaymentIntentId: string } => Boolean(item)),
       },
     });
-  }
-  const frozenIds = plan.freezeIndexes.map((index) => pending[index]!.id);
-  if (frozenIds.length > 0) {
-    await tx.ledgerTransaction.updateMany({
-      where: { id: { in: frozenIds }, status: "HELD" },
-      data: { status: "FROZEN" },
-    });
-    for (const index of plan.freezeIndexes) {
-      const row = pending[index]!;
-      await tx.moneyEvent.create({
-        data: {
-          transactionId: row.id,
-          kind: reviewKind === "DISPUTE" ? "DISPUTE_FROZEN" : "REFUND_FROZEN",
-          grossCents: row.netCents,
-          feeCents: 0,
-          netCents: row.netCents,
-          note: fact.eventId,
-        },
+    if (entry) {
+      paymentCase = await tx.paymentCase.update({
+        where: { id: paymentCase.id },
+        data: { packEntryId: entry.id, userId: entry.userId },
       });
     }
   }
-  if (plan.spentLights > 0 || plan.reviewCents > 0 || frozenIds.length > 0) {
+  const snapshot: PaymentSnapshot = {
+    refunded: paymentCase.refunded,
+    held: paymentCase.held,
+    restored: paymentCase.restored,
+    dispute: paymentCase.dispute === "open" || paymentCase.dispute === "won" || paymentCase.dispute === "lost" ? paymentCase.dispute : null,
+  };
+  const next = reducePaymentCase(snapshot, event);
+  const generation = next.effect === "clawback" ? paymentCase.generation + 1 : paymentCase.generation;
+  let reverseLights = 0;
+  let reservedCents = 0;
+  if (next.effect === "clawback" && paymentCase.packEntryId) {
+    const moved = await clawbackPack(tx, paymentCase.packEntryId, generation);
+    reverseLights = moved.reverseLights;
+    reservedCents = moved.reservedCents;
     await tx.accountReview.create({
       data: {
-        userId: entry.userId,
-        kind: reviewKind,
-        reversedCents: plan.reverseLights,
-        frozenCents: plan.freezeIndexes.reduce((sum, index) => sum + pending[index]!.netCents, 0),
-        reviewCents: plan.reviewCents,
+        userId: paymentCase.userId ?? (await tx.creditEntry.findUniqueOrThrow({ where: { id: paymentCase.packEntryId } })).userId,
+        packEntryId: paymentCase.packEntryId,
+        kind: event === "refund" ? "REFUND" : "DISPUTE",
+        reversedCents: reverseLights,
+        frozenCents: reservedCents,
+        reviewCents: 0,
         stripeEventId: fact.eventId,
+        status: "OPEN",
       },
     });
   }
-  return plan.spentLights > 0 ? "reversed-with-review" : "reversed";
+  if (next.effect === "restore" && paymentCase.packEntryId) {
+    await restorePack(tx, paymentCase.packEntryId, paymentCase.generation);
+    await tx.accountReview.updateMany({
+      where: { packEntryId: paymentCase.packEntryId, status: "OPEN" },
+      data: { status: "RESTORED" },
+    });
+  }
+  if (!paymentCase.packEntryId && (event === "refund" || event === "dispute_open" || event === "dispute_lost")) {
+    for (const key of keys) await rememberNotice(tx, key, event === "refund" ? "REFUND_FIRST" : event === "dispute_lost" ? "DISPUTE" : "DISPUTE");
+  }
+  if (event === "dispute_won") {
+    for (const key of keys) await rememberNotice(tx, key, "WON");
+  }
+  await tx.paymentCase.update({
+    where: { id: paymentCase.id },
+    data: {
+      refunded: next.state.refunded,
+      held: next.state.held,
+      restored: next.state.restored,
+      dispute: next.state.dispute,
+      generation,
+      sessionId: fact.sessionId ?? paymentCase.sessionId,
+      paymentIntentId: fact.paymentIntentId ?? paymentCase.paymentIntentId,
+    },
+  });
+  if (next.effect === "none") return "already-applied";
+  if (!paymentCase.packEntryId) return "deferred";
+  return next.effect === "restore" ? "restored" : reservedCents > 0 ? "reversed-with-hold" : "reversed";
+}
+
+async function ensurePaymentCase(tx: Prisma.TransactionClient, sessionId?: string | null, paymentIntentId?: string | null) {
+  const existing = await tx.paymentCase.findFirst({
+    where: {
+      OR: [
+        sessionId ? { sessionId } : undefined,
+        paymentIntentId ? { paymentIntentId } : undefined,
+      ].filter((item): item is { sessionId: string } | { paymentIntentId: string } => Boolean(item)),
+    },
+  });
+  if (existing) return existing;
+  return tx.paymentCase.create({
+    data: {
+      sessionId: sessionId ?? null,
+      paymentIntentId: paymentIntentId ?? null,
+    },
+  });
 }
 
 export function factFromStripeEvent(event: {
@@ -213,18 +247,30 @@ export function factFromStripeEvent(event: {
       paymentStatus: typeof object.payment_status === "string" ? object.payment_status : "",
     };
   }
-  if (event.type === "charge.refunded" || event.type === "charge.dispute.created") {
-    return {
-      eventId: event.id,
-      type: event.type,
-      sessionId: typeof object.metadata === "object" && object.metadata && "sessionId" in object.metadata
-        ? String((object.metadata as { sessionId?: string }).sessionId ?? "") || null
-        : null,
-      paymentIntentId: typeof object.payment_intent === "string" ? object.payment_intent : null,
-      ...(event.type === "charge.refunded"
-        ? { amountCents: typeof object.amount_refunded === "number" ? object.amount_refunded : null }
-        : {}),
-    } as StripeFact;
+  if (event.type === "charge.refunded" || event.type === "charge.dispute.created" || event.type === "charge.dispute.closed") {
+    const sessionId = typeof object.metadata === "object" && object.metadata && "sessionId" in object.metadata
+      ? String((object.metadata as { sessionId?: string }).sessionId ?? "") || null
+      : null;
+    const paymentIntentId = typeof object.payment_intent === "string" ? object.payment_intent : null;
+    if (event.type === "charge.dispute.closed") {
+      return {
+        eventId: event.id,
+        type: "charge.dispute.closed",
+        sessionId,
+        paymentIntentId,
+        status: typeof object.status === "string" ? object.status : "lost",
+      };
+    }
+    if (event.type === "charge.refunded") {
+      return {
+        eventId: event.id,
+        type: "charge.refunded",
+        sessionId,
+        paymentIntentId,
+        amountCents: typeof object.amount_refunded === "number" ? object.amount_refunded : null,
+      };
+    }
+    return { eventId: event.id, type: "charge.dispute.created", sessionId, paymentIntentId };
   }
   if (event.type === "payment_intent.succeeded") {
     if (!object.id || typeof object.amount !== "number") return null;

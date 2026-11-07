@@ -99,6 +99,8 @@ export const sk = {
   },
   wallet: {
     lightsTitle: "Svetielka",
+    reserved: "Podržané pre kontrolu",
+    demoEarnings: "Ukážkové príjmy, nevyplatiteľné",
     earned: "Zarobené",
     frozen: "Zmrazené",
     paid: "Vyplatené",
@@ -235,6 +237,12 @@ export const sk = {
     disabled: "SEED_SECRET nie je nastavené, takže naplnenie z prehliadača je vypnuté.",
   },
   admin: {
+    money: "Peniaze na kontrole",
+    moneyNote: "Zmrazenie výplaty rieši len tím. Človek si svetielka sám nevráti.",
+    restore: "Vrátiť svetielka",
+    release: "Uvoľniť výplatu",
+    retain: "Podržať",
+    reversed: "Vrátené svetielka",
     title: "Moderovanie",
     intro: "Ticho a spravodlivo. Žiadne verejné zahanbenie — len rozhodnutie, čo v spoločenstve ostane.",
     reports: "Nahlásenia",
@@ -328,6 +336,11 @@ export const sk = {
     dignityTitle: "Dôstojnosť",
     dignityBody:
       "Nežobríme a nikoho neponižujeme. Koho natočíme, musí súhlasiť. Pri deťoch súhlasí rodič. Ak niečo bolí, dá sa to nahlásiť.",
+  },
+  age: {
+    need: "Ak chcete vysielať alebo prijímať dary, potvrďte, že máte aspoň 18 rokov. Nie je to overenie totožnosti ani veku.",
+    declared: "Sami ste uviedli, že máte aspoň 18 rokov. Toto nie je overený vek ani totožnosť.",
+    button: "Mám aspoň 18 rokov",
   },
   common: {
     loading: "Načítavam…",

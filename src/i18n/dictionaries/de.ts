@@ -58,6 +58,8 @@ const de: Messages = {
   },
   wallet: {
     lightsTitle: "Lichter",
+    reserved: "Für die Prüfung gehalten",
+    demoEarnings: "Probeeinnahmen, nicht auszahlbar",
     earned: "Verdient",
     frozen: "Eingefroren",
     paid: "Ausgezahlt",
@@ -140,6 +142,12 @@ const de: Messages = {
     disabled: "SEED_SECRET ist nicht gesetzt, darum ist die Füllung im Browser aus.",
   },
   admin: {
+    money: "Geld in Prüfung",
+    moneyNote: "Nur das Team löst eine Auszahlungssperre. Niemand gibt sich selbst Lichter zurück.",
+    restore: "Lichter zurückgeben",
+    release: "Auszahlung freigeben",
+    retain: "Halten",
+    reversed: "Zurückgebuchte Lichter",
     title: "Moderation", intro: "Still und gerecht. Keine öffentliche Beschämung — nur eine Entscheidung, was in der Gemeinschaft bleibt.",
     reports: "Meldungen", comments: "Zurückgehaltene Worte", creators: "Prüfung der Menschen", audit: "Protokoll",
     verify: "Prüfen", reject: "Ablehnen", hide: "Verbergen", show: "Zeigen", dismiss: "Ablegen", review: "Erledigt",
@@ -180,6 +188,11 @@ const de: Messages = {
     liveBody: "Wer Taten teilt, kann vom Telefon aus senden. Du kannst mit einem Wort, einem Herz und einer Gabe dabei sein. In einem Segenskreis sind mehrere Menschen in einem Raum, und alle werden gesegnet.",
     dignityTitle: "Würde",
     dignityBody: "Wir betteln nicht und wir demütigen niemanden. Wer gefilmt wird, muss zustimmen. Bei einem Kind stimmt ein Elternteil zu. Wenn etwas wehtut, kann man es melden.",
+  },
+  age: {
+    need: "Zum Senden oder Empfangen bestätige, dass du mindestens 18 bist. Das ist keine Identitäts- oder Altersprüfung.",
+    declared: "Du hast selbst gesagt, dass du mindestens 18 bist. Das ist kein geprüftes Alter und keine Identität.",
+    button: "Ich bin mindestens 18",
   },
   common: { loading: "Lade…", error: "Etwas ist schiefgegangen. Versuch es noch einmal.", anonymous: "Anonyme gebende Person", back: "Zurück", save: "Speichern", admin: "Moderation" },
 };

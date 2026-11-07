@@ -58,6 +58,106 @@ export function platformBearsProcessing(grossCents: number, processorCents: numb
   };
 }
 
+export type PaymentSnapshot = {
+  refunded: boolean;
+  held: boolean;
+  restored: boolean;
+  dispute: "open" | "won" | "lost" | null;
+};
+
+export type PaymentEffect = "clawback" | "restore" | "none";
+
+/** Provider events. A won dispute never restores lights after a refund, and a second event id does not restore twice. */
+export function reducePaymentCase(
+  state: PaymentSnapshot,
+  event: "refund" | "dispute_open" | "dispute_won" | "dispute_lost",
+): { state: PaymentSnapshot; effect: PaymentEffect } {
+  if (event === "refund") {
+    const next = { ...state, refunded: true };
+    if (!state.held || state.restored) {
+      return { state: { ...next, held: true, restored: false }, effect: "clawback" };
+    }
+    return { state: next, effect: "none" };
+  }
+  if (event === "dispute_open") {
+    if (state.refunded || state.dispute === "won" || state.dispute === "lost") {
+      return { state, effect: "none" };
+    }
+    if (!state.held) return { state: { ...state, dispute: "open", held: true }, effect: "clawback" };
+    return { state: { ...state, dispute: "open" }, effect: "none" };
+  }
+  if (event === "dispute_won") {
+    const next = { ...state, dispute: "won" as const };
+    if (state.refunded) return { state: next, effect: "none" };
+    if (state.held && !state.restored) return { state: { ...next, held: false, restored: true }, effect: "restore" };
+    return { state: next, effect: "none" };
+  }
+  const next = { ...state, dispute: "lost" as const };
+  if (!state.held && !state.refunded) return { state: { ...next, held: true }, effect: "clawback" };
+  return { state: next, effect: "none" };
+}
+
+/** Share an already-recorded creator net. Does not take another 15% fee. */
+export function attributeRecordedNet(netCents: number, lights: number, grossCents: number): number {
+  if (grossCents <= 0 || lights <= 0 || netCents < 0) return 0;
+  if (lights >= grossCents) return netCents;
+  return Math.floor((netCents * lights) / grossCents);
+}
+
+export function distributeExact(total: number, weights: number[]): number[] {
+  const weightSum = weights.reduce((sum, weight) => sum + weight, 0);
+  if (total <= 0 || weightSum <= 0) return weights.map(() => 0);
+  const amounts = weights.map((weight) => Math.floor((total * weight) / weightSum));
+  let remainder = total - amounts.reduce((sum, amount) => sum + amount, 0);
+  for (let index = 0; index < amounts.length && remainder > 0; index += 1) {
+    amounts[index] += 1;
+    remainder -= 1;
+  }
+  return amounts;
+}
+
+export function payableCents(input: { realAvailable: number; reserved: number }): number {
+  if (input.realAvailable < 0 || input.reserved < 0) throw new Error("NEGATIVE");
+  return Math.max(0, input.realAvailable - input.reserved);
+}
+
+export function payoutDecision(input: {
+  staffVerified: boolean;
+  realAvailable: number;
+  sandboxAvailable: number;
+  reserved: number;
+}): { payable: number; reason: "NOT_VERIFIED" | "DEMO_ONLY" | "HELD" | "NONE" | "OK" } {
+  const payable = payableCents({ realAvailable: input.realAvailable, reserved: input.reserved });
+  if (!input.staffVerified) return { payable: 0, reason: "NOT_VERIFIED" };
+  if (input.realAvailable === 0 && input.sandboxAvailable > 0) return { payable: 0, reason: "DEMO_ONLY" };
+  if (payable === 0 && input.reserved > 0) return { payable: 0, reason: "HELD" };
+  if (payable === 0) return { payable: 0, reason: "NONE" };
+  return { payable, reason: "OK" };
+}
+
+export function adultDecision(
+  user: { adultAttestedAt: Date | null } | null,
+): "UNAUTHENTICATED" | "AGE_REQUIRED" | "OK" {
+  if (!user) return "UNAUTHENTICATED";
+  if (!user.adultAttestedAt) return "AGE_REQUIRED";
+  return "OK";
+}
+
+export function reviewResolveDecision(
+  actor: { id: string; role: string } | null,
+  reviewUserId: string,
+  action: "restore" | "release" | "retain",
+  payment: { refunded: boolean; dispute: string | null },
+): "UNAUTHENTICATED" | "FORBIDDEN" | "SELF_REVIEW" | "RESTORED_BLOCKED" | "OK" {
+  if (!actor) return "UNAUTHENTICATED";
+  if (actor.role !== "MODERATOR" && actor.role !== "ADMIN") return "FORBIDDEN";
+  if (actor.id === reviewUserId) return "SELF_REVIEW";
+  if (action === "restore" && (payment.refunded || payment.dispute === "open" || payment.dispute === "lost")) {
+    return "RESTORED_BLOCKED";
+  }
+  return "OK";
+}
+
 export function creditBlockedByEarlierNotice(kinds: readonly string[]): boolean {
   return kinds.includes("REFUND_FIRST") || kinds.includes("DISPUTE");
 }

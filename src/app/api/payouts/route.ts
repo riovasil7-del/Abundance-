@@ -4,30 +4,30 @@ import { audit } from "@/server/audit";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
-import { allocationBucket } from "@/server/ledger";
+import { payoutDecision } from "@/server/money";
+import { creatorMoney } from "@/server/wallet";
 import { getPayoutProvider, type PayoutProviderId } from "@/server/payouts";
-import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { consumeDurableLimit } from "@/server/ratelimit";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
-  const limit = memoryRateLimiter.consume(clientKey(request, "payout", user.id), 3, 60 * 60 * 1000);
+  const limit = await consumeDurableLimit("payout", user.id, 3, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
-  const allocations = await db.ledgerAllocation.findMany({
-    where: { creatorId: user.creatorProfile.id },
-    include: { transaction: true },
+  const money = await creatorMoney(user.creatorProfile.id);
+  const decision = payoutDecision({
+    staffVerified: user.creatorProfile.verificationStatus === "VERIFIED",
+    realAvailable: money.realAvailable,
+    sandboxAvailable: money.sandboxAvailable,
+    reserved: money.reserved,
   });
-  const availableCents = allocations.reduce((sum, allocation) => {
-    const bucket = allocationBucket(allocation.transaction.status, allocation.transaction.holdUntil);
-    return bucket === "available" ? sum + allocation.netCents : sum;
-  }, 0);
-  if (availableCents <= 0) return jsonError(400, "NOTHING_TO_PAY");
+  if (decision.payable <= 0) return jsonError(400, decision.reason);
 
   const providerId = (user.creatorProfile.payoutProvider || "stub") as PayoutProviderId;
   const result = await getPayoutProvider().requestPayout({
     creatorId: user.creatorProfile.id,
-    amountCents: availableCents,
+    amountCents: decision.payable,
     currency: LEDGER_CURRENCY,
     provider: providerId === "stub" ? "mpesa" : providerId,
     destinationRef: user.creatorProfile.payoutDestination,
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   const payout = await db.payoutRequest.create({
     data: {
       creatorId: user.creatorProfile.id,
-      amountCents: availableCents,
+      amountCents: decision.payable,
       currency: LEDGER_CURRENCY,
       provider: result.provider,
       status: "STUBBED",
@@ -48,11 +48,12 @@ export async function POST(request: Request) {
     action: "PAYOUT_REQUEST",
     entityType: "PayoutRequest",
     entityId: payout.id,
-    metadata: { amountCents: availableCents, provider: result.provider, status: "STUBBED" },
+    metadata: { amountCents: decision.payable, provider: result.provider, status: "STUBBED", realMoney: false },
   });
   return NextResponse.json({
     status: "STUBBED",
-    amountCents: availableCents,
+    realMoney: false,
+    amountCents: decision.payable,
     reference: result.reference,
     provider: result.provider,
   });

@@ -21,6 +21,16 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
     const existing = await prisma.user.count();
     if (existing > 0) throw new Error("ALREADY_SEEDED");
   }
+  await prisma.rateLimitHit.deleteMany();
+  await prisma.creditRelease.deleteMany();
+  await prisma.creditAllocation.deleteMany();
+  await prisma.payoutReservation.deleteMany();
+  await prisma.paymentCase.deleteMany();
+  await prisma.accountReview.deleteMany();
+  await prisma.moneyEvent.deleteMany();
+  await prisma.webhookDelivery.deleteMany();
+  await prisma.paymentMarker.deleteMany();
+  await prisma.creditEntry.deleteMany();
   await prisma.payoutRequest.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.report.deleteMany();
@@ -40,13 +50,13 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
   await prisma.user.deleteMany();
 
   const elena = await prisma.user.create({
-    data: { email: "elena@hojnost.local", passwordHash, name: "Elena Horváthová", role: "SUPPORTER", locale: "sk" },
+    data: { email: "elena@hojnost.local", passwordHash, name: "Elena Horváthová", role: "SUPPORTER", locale: "sk", adultAttestedAt: new Date("2020-01-01") },
   });
   const admin = await prisma.user.create({
-    data: { email: "admin@hojnost.local", passwordHash, name: "Mira Adminová", role: "ADMIN", locale: "sk" },
+    data: { email: "admin@hojnost.local", passwordHash, name: "Mira Adminová", role: "ADMIN", locale: "sk", adultAttestedAt: new Date("2020-01-01") },
   });
   await prisma.user.create({
-    data: { email: "mod@hojnost.local", passwordHash, name: "Adam Moderátor", role: "MODERATOR", locale: "sk" },
+    data: { email: "mod@hojnost.local", passwordHash, name: "Adam Moderátor", role: "MODERATOR", locale: "sk", adultAttestedAt: new Date("2020-01-01") },
   });
 
   const creators = {
@@ -56,6 +66,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         passwordHash,
         name: "Amina Otieno",
         role: "CREATOR",
+        adultAttestedAt: new Date("2020-01-01"),
         creatorProfile: {
           create: {
             slug: "amina",
@@ -79,6 +90,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         passwordHash,
         name: "Joseph Kamau",
         role: "CREATOR",
+        adultAttestedAt: new Date("2020-01-01"),
         creatorProfile: {
           create: {
             slug: "joseph",
@@ -102,6 +114,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         passwordHash,
         name: "Grace Wanjiku",
         role: "CREATOR",
+        adultAttestedAt: new Date("2020-01-01"),
         creatorProfile: {
           create: {
             slug: "grace",
@@ -125,6 +138,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         passwordHash,
         name: "Daniel Okello",
         role: "CREATOR",
+        adultAttestedAt: new Date("2020-01-01"),
         creatorProfile: {
           create: {
             slug: "daniel",

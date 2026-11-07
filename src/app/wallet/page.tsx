@@ -94,6 +94,16 @@ export default async function WalletPage({ searchParams }: { searchParams: Promi
           <p className="muted">
             {messages.wallet.earned}: {formatMoney(wallet.earnedCents, locale)}
           </p>
+          {wallet.reservedCents > 0 ? (
+            <p className="notice">
+              {messages.wallet.reserved}: {formatMoney(wallet.reservedCents, locale)}
+            </p>
+          ) : null}
+          {wallet.demoEarningsCents > 0 ? (
+            <p className="notice">
+              {messages.wallet.demoEarnings}: {formatMoney(wallet.demoEarningsCents, locale)}
+            </p>
+          ) : null}
           <p className="notice">{messages.wallet.paidNone}</p>
           <p className="muted">{messages.wallet.processingNote}</p>
           <PayoutButton />

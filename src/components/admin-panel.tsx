@@ -8,7 +8,7 @@ export function AdminActions({
   kind,
   id,
 }: {
-  kind: "creator" | "comment" | "video" | "report";
+  kind: "creator" | "comment" | "video" | "report" | "review";
   id: string;
 }) {
   const router = useRouter();
@@ -23,6 +23,21 @@ export function AdminActions({
     router.refresh();
   }
 
+  if (kind === "review") {
+    return (
+      <div className="admin-actions">
+        <button type="button" className="btn-gold" onClick={() => post(`/api/admin/reviews/${id}`, { action: "release" })}>
+          {m.admin.release}
+        </button>
+        <button type="button" className="btn-ghost" onClick={() => post(`/api/admin/reviews/${id}`, { action: "retain" })}>
+          {m.admin.retain}
+        </button>
+        <button type="button" className="btn-ghost" onClick={() => post(`/api/admin/reviews/${id}`, { action: "restore" })}>
+          {m.admin.restore}
+        </button>
+      </div>
+    );
+  }
   if (kind === "creator") {
     return (
       <div className="admin-actions">

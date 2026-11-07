@@ -9,13 +9,15 @@ import { CreditError, catalogPriceCents, spendLights } from "@/server/credits";
 import { sharesFromNet } from "@/server/ledger";
 import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
 import { publishRoomEvent } from "@/server/live-events";
-import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { adultDecision } from "@/server/money";
+import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return jsonError(401, "UNAUTHENTICATED");
-  const limit = memoryRateLimiter.consume(clientKey(request, "donate", user.id), 30, 60 * 60 * 1000);
+  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  const limit = await consumeDurableLimit("donate", user.id, 30, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
   const raw = await request.json().catch(() => null);
@@ -26,11 +28,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const session = await db.liveSession.findUnique({
     where: { id },
     include: {
-      host: true,
+      host: { include: { user: { select: { adultAttestedAt: true } } } },
       circle: { include: { participants: { include: { creator: true }, orderBy: { joinedAt: "asc" } } } },
     },
   });
   if (!session || session.status !== "LIVE") return jsonError(404, "NOT_FOUND");
+  if (!session.host.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
 
   const gift = await db.gift.findUnique({ where: { slug: parsed.data.giftSlug } });
   if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");

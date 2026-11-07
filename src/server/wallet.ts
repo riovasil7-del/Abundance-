@@ -25,6 +25,8 @@ export type WalletSnapshot = {
   frozenCents: number;
   paidCents: number;
   reviewCents: number;
+  reservedCents: number;
+  demoEarningsCents: number;
   lines: WalletLine[];
 };
 
@@ -82,13 +84,20 @@ export async function loadWallet(input: {
               : null,
       };
     });
-    const totals = totalsFrom(allocations.map((allocation) => ({
-      status: allocation.transaction.status,
-      holdUntil: allocation.transaction.holdUntil,
-      netCents: allocation.netCents,
-    })));
+    const money = await creatorMoney(input.creatorId);
     const review = await openReviewCents(input.userId);
-    return { mode: "creator", ...totals, reviewCents: review, lines };
+    return {
+      mode: "creator",
+      earnedCents: money.earned,
+      pendingCents: money.pending,
+      availableCents: money.payable,
+      frozenCents: money.frozen,
+      paidCents: money.paid,
+      reservedCents: money.reserved,
+      demoEarningsCents: money.sandboxAvailable,
+      reviewCents: review,
+      lines,
+    };
   }
 
   const donations = await db.ledgerTransaction.findMany({
@@ -125,7 +134,51 @@ export async function loadWallet(input: {
     frozenCents: 0,
     paidCents: 0,
     reviewCents: await openReviewCents(input.userId),
+    reservedCents: 0,
+    demoEarningsCents: 0,
     lines,
+  };
+}
+
+export async function creatorMoney(creatorId: string) {
+  const allocations = await db.ledgerAllocation.findMany({
+    where: { creatorId },
+    include: { transaction: true },
+  });
+  let realAvailable = 0;
+  let sandboxAvailable = 0;
+  let pending = 0;
+  let frozen = 0;
+  let paid = 0;
+  let earned = 0;
+  for (const allocation of allocations) {
+    const bucket = earningBucket(allocation.transaction.status, allocation.transaction.holdUntil);
+    if (!bucket) continue;
+    const demo = allocation.transaction.sandbox || allocation.transaction.paymentMode === "DEMO";
+    if (demo) {
+      if (bucket === "available" || bucket === "pending") sandboxAvailable += allocation.netCents;
+      continue;
+    }
+    earned += allocation.netCents;
+    if (bucket === "pending") pending += allocation.netCents;
+    if (bucket === "available") realAvailable += allocation.netCents;
+    if (bucket === "frozen") frozen += allocation.netCents;
+    if (bucket === "paid") paid += allocation.netCents;
+  }
+  const reservedRow = await db.payoutReservation.aggregate({
+    where: { creatorId, status: "ACTIVE" },
+    _sum: { amountCents: true },
+  });
+  const reserved = reservedRow._sum.amountCents ?? 0;
+  return {
+    realAvailable,
+    sandboxAvailable,
+    pending,
+    frozen,
+    paid,
+    earned,
+    reserved,
+    payable: Math.max(0, realAvailable - reserved),
   };
 }
 

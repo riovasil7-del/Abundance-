@@ -58,6 +58,8 @@ const pt: Messages = {
   },
   wallet: {
     lightsTitle: "Luzes",
+    reserved: "Retido para revisão",
+    demoEarnings: "Ganhos de ensaio, não pagáveis",
     earned: "Ganho",
     frozen: "Congelado",
     paid: "Pago",
@@ -140,6 +142,12 @@ const pt: Messages = {
     disabled: "SEED_SECRET não está definido, por isso o enchimento no navegador está desligado.",
   },
   admin: {
+    money: "Dinheiro em revisão",
+    moneyNote: "Só a equipa solta um bloqueio de pagamento. Ninguém devolve luzes a si mesmo.",
+    restore: "Devolver luzes",
+    release: "Soltar o pagamento",
+    retain: "Manter",
+    reversed: "Luzes revertidas",
     title: "Moderação", intro: "Com calma e justiça. Sem humilhação pública — só uma decisão sobre o que fica na comunidade.",
     reports: "Avisos", comments: "Palavras retidas", creators: "Verificação", audit: "Diário",
     verify: "Verificar", reject: "Recusar", hide: "Ocultar", show: "Mostrar", dismiss: "Arquivar", review: "Revisto",
@@ -180,6 +188,11 @@ const pt: Messages = {
     liveBody: "Quem partilha pode começar uma emissão no telemóvel. Tu podes acompanhar com uma palavra, um coração e uma oferta. Num círculo de bênção várias pessoas partilham uma sala, e todas ficam abençoadas.",
     dignityTitle: "Dignidade",
     dignityBody: "Não pedimos esmola e não humilhamos ninguém. Quem é filmado tem de aceitar. Com uma criança, aceita a mãe ou o pai. Se algo magoa, pode ser avisado.",
+  },
+  age: {
+    need: "Para emitir ou receber, confirma que tens pelo menos 18 anos. Não é uma verificação de identidade nem de idade.",
+    declared: "Declaraste ter pelo menos 18 anos. Não é uma idade nem uma identidade verificadas.",
+    button: "Tenho pelo menos 18 anos",
   },
   common: { loading: "A carregar…", error: "Algo correu mal. Tenta de novo.", anonymous: "Pessoa anónima", back: "Voltar", save: "Guardar", admin: "Moderação" },
 };

@@ -58,6 +58,8 @@ const ha: Messages = {
   },
   wallet: {
     lightsTitle: "Fitilu",
+    reserved: "An riƙe don duba",
+    demoEarnings: "Kuɗin gwaji, ba a biya",
     earned: "An samu",
     frozen: "An daskarar",
     paid: "An biya",
@@ -140,6 +142,12 @@ const ha: Messages = {
     disabled: "Ba a saita SEED_SECRET ba, don haka cikawa daga burauza a kashe take.",
   },
   admin: {
+    money: "Kuɗi a duba",
+    moneyNote: "Ƙungiya ce kawai ke buɗe riƙe biya. Mutum ba ya mayar wa kansa fitilu.",
+    restore: "Mayar da fitilu",
+    release: "Saki biya",
+    retain: "Riƙe",
+    reversed: "Fitilun da aka mayar",
     title: "Kula", intro: "Cikin natsuwa da adalci. Babu kunya a fili — shawara kawai game da abin da ya rage a al'umma.",
     reports: "Sanarwa", comments: "Kalmomin da aka riƙe", creators: "Tabbaci", audit: "Littafi",
     verify: "Tabbatar", reject: "Ƙi", hide: "Ɓoye", show: "Nuna", dismiss: "Ajiye", review: "An duba",
@@ -180,6 +188,11 @@ const ha: Messages = {
     liveBody: "Wanda yake raba zai iya fara watsa daga waya. Za ka iya zama tare da shi da magana, da zuciya, da kyauta. A da'irar albarka mutane da yawa suna raba ɗaki ɗaya, kuma kowa yana samun albarka.",
     dignityTitle: "Mutunci",
     dignityBody: "Ba mu yin bara, kuma ba mu wulakantar kowa. Wanda aka ɗauka dole ya yarda. Ga yaro, iyaye suna yarda. Idan wani abu ya rauni, ana iya sanar da shi.",
+  },
+  age: {
+    need: "Don watsa ko karɓa, tabbatar kana da aƙalla shekara 18. Wannan ba tantancewar shaida ko shekaru ba ne.",
+    declared: "Ka faɗi kana da aƙalla shekara 18. Wannan ba tabbataccen shekaru ko shaida ba ne.",
+    button: "Ina da aƙalla shekara 18",
   },
   common: { loading: "Ana lodi…", error: "Wani abu bai yi nasara ba. Sake gwadawa.", anonymous: "Mutum ba tare da suna ba", back: "Koma", save: "Ajiye", admin: "Kula" },
 };

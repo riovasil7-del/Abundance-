@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/server/auth";
 import { beginPackPurchase, CreditError } from "@/server/credits";
 import { financialDenial } from "@/server/money";
 import { jsonError } from "@/server/http";
-import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { consumeDurableLimit } from "@/server/ratelimit";
 
 const bodySchema = z.object({
   packSlug: z.string().trim().min(1).max(40),
@@ -15,7 +15,7 @@ const bodySchema = z.object({
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || financialDenial(user)) return jsonError(401, "UNAUTHENTICATED");
-  const limit = memoryRateLimiter.consume(clientKey(request, "lights", user.id), 8, 60 * 60 * 1000);
+  const limit = await consumeDurableLimit("lights", user.id, 8, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { audit } from "@/server/audit";
 import { getCurrentUser } from "@/server/auth";
+import { adultDecision } from "@/server/money";
 import { jsonError } from "@/server/http";
 import { readLiveKitCredentials } from "@/server/live-access";
 import { openLiveSession } from "@/server/live-sessions";
@@ -14,6 +15,7 @@ const bodySchema = z.object({
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
+  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
   if (!readLiveKitCredentials()) return jsonError(503, "LIVE_NOT_CONFIGURED");
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));

@@ -58,6 +58,8 @@ const fr: Messages = {
   },
   wallet: {
     lightsTitle: "Lumières",
+    reserved: "Retenu pour revue",
+    demoEarnings: "Gains d'essai, non versables",
     earned: "Gagné",
     frozen: "Gelé",
     paid: "Versé",
@@ -140,6 +142,12 @@ const fr: Messages = {
     disabled: "SEED_SECRET n'est pas défini, le remplissage depuis le navigateur est éteint.",
   },
   admin: {
+    money: "Argent en revue",
+    moneyNote: "Seule l'équipe lève un gel de versement. Personne ne se rend des lumières.",
+    restore: "Rendre les lumières",
+    release: "Libérer le versement",
+    retain: "Garder",
+    reversed: "Lumières reprises",
     title: "Modération", intro: "Avec calme et justesse. Pas d'humiliation publique — seulement une décision sur ce qui reste dans la communauté.",
     reports: "Signalements", comments: "Mots retenus", creators: "Vérification", audit: "Journal",
     verify: "Vérifier", reject: "Refuser", hide: "Cacher", show: "Montrer", dismiss: "Classer", review: "Traité",
@@ -180,6 +188,11 @@ const fr: Messages = {
     liveBody: "Une personne peut commencer une émission depuis le téléphone. Tu peux être avec elle par un mot, un cœur et un don. Dans un cercle de bénédiction, plusieurs personnes partagent une salle, et chacune est bénie.",
     dignityTitle: "Dignité",
     dignityBody: "Nous ne mendions pas et nous n'humilions personne. Toute personne filmée doit accepter. Pour un enfant, un parent accepte. Si quelque chose blesse, on peut le signaler.",
+  },
+  age: {
+    need: "Pour émettre ou recevoir, confirmez avoir au moins 18 ans. Ce n'est pas une vérification d'identité ni d'âge.",
+    declared: "Vous avez déclaré avoir au moins 18 ans. Ce n'est pas un âge ni une identité vérifiés.",
+    button: "J'ai au moins 18 ans",
   },
   common: { loading: "Chargement…", error: "Quelque chose n'a pas marché. Réessaie.", anonymous: "Personne anonyme", back: "Retour", save: "Enregistrer", admin: "Modération" },
 };

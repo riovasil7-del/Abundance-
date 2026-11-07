@@ -58,6 +58,8 @@ const zu: Messages = {
   },
   wallet: {
     lightsTitle: "Izibani",
+    reserved: "Kubanjelwe ukubuyekezwa",
+    demoEarnings: "Imali yokuhlola, ayikhokhelwa",
     earned: "Okuzuziwe",
     frozen: "Okumisiwe",
     paid: "Okukhokhelwe",
@@ -140,6 +142,12 @@ const zu: Messages = {
     disabled: "I-SEED_SECRET ayimisiwe, ngakho ukugcwalisa kusuka kusiphequluli kucishiwe.",
   },
   admin: {
+    money: "Imali esahlolwa",
+    moneyNote: "Ithimba kuphela elikhipha ukubanjwa kwenkokhelo. Akekho ozibuyisela izibani.",
+    restore: "Buyisela izibani",
+    release: "Dedela inkokhelo",
+    retain: "Bamba",
+    reversed: "Izibani ezibuyisiwe",
     title: "Ukunakekela", intro: "Ngokuthula nangokulunga. Akukho ihlazo esobaleni — isinqumo nje sokuthi yini ehlala emphakathini.",
     reports: "Imibiko", comments: "Amagama agciniwe", creators: "Ukuqinisekisa", audit: "Incwadi",
     verify: "Qinisekisa", reject: "Yenqaba", hide: "Fihla", show: "Khombisa", dismiss: "Beka eceleni", review: "Kubhekiwe",
@@ -180,6 +188,11 @@ const zu: Messages = {
     liveBody: "Ophana angakwazi ukuqala ukusakaza ocingweni. Ungaba naye ngegama, ngenhliziyo, nangesipho. Embuthanweni wesibusiso abantu abaningi babelana ngegumbi elilodwa, wonke umuntu ubusiswa.",
     dignityTitle: "Isithunzi",
     dignityBody: "Asiceli, futhi asihlazi muntu. Othwetshulwayo kufanele avume. Enganeni, umzali uyavuma. Uma into ibuhlungu, ingabikwa.",
+  },
+  age: {
+    need: "Ukuze usakaze noma wamukele, qinisekisa ukuthi uneminyaka okungenani engu-18. Lokhu akusiwo ukuhlolwa kobunikazi noma kobudala.",
+    declared: "Uzisho wena ukuthi uneminyaka okungenani engu-18. Lokhu akubona ubudala noma ubunikazi obuqinisekisiwe.",
+    button: "Ngineiminyaka okungenani engu-18",
   },
   common: { loading: "Iyalayisha…", error: "Kukhona okungahambanga kahle. Zama futhi.", anonymous: "Umuntu ongenagama", back: "Emuva", save: "Londoloza", admin: "Ukunakekela" },
 };

@@ -43,6 +43,7 @@ export async function recordDonation(input: {
   holdDays: number;
   note?: string;
   liveSessionId?: string | null;
+  sandbox?: boolean;
 }, writer: Prisma.TransactionClient | PrismaClient = db): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
   const split = assertSplitMatchesPrice(input.priceCents, input.charge.split);
   const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
@@ -81,6 +82,7 @@ export async function recordDonation(input: {
       familyMembershipId: input.familyMembershipId ?? null,
       holdUntil: holdUntil(input.holdDays),
       note: input.note,
+      sandbox: input.sandbox ?? input.charge.mode === "demo",
       liveSessionId: input.liveSessionId ?? null,
       allocations: {
         create: input.shares.map((share) => ({

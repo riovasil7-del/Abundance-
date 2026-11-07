@@ -58,6 +58,8 @@ const pl: Messages = {
   },
   wallet: {
     lightsTitle: "Światełka",
+    reserved: "Wstrzymane do kontroli",
+    demoEarnings: "Próbne wpływy, niewypłacalne",
     earned: "Zarobione",
     frozen: "Zamrożone",
     paid: "Wypłacone",
@@ -140,6 +142,12 @@ const pl: Messages = {
     disabled: "SEED_SECRET nie jest ustawione, więc napełnianie z przeglądarki jest wyłączone.",
   },
   admin: {
+    money: "Pieniądze w kontroli",
+    moneyNote: "Tylko zespół zdejmuje wstrzymanie wypłaty. Nikt nie oddaje sobie światełek.",
+    restore: "Zwróć światełka",
+    release: "Zwolnij wypłatę",
+    retain: "Zatrzymaj",
+    reversed: "Cofnięte światełka",
     title: "Moderacja", intro: "Cicho i sprawiedliwie. Bez publicznego zawstydzania — tylko decyzja, co zostaje we wspólnocie.",
     reports: "Zgłoszenia", comments: "Zatrzymane słowa", creators: "Sprawdzenie osób", audit: "Dziennik",
     verify: "Sprawdzić", reject: "Odrzucić", hide: "Ukryć", show: "Pokazać", dismiss: "Odłożyć", review: "Załatwione",
@@ -180,6 +188,11 @@ const pl: Messages = {
     liveBody: "Osoba, która się dzieli, może zacząć transmisję z telefonu. Ty możesz być z nią słowem, sercem i darem. W kręgu błogosławieństwa kilka osób jest w jednej izbie i każdy jest błogosławiony.",
     dignityTitle: "Godność",
     dignityBody: "Nie żebrzemy i nikogo nie upokarzamy. Kogo filmujemy, musi się zgodzić. Przy dziecku zgodę daje rodzic. Jeśli coś boli, można to zgłosić.",
+  },
+  age: {
+    need: "Aby nadawać albo przyjmować dary, potwierdź, że masz co najmniej 18 lat. To nie jest sprawdzenie tożsamości ani wieku.",
+    declared: "Samodzielnie podałeś, że masz co najmniej 18 lat. To nie jest zweryfikowany wiek ani tożsamość.",
+    button: "Mam co najmniej 18 lat",
   },
   common: { loading: "Wczytuję…", error: "Coś się nie udało. Spróbuj jeszcze raz.", anonymous: "Osoba anonimowa", back: "Wstecz", save: "Zapisz", admin: "Moderacja" },
 };
