@@ -40,6 +40,7 @@ export default async function UploadPage() {
         <Link href="/rules">{messages.upload.rulesLink}</Link>
       </div>
       <StoryForm
+        ownerId={user.id}
         circles={memberships.map((membership) => ({
           id: membership.circle.id,
           title: pickLocalized(locale, membership.circle.title, membership.circle.titleEn),

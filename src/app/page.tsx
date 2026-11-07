@@ -41,6 +41,7 @@ export default async function HomePage() {
         loggedIn={Boolean(user)}
         viewerName={user?.name ?? null}
         lightBalance={lights}
+        initialLowData={Boolean(user?.lowData)}
       />
     </div>
   );

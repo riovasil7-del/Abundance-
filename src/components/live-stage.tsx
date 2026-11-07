@@ -3,6 +3,7 @@
 import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useConnectionState, useParticipants, useRoomContext, useTracks } from "@livekit/components-react";
 import { ConnectionState, RoomEvent, Track, type RoomOptions } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
+import { remoteVideoSubscribed } from "@/lib/low-data";
 import { formatMoney } from "@/lib/format";
 import { capTail } from "@/lib/gift-guard";
 import type { GiftChoice, Receipt } from "@/lib/types";
@@ -114,6 +115,7 @@ function Broadcast({
   const people = useParticipants();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
   const [audioOnly, setAudioOnly] = useState(false);
+  const [cameraOn, setCameraOn] = useState(canPublish);
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [muted, setMuted] = useState(false);
   const [hearts, setHearts] = useState<Heart[]>([]);
@@ -264,16 +266,27 @@ function Broadcast({
   }, [sessionId, blocked]);
 
   useEffect(() => {
-    room.remoteParticipants.forEach((participant) => {
-      participant.trackPublications.forEach((publication) => {
-        if (publication.kind === Track.Kind.Video) publication.setSubscribed(!audioOnly);
+    const subscribe = remoteVideoSubscribed(audioOnly);
+    const apply = () => {
+      room.remoteParticipants.forEach((participant) => {
+        participant.trackPublications.forEach((publication) => {
+          if (publication.kind === Track.Kind.Video) publication.setSubscribed(subscribe);
+        });
       });
-    });
+    };
+    apply();
+    const onPublished = (publication: { kind: Track.Kind; setSubscribed: (subscribed: boolean) => void }) => {
+      if (publication.kind === Track.Kind.Video) publication.setSubscribed(subscribe);
+    };
+    room.on(RoomEvent.TrackPublished, onPublished);
     if (canPublish) {
-      room.localParticipant.setCameraEnabled(!audioOnly, { facingMode: facing }).catch(() => setMediaNote(m.live.cameraNeed));
+      room.localParticipant.setCameraEnabled(cameraOn && subscribe, { facingMode: facing }).catch(() => setMediaNote(m.live.cameraNeed));
       room.localParticipant.setMicrophoneEnabled(!muted).catch(() => setMediaNote(m.live.cameraNeed));
     }
-  }, [audioOnly, canPublish, facing, room]);
+    return () => {
+      room.off(RoomEvent.TrackPublished, onPublished);
+    };
+  }, [audioOnly, cameraOn, canPublish, facing, muted, room, m.live.cameraNeed]);
 
   async function sendHeart() {
     const now = Date.now();
@@ -487,12 +500,16 @@ function Broadcast({
         ) : null}
         {canPublish ? (
           <>
+            <button type="button" onClick={() => setCameraOn((value) => !value)} aria-pressed={cameraOn && !audioOnly}>
+              {cameraOn && !audioOnly ? "●" : "○"}
+              <span>{cameraOn && !audioOnly ? m.studio.cameraOff : m.studio.cameraOn}</span>
+            </button>
             <button
               type="button"
               onClick={() => {
                 const next = facing === "user" ? "environment" : "user";
                 setFacing(next);
-                room.localParticipant.setCameraEnabled(true, { facingMode: next }).catch(() => undefined);
+                setCameraOn(true);
               }}
             >
               ↻<span>{m.live.flip}</span>

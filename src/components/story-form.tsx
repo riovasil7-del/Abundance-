@@ -1,14 +1,15 @@
 "use client";
 
-import { useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useRouter } from "next/navigation";
 import { DEED_KINDS } from "@/config/app";
+import { saveDeviceDraft } from "@/lib/draft-store";
 import { useI18n } from "./providers";
 
 type Region = { x: number; y: number; w: number; h: number };
 type Mode = "TEXT" | "NO_FACES" | "COVERED";
 
-export function StoryForm({ circles }: { circles: { id: string; title: string }[] }) {
+export function StoryForm({ circles, ownerId }: { circles: { id: string; title: string }[]; ownerId: string }) {
   const { messages: m } = useI18n();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("TEXT");
@@ -18,7 +19,18 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const frame = useRef<HTMLDivElement>(null);
+  const tokenRef = useRef(typeof crypto !== "undefined" ? crypto.randomUUID() : "story-token");
+  const [photoGate, setPhotoGate] = useState<"local-test" | "durable" | "blocked">("local-test");
   const start = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    void fetch("/api/account/data")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.photo === "blocked" || data.photo === "durable" || data.photo === "local-test") setPhotoGate(data.photo);
+      })
+      .catch(() => undefined);
+  }, []);
 
   function point(event: PointerEvent<HTMLDivElement>) {
     const box = frame.current?.getBoundingClientRect();
@@ -65,6 +77,7 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
             deedKind: data.get("deedKind"),
             circleId: data.get("circleId"),
             visibility,
+            clientToken: tokenRef.current,
           }),
         });
         const body = await response.json().catch(() => ({}));
@@ -72,6 +85,7 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
           setError(m.common.error);
           return;
         }
+        tokenRef.current = crypto.randomUUID();
         router.push(`/creator/${body.slug}`);
         router.refresh();
         return;
@@ -85,14 +99,35 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
       data.set("regions", JSON.stringify(regions));
       data.set("reviewed", previewUrl ? "true" : "false");
       data.set("visibility", visibility);
+      data.set("clientToken", tokenRef.current);
       const response = await fetch("/api/stories", { method: "POST", body: data });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setError(body.error === "VIDEO_REDACTION_UNSUPPORTED" ? m.upload.noVideo : body.error === "REVIEW_REQUIRED" ? m.upload.reviewFirst : m.common.error);
+        setError(
+          body.error === "VIDEO_REDACTION_UNSUPPORTED"
+            ? m.upload.noVideo
+            : body.error === "REVIEW_REQUIRED"
+              ? m.upload.reviewFirst
+              : body.error === "MEDIA_BLOCKED"
+                ? m.studio.storageBlocked
+                : m.common.error,
+        );
         return;
       }
+      tokenRef.current = crypto.randomUUID();
       router.push(`/creator/${body.slug}`);
       router.refresh();
+    } catch {
+      const formData = new FormData(form);
+      await saveDeviceDraft({
+        id: tokenRef.current,
+        ownerId,
+        title: String(formData.get("title") ?? ""),
+        caption: String(formData.get("caption") ?? ""),
+        deedKind: String(formData.get("deedKind") ?? "good_deed"),
+        updatedAt: Date.now(),
+      });
+      setError(navigator.onLine ? m.studio.retry : m.studio.offline);
     } finally {
       setBusy(false);
     }
@@ -139,6 +174,8 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
           ))}
         </select>
       </label>
+      {photoGate === "local-test" ? <p className="notice">{m.studio.storageLocal}</p> : null}
+      {photoGate === "blocked" ? <p className="notice">{m.studio.storageBlocked}</p> : null}
       <fieldset>
         <legend>{m.upload.how}</legend>
         <label className="check-row">
@@ -146,11 +183,11 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
           <span>{m.upload.wordsOnly}</span>
         </label>
         <label className="check-row">
-          <input type="radio" name="mode" checked={mode === "NO_FACES"} onChange={() => setMode("NO_FACES")} />
+          <input type="radio" name="mode" checked={mode === "NO_FACES"} disabled={photoGate === "blocked"} onChange={() => setMode("NO_FACES")} />
           <span>{m.upload.noFaces}</span>
         </label>
         <label className="check-row">
-          <input type="radio" name="mode" checked={mode === "COVERED"} onChange={() => setMode("COVERED")} />
+          <input type="radio" name="mode" checked={mode === "COVERED"} disabled={photoGate === "blocked"} onChange={() => setMode("COVERED")} />
           <span>{m.upload.cover}</span>
         </label>
       </fieldset>
@@ -221,6 +258,23 @@ export function StoryForm({ circles }: { circles: { id: string; title: string }[
         onClick={(event) => void publish(event.currentTarget.form!, "DRAFT")}
       >
         {m.upload.draft}
+      </button>
+      <button
+        className="btn-ghost"
+        type="button"
+        onClick={(event) => {
+          const data = new FormData(event.currentTarget.form!);
+          void saveDeviceDraft({
+            id: tokenRef.current,
+            ownerId,
+            title: String(data.get("title") ?? ""),
+            caption: String(data.get("caption") ?? ""),
+            deedKind: String(data.get("deedKind") ?? "good_deed"),
+            updatedAt: Date.now(),
+          }).then(() => setError(m.studio.offline));
+        }}
+      >
+        {m.studio.keepHere}
       </button>
     </form>
   );

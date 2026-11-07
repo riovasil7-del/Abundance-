@@ -198,7 +198,7 @@ textarea { min-height: 96px; resize: vertical; }
 .pill.soft { background: #e7f3fb; color: #245774; }
 
 .feed-switch {
-  display: flex; gap: 6px; padding: 8px 10px 0; overflow-x: auto;
+  display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px 0;
 }
 .feed-switch button {
   border: 1px solid var(--line); border-radius: 999px; min-height: 36px; padding: 0 12px;
