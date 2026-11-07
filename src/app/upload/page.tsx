@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UploadForm } from "@/components/upload-form";
+import { StoryForm } from "@/components/story-form";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
@@ -39,7 +39,7 @@ export default async function UploadPage() {
         <h1>{messages.upload.title}</h1>
         <Link href="/rules">{messages.upload.rulesLink}</Link>
       </div>
-      <UploadForm
+      <StoryForm
         circles={memberships.map((membership) => ({
           id: membership.circle.id,
           title: pickLocalized(locale, membership.circle.title, membership.circle.titleEn),

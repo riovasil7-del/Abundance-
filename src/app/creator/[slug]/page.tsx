@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StoryDesk } from "@/components/story-desk";
 import { CreatorBond } from "@/components/creator-bond";
 import { FamilyJoin } from "@/components/creator-actions";
 import { StartLiveButton } from "@/components/start-live-button";
@@ -18,7 +19,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
   const user = await getCurrentUser();
   const creator = await db.creatorProfile.findUnique({
     where: { slug },
-    include: { videos: { where: { moderationStatus: "VISIBLE" }, orderBy: { createdAt: "desc" } } },
+    include: { videos: { orderBy: { createdAt: "desc" } } },
   });
   if (!creator) {
     return (
@@ -70,7 +71,9 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
       <section className="stack">
         <h2>{messages.creator.videos}</h2>
         <div className="video-grid">
-          {creator.videos.map((video) => (
+          {creator.videos
+            .filter((video) => video.visibility === "PUBLISHED" && video.moderationStatus === "VISIBLE")
+            .map((video) => (
             <Link key={video.id} href="/" className="thumb">
               {video.posterUrl ? <img src={video.posterUrl} alt="" /> : <div className="ph" />}
               <span>
@@ -82,6 +85,16 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
           ))}
         </div>
       </section>
+      {self ? (
+        <StoryDesk
+          stories={creator.videos.map((video) => ({
+            id: video.id,
+            title: video.title,
+            visibility: video.visibility,
+            mediaKind: video.mediaKind,
+          }))}
+        />
+      ) : null}
 
       <CreatorBond
         creatorUserId={creator.userId}

@@ -19,7 +19,7 @@ export type FeedVideo = {
   id: string;
   title: string;
   caption: string;
-  playbackUrl: string;
+  playbackUrl: string | null;
   posterUrl: string | null;
   deedLabel: string;
   blessingCount: number;

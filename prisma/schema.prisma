@@ -138,9 +138,15 @@ model Video {
   titleEn          String?
   caption          String
   captionEn        String?
-  storageKey       String
-  playbackUrl      String
+  storageKey       String?
+  playbackUrl      String?
   posterUrl        String?
+  /// DRAFT and PRIVATE stay off every feed. PUBLISHED can be discovered.
+  visibility       String           @default("PUBLISHED")
+  /// NONE is a text story. PHOTO is a redacted PNG. VIDEO is older demo media.
+  mediaKind        String           @default("VIDEO")
+  /// TEXT_ONLY, NO_FACES, or COVERED. This is not a legal-consent check.
+  peopleNote       String?
   durationSec      Int              @default(8)
   deedKind         String
   /// Language of the picture and the words. Not a device location.
@@ -157,6 +163,7 @@ model Video {
   transactions LedgerTransaction[]
 
   @@index([moderationStatus, createdAt])
+  @@index([visibility, moderationStatus, createdAt])
   @@index([deedKind, createdAt])
   @@index([creatorId, createdAt])
 }

@@ -218,6 +218,14 @@ textarea { min-height: 96px; resize: vertical; }
 .slide { height: 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 10px; }
 .video-card { position: relative; height: 100%; border-radius: 28px; overflow: hidden; background: #1d1814; box-shadow: var(--shadow); }
 .video-el, .video-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%; }
+.cover-frame {
+  position: relative; height: 180px; border: 1px dashed var(--line); border-radius: 16px; touch-action: none;
+}
+.cover-frame i { position: absolute; background: rgba(36, 25, 16, 0.92); }
+.text-story {
+  position: absolute; inset: 0; padding: 64px 18px 18px; color: #fffaf3;
+  background: linear-gradient(180deg, #8d6a45, #2a211c);
+}
 .video-shade {
   position: absolute; inset: auto 0 0 0; height: 34%;
   background: linear-gradient(180deg, transparent, rgba(28, 21, 14, 0.72));

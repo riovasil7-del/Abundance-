@@ -51,6 +51,7 @@ export async function loadFeedPage(input: {
   const videos = await db.video.findMany({
     where: {
       moderationStatus: "VISIBLE",
+      visibility: "PUBLISHED",
       ...(input.view === "following" ? { creator: { userId: { in: followedUserIds } } } : {}),
       ...(input.view === "community"
         ? { OR: [{ deedKind: { in: ["good_deed", "craft", "gratitude"] } }, { circleId: { not: null } }] }
@@ -146,7 +147,7 @@ function toFeedVideo(
     titleEn: string | null;
     caption: string;
     captionEn: string | null;
-    playbackUrl: string;
+    playbackUrl: string | null;
     posterUrl: string | null;
     deedKind: string;
     _count: { blessings: number; comments: number };
