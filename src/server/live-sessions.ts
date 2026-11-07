@@ -48,6 +48,10 @@ export async function loadLiveAudience(sessionId: string): Promise<{
 } | null> {
   const session = await fetchSession(sessionId);
   if (!session) return null;
+  const accepted = await db.liveInvite.findMany({
+    where: { sessionId, status: "ACCEPTED", consentAt: { not: null } },
+    select: { inviteeId: true },
+  });
   return {
     session,
     audience: {
@@ -55,6 +59,7 @@ export async function loadLiveAudience(sessionId: string): Promise<{
       circlePublisherUserIds: session.circle
         ? session.circle.participants.map((participant) => participant.creator.userId)
         : null,
+      cohostUserIds: accepted.map((invite) => invite.inviteeId),
     },
   };
 }

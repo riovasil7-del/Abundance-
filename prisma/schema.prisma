@@ -85,6 +85,12 @@ model User {
   blocksReceived    UserBlock[]         @relation("BlocksReceived")
   creditEntries     CreditEntry[]
   accountReviews    AccountReview[]
+  followsOut        Follow[]           @relation("FollowsOut")
+  followsIn         Follow[]           @relation("FollowsIn")
+  creatorUpdates    CreatorUpdate[]
+  notesSent         Encouragement[]    @relation("EncouragementFrom")
+  notesReceived     Encouragement[]    @relation("EncouragementTo")
+  liveInvites       LiveInvite[]
 }
 
 model CreatorProfile {
@@ -324,6 +330,7 @@ model LiveSession {
 
   messages     LiveMessage[]
   transactions LedgerTransaction[]
+  invites      LiveInvite[]
 
   @@index([status, startedAt])
 }
@@ -501,4 +508,60 @@ model PayoutRequest {
   status      String
   reference   String?
   createdAt   DateTime       @default(now())
+}
+
+/// One row per supporter and creator. A second follow does not create a second row.
+model Follow {
+  id         String   @id @default(cuid())
+  followerId String
+  creatorId  String
+  createdAt  DateTime @default(now())
+  follower   User     @relation("FollowsOut", fields: [followerId], references: [id], onDelete: Cascade)
+  creator    User     @relation("FollowsIn", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, creatorId])
+  @@index([creatorId])
+}
+
+/// In-app note from a creator. Nothing here sends email, SMS, or a push.
+model CreatorUpdate {
+  id               String           @id @default(cuid())
+  creatorId        String
+  creator          User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  body             String
+  moderationStatus ModerationStatus @default(VISIBLE)
+  createdAt        DateTime         @default(now())
+
+  @@index([creatorId, createdAt])
+}
+
+/// Private thanks or a helpful mark. Only the recipient can list these. Not a ranking.
+model Encouragement {
+  id               String           @id @default(cuid())
+  fromUserId       String
+  toUserId         String
+  fromUser         User             @relation("EncouragementFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser           User             @relation("EncouragementTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  kind             String
+  body             String
+  moderationStatus ModerationStatus @default(VISIBLE)
+  createdAt        DateTime         @default(now())
+
+  @@index([toUserId, createdAt])
+}
+
+/// Host invite for one extra co-host. Publishing waits for an explicit accept and camera consent.
+model LiveInvite {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  inviteeId String
+  invitee   User        @relation(fields: [inviteeId], references: [id], onDelete: Cascade)
+  status    String      @default("PENDING")
+  consentAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([sessionId, inviteeId])
+  @@index([inviteeId, status])
 }

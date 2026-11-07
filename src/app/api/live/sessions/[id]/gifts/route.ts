@@ -6,7 +6,7 @@ import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { randomUUID } from "node:crypto";
 import { CreditError, catalogPriceCents, spendLights } from "@/server/credits";
-import { sharesFromNet } from "@/server/ledger";
+import { liveGiftShares } from "@/server/community-rules";
 import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
 import { publishRoomEvent } from "@/server/live-events";
 import { adultDecision } from "@/server/money";
@@ -38,38 +38,58 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const gift = await db.gift.findUnique({ where: { slug: parsed.data.giftSlug } });
   if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
 
-  const recipients = session.circle
-    ? orderedVerified(session.circle.participants)
-    : [
-        {
-          creatorId: session.host.id,
-          displayName: session.host.displayName,
-          payoutHoldDays: session.host.payoutHoldDays,
-          stripeAccountId: session.host.stripeAccountId,
-        },
-      ];
-  if (recipients.length === 0) return jsonError(422, "NO_VERIFIED_PARTICIPANTS");
+  const acceptedInvites = await db.liveInvite.findMany({
+    where: { sessionId: session.id, status: "ACCEPTED", consentAt: { not: null } },
+    include: { invitee: { include: { creatorProfile: true } } },
+  });
+  const cohostProfiles = acceptedInvites.flatMap((invite) =>
+    invite.invitee.creatorProfile && invite.invitee.adultAttestedAt ? [invite.invitee.creatorProfile] : [],
+  );
+  const circlePeople = session.circle ? orderedVerified(session.circle.participants) : [];
+  const catalog = new Map(
+    [
+      {
+        creatorId: session.host.id,
+        displayName: session.host.displayName,
+        payoutHoldDays: session.host.payoutHoldDays,
+        stripeAccountId: session.host.stripeAccountId,
+      },
+      ...circlePeople,
+      ...cohostProfiles.map((profile) => ({
+        creatorId: profile.id,
+        displayName: profile.displayName,
+        payoutHoldDays: profile.payoutHoldDays,
+        stripeAccountId: profile.stripeAccountId,
+      })),
+    ].map((person) => [person.creatorId, person]),
+  );
+  const priceCents = catalogPriceCents(gift.priceCents, raw);
+  const shared = liveGiftShares({
+    priceCents,
+    selectedCreatorId: parsed.data.recipientCreatorId ?? null,
+    hostCreatorId: session.host.id,
+    circleCreatorIds: session.circle ? circlePeople.map((person) => person.creatorId) : null,
+    acceptedCohostCreatorIds: cohostProfiles.map((profile) => profile.id),
+  });
+  if ("error" in shared) return jsonError(403, shared.error);
+  const recipients = shared.shares.map((share) => catalog.get(share.creatorId)).filter((person) => person != null);
+  if (recipients.length !== shared.shares.length || recipients.length === 0) return jsonError(422, "NO_VERIFIED_PARTICIPANTS");
   if (user.creatorProfile && recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)) {
     return jsonError(400, "SELF_GIFT");
   }
-
-  const priceCents = catalogPriceCents(gift.priceCents, raw);
   const settled = settleLiveGift({
     catalogPriceCents: priceCents,
     untrustedClientAmount: raw,
     verifiedRecipientCount: recipients.length,
   });
-  const shares = sharesFromNet(
-    recipients.map((recipient) => recipient.creatorId),
-    settled.netCents,
-  );
+  const shares = shared.shares;
   let spent;
   try {
     spent = await spendLights({
       donorId: user.id,
       priceCents,
       token: parsed.data.token ?? randomUUID(),
-      kind: session.circle ? "CIRCLE" : "GIFT",
+      kind: shared.attributedTo === "circle" ? "CIRCLE" : "GIFT",
       shares,
       circleId: session.circleId,
       giftId: gift.id,
@@ -100,6 +120,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         feeCents: transaction.feeCents,
         netCents: transaction.netCents,
         liveSessionId: session.id,
+        attributedTo: shared.attributedTo,
       },
     });
   }

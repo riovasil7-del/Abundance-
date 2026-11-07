@@ -70,3 +70,27 @@ test("viewer tokens subscribe only; the creator token can publish", async () => 
   assert.equal(viewerGrant?.canSubscribe, true);
   assert.equal(viewerGrant?.canPublishData, true);
 });
+
+test("mocked LiveKit token, no live server: an accepted co-host can publish and a viewer cannot", async () => {
+  const audience = { hostUserId: "host", circlePublisherUserIds: null, cohostUserIds: ["cohost"] };
+  const cohost = await tokenForParticipant({
+    credentials,
+    userId: "cohost",
+    name: "Joseph",
+    room: "solo_host",
+    audience,
+  });
+  const viewer = await tokenForParticipant({
+    credentials,
+    userId: "viewer",
+    name: "Elena",
+    room: "solo_host",
+    audience,
+  });
+  assert.equal(cohost.canPublish, true);
+  assert.equal(viewer.canPublish, false);
+  const cohostGrant = await readVideoGrant(cohost.token, credentials.apiKey, credentials.apiSecret);
+  const viewerGrant = await readVideoGrant(viewer.token, credentials.apiKey, credentials.apiSecret);
+  assert.equal(cohostGrant?.canPublish, true);
+  assert.equal(viewerGrant?.canPublish, false);
+});

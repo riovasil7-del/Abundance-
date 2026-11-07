@@ -4,16 +4,20 @@ import { AccessToken, TokenVerifier, type VideoGrant } from "livekit-server-sdk"
  * Who may publish in a room.
  * A solo room lists no circle publishers: only the creator who opened it can publish.
  * A blessing-circle room lists every participant creator. Supporters never publish.
+ * An accepted co-host can publish only after they consent. A viewer request cannot add a grant.
  * There is no rank and no "winner" grant.
  */
 export type LiveAudience = {
   hostUserId: string;
   circlePublisherUserIds: readonly string[] | null;
+  /** User ids with an accepted invite and recorded camera or microphone consent. */
+  cohostUserIds?: readonly string[];
 };
 
 export function canPublishToRoom(userId: string, audience: LiveAudience): boolean {
-  if (!userId) return false;
+  if (!userId || userId.startsWith("guest_")) return false;
   if (userId === audience.hostUserId) return true;
+  if (audience.cohostUserIds?.includes(userId)) return true;
   return Boolean(audience.circlePublisherUserIds?.includes(userId));
 }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CreatorBond } from "@/components/creator-bond";
 import { FamilyJoin } from "@/components/creator-actions";
 import { StartLiveButton } from "@/components/start-live-button";
 import { readLiveKitCredentials } from "@/server/live-access";
@@ -37,6 +38,14 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
     : null;
   const tiers = FAMILY_TIERS_CENTS.map((cents) => ({ cents, netCents: splitDonation(cents).netCents }));
   const self = user?.creatorProfile?.id === creator.id;
+  const following = user
+    ? Boolean(await db.follow.findUnique({ where: { followerId_creatorId: { followerId: user.id, creatorId: creator.userId } } }))
+    : false;
+  const updates = await db.creatorUpdate.findMany({
+    where: { creatorId: creator.userId, moderationStatus: "VISIBLE" },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
 
   return (
     <div className="page stack">
@@ -74,6 +83,13 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
+      <CreatorBond
+        creatorUserId={creator.userId}
+        self={self}
+        loggedIn={Boolean(user)}
+        initialFollowing={following}
+        updates={updates.map((update) => ({ id: update.id, body: update.body }))}
+      />
       {self ? <StartLiveButton configured={Boolean(readLiveKitCredentials())} /> : null}
       {user && !self ? <FamilyJoin creatorId={creator.id} tiers={tiers} already={membership?.status === "ACTIVE"} /> : null}
       {!user ? (

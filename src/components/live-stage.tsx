@@ -9,6 +9,7 @@ import type { GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
+import { CollabPanel } from "./collab-panel";
 import { Sheet } from "./sheet";
 
 const roomOptions: RoomOptions = {
@@ -122,17 +123,35 @@ function Broadcast({
   const [draft, setDraft] = useState("");
   const [chatNote, setChatNote] = useState<string | null>(null);
   const [giftOpen, setGiftOpen] = useState(false);
+  const [collabOpen, setCollabOpen] = useState(false);
   const [slug, setSlug] = useState(gifts[0]?.slug ?? "");
   const [anonymous, setAnonymous] = useState(false);
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [blessingNet, setBlessingNet] = useState(initialBlessingNetCents);
   const [lights, setLights] = useState(initialLightBalance);
+  const [recipients, setRecipients] = useState<{ creatorId: string; name: string }[]>([]);
+  const [recipientId, setRecipientId] = useState("");
   const [blocked, setBlocked] = useState<string[]>([]);
   const seenGifts = useRef(new Set<string>());
   const primed = useRef(false);
   const heartStamps = useRef<number[]>([]);
   const chosen = gifts.find((gift) => gift.slug === slug) ?? gifts[0];
+  useEffect(() => {
+    if (!giftOpen) return;
+    let cancelled = false;
+    fetch(`/api/live/sessions/${sessionId}/collab`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.recipients) return;
+        setRecipients(data.recipients);
+        setRecipientId((current) => current || data.recipients[0]?.creatorId || "");
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [giftOpen, sessionId]);
   const connection = useConnectionState();
   const [chatPaused, setChatPaused] = useState(false);
   const pausedRef = useRef(false);
@@ -302,7 +321,12 @@ function Broadcast({
         const response = await fetch(`/api/live/sessions/${sessionId}/gifts`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token }),
+          body: JSON.stringify({
+            giftSlug: chosen.slug,
+            anonymous,
+            token,
+            ...(recipientId ? { recipientCreatorId: recipientId } : {}),
+          }),
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
@@ -451,6 +475,11 @@ function Broadcast({
         <button type="button" aria-label={m.live.heart} onClick={() => void sendHeart()}>
           ♥<span>{m.live.heart}</span>
         </button>
+        {loggedIn ? (
+          <button type="button" onClick={() => setCollabOpen(true)}>
+            +<span>{m.bond.cohosts}</span>
+          </button>
+        ) : null}
         {loggedIn && !isHost ? (
           <button type="button" onClick={() => { setReceipt(null); setGiftOpen(true); }}>
             ✦<span>{m.live.gift}</span>
@@ -522,6 +551,11 @@ function Broadcast({
       </form>
       {chatNote ? <p className="live-note">{chatNote}</p> : null}
 
+      {collabOpen ? (
+        <Sheet title={m.bond.cohosts} onClose={() => setCollabOpen(false)}>
+          <CollabPanel sessionId={sessionId} loggedIn={loggedIn} />
+        </Sheet>
+      ) : null}
       {giftOpen ? (
         <Sheet title={m.live.gift} onClose={() => setGiftOpen(false)}>
           <div data-screen="live-gift">
@@ -573,6 +607,22 @@ function Broadcast({
                     <span>{formatMoney(chosen.netCents, locale)}</span>
                   </div>
                 </div>
+                {recipients.length > 1 ? (
+                  <fieldset>
+                    <legend>{m.bond.recipient}</legend>
+                    {recipients.map((recipient) => (
+                      <label key={recipient.creatorId} className="check-row">
+                        <input
+                          type="radio"
+                          name="live-recipient"
+                          checked={recipientId === recipient.creatorId}
+                          onChange={() => setRecipientId(recipient.creatorId)}
+                        />
+                        <span>{recipient.name}</span>
+                      </label>
+                    ))}
+                  </fieldset>
+                ) : null}
                 <label className="check-row">
                   <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
                   <span>{m.gifts.anonymous}</span>

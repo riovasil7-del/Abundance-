@@ -68,6 +68,13 @@ export function lightPack(slug: string | undefined | null) {
  */
 export const GIFT_CONFIRM_CENTS = 500;
 
+/**
+ * Extra camera publishers besides the host.
+ * Three is the initial cap: each extra video track is heavy on a phone connection.
+ * Blessing-circle participants already publish through the circle and are not extra co-hosts.
+ */
+export const LIVE_MAX_COHOSTS = 3;
+
 export const GIFT_CATALOG = [
   { slug: "candle", nameSk: "Sviečka", nameEn: "Candle", priceCents: 100, symbol: "🕯️", sortOrder: 1 },
   { slug: "bread", nameSk: "Chlieb", nameEn: "Bread", priceCents: 300, symbol: "🍞", sortOrder: 2 },
