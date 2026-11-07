@@ -8,6 +8,7 @@ import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
+import { Sheet } from "./sheet";
 
 export function FeedExperience({
   videos,
@@ -342,8 +343,7 @@ export function FeedExperience({
       ))}
 
       {sheet ? (
-        <div className="sheet-back" onClick={() => setSheet(null)}>
-          <div className="sheet" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
+        <Sheet title={sheet === "gift" ? m.gifts.title : sheet === "comments" ? m.comments.title : m.report.title} onClose={() => setSheet(null)}>
             {sheet === "gift" && current && chosen ? (
               receipt ? (
                 <div data-screen="gift-receipt">
@@ -487,8 +487,7 @@ export function FeedExperience({
                 </button>
               </div>
             ) : null}
-          </div>
-        </div>
+        </Sheet>
       ) : null}
     </div>
   );

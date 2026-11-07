@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDialogA11y } from "./sheet";
 import { useI18n } from "./providers";
 
 const SLIDES = ["welcome", "gifts", "deed", "live", "dignity"] as const;
@@ -10,6 +11,8 @@ export function IntroTour() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [touchX, setTouchX] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogA11y(dialogRef, close, open);
 
   useEffect(() => {
     const seen = document.cookie.split(";").some((part) => part.trim().startsWith("introSeen=1"));
@@ -43,7 +46,7 @@ export function IntroTour() {
   const body = slides[step]?.body ?? m.tour.welcomeBody;
 
   return (
-    <div className="sheet-back tour-back" role="dialog" aria-modal="true" aria-label={title}>
+    <div ref={dialogRef} className="sheet-back tour-back" role="dialog" aria-modal="true" aria-label={title}>
       <div
         className="sheet tour-sheet"
         onTouchStart={(event) => setTouchX(event.changedTouches[0]?.clientX ?? null)}

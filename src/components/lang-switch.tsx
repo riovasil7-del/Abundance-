@@ -5,6 +5,7 @@ import { useState } from "react";
 import { LOCALES, type Locale } from "@/config/app";
 import { LANGUAGE_META } from "@/i18n/meta";
 import { useI18n } from "./providers";
+import { Sheet } from "./sheet";
 
 export function LangSwitch({ locale }: { locale: Locale }) {
   const router = useRouter();
@@ -27,19 +28,17 @@ export function LangSwitch({ locale }: { locale: Locale }) {
         {LANGUAGE_META[locale].nativeName}
       </button>
       {open ? (
-        <div className="sheet-back" onClick={() => setOpen(false)}>
-          <div className="sheet" role="dialog" aria-label={messages.language.choose} onClick={(event) => event.stopPropagation()}>
-            <p className="kicker">{messages.language.label}</p>
-            <h2>{messages.language.choose}</h2>
-            <div className="lang-list">
-              {LOCALES.map((code) => (
-                <button type="button" key={code} className={code === locale ? "lang-option on" : "lang-option"} onClick={() => void choose(code)}>
-                  {LANGUAGE_META[code].nativeName}
-                </button>
-              ))}
-            </div>
+        <Sheet title={messages.language.choose} onClose={() => setOpen(false)}>
+          <p className="kicker">{messages.language.label}</p>
+          <h2>{messages.language.choose}</h2>
+          <div className="lang-list">
+            {LOCALES.map((code) => (
+              <button type="button" key={code} className={code === locale ? "lang-option on" : "lang-option"} onClick={() => void choose(code)}>
+                {LANGUAGE_META[code].nativeName}
+              </button>
+            ))}
           </div>
-        </div>
+        </Sheet>
       ) : null}
     </>
   );

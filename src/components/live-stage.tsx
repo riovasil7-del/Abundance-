@@ -9,6 +9,7 @@ import type { GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
+import { Sheet } from "./sheet";
 
 const roomOptions: RoomOptions = {
   adaptiveStream: true,
@@ -522,8 +523,8 @@ function Broadcast({
       {chatNote ? <p className="live-note">{chatNote}</p> : null}
 
       {giftOpen ? (
-        <div className="sheet-back" onClick={() => setGiftOpen(false)}>
-          <div className="sheet" onClick={(event) => event.stopPropagation()} data-screen="live-gift">
+        <Sheet title={m.live.gift} onClose={() => setGiftOpen(false)}>
+          <div data-screen="live-gift">
             {receipt ? (
               <div data-screen="live-gift-receipt">
                 <p className="kicker">{m.gifts.receiptTitle}</p>
@@ -592,7 +593,7 @@ function Broadcast({
               </div>
             ) : null}
           </div>
-        </div>
+        </Sheet>
       ) : null}
     </div>
   );
