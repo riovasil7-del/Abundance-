@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
+import { capTail, videoPreload } from "@/lib/gift-guard";
 import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
+import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
@@ -38,6 +40,7 @@ export function FeedExperience({
   const [reason, setReason] = useState("other");
   const [reportNote, setReportNote] = useState<string | null>(null);
   const [lights, setLights] = useState(lightBalance);
+  const [needsTap, setNeedsTap] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -59,15 +62,55 @@ export function FeedExperience({
     const root = rootRef.current;
     if (!root) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let cancelled = false;
     root.querySelectorAll("video").forEach((video, index) => {
+      video.muted = true;
+      if (index !== active) {
+        video.pause();
+        return;
+      }
       video.muted = muted;
-      if (index === active && !reduce) video.play().catch(() => undefined);
-      else video.pause();
+      if (reduce) {
+        video.pause();
+        if (!cancelled) setNeedsTap(true);
+        return;
+      }
+      video.play().then(
+        () => {
+          if (!cancelled) setNeedsTap(false);
+        },
+        () => {
+          if (!cancelled) setNeedsTap(true);
+        },
+      );
     });
+    return () => {
+      cancelled = true;
+    };
   }, [active, muted, items.length]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    return () => {
+      root?.querySelectorAll("video").forEach((video) => {
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+      });
+    };
+  }, []);
+
+  function go(step: number) {
+    const root = rootRef.current;
+    if (!root) return;
+    const next = Math.min(items.length - 1, Math.max(0, active + step));
+    const slide = root.querySelector<HTMLElement>(`[data-index="${next}"]`);
+    slide?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
 
   const current = items[active];
   const chosen = gifts.find((gift) => gift.slug === giftSlug) ?? gifts[0];
+  const giftAttempt = useGiftAttempt(chosen?.priceCents);
 
   async function bless(video: FeedVideo) {
     if (!loggedIn) {
@@ -90,32 +133,35 @@ export function FeedExperience({
     );
   }
 
-  async function sendGift() {
+  function sendGift() {
     if (!current || !chosen) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/donations", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          giftSlug: chosen.slug,
-          videoId: current.id,
-          anonymous,
-          payItForwardFromId: forwardId || null,
-          token: crypto.randomUUID(),
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
-        return;
+    giftAttempt.armOrSend(async (token) => {
+      setBusy(true);
+      setError(null);
+      try {
+        const response = await fetch("/api/donations", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            giftSlug: chosen.slug,
+            videoId: current.id,
+            anonymous,
+            payItForwardFromId: forwardId || null,
+            token,
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
+          return false;
+        }
+        if (typeof data.lightBalance === "number") setLights(data.lightBalance);
+        setReceipt(data as Receipt);
+        return true;
+      } finally {
+        setBusy(false);
       }
-      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
-      setReceipt(data as Receipt);
-    } finally {
-      setBusy(false);
-    }
+    });
   }
 
   async function openComments(videoId: string) {
@@ -124,7 +170,7 @@ export function FeedExperience({
     const response = await fetch(`/api/videos/${videoId}/comments`);
     if (!response.ok) return;
     const data = (await response.json()) as { comments: { id: string; author: string; body: string }[] };
-    setComments(data.comments);
+    setComments(capTail(data.comments));
   }
 
   async function sendComment() {
@@ -145,7 +191,7 @@ export function FeedExperience({
       if (data.status === "FLAGGED") {
         setCommentNote(m.comments.flagged);
       } else {
-        setComments((prev) => [...prev, { id: data.id, author: viewerName || m.me.title, body: draft }]);
+        setComments((prev) => capTail([...prev, { id: data.id, author: viewerName || m.me.title, body: draft }]));
         setDraft("");
       }
     } finally {
@@ -173,7 +219,23 @@ export function FeedExperience({
   }
 
   return (
-    <div className="feed" ref={rootRef} data-screen="feed">
+    <div
+      className="feed"
+      ref={rootRef}
+      data-screen="feed"
+      tabIndex={0}
+      aria-label={m.feed.stage}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          go(1);
+        }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          go(-1);
+        }
+      }}
+    >
       {items.map((video, index) => (
         <article className="slide" data-slide data-index={index} key={video.id}>
           <div className="video-card">
@@ -183,10 +245,35 @@ export function FeedExperience({
               poster={video.posterUrl ?? undefined}
               playsInline
               loop
-              muted={muted}
-              preload={Math.abs(index - active) <= 1 ? "metadata" : "none"}
+              muted={muted || index !== active}
+              preload={videoPreload(index, active)}
               src={Math.abs(index - active) <= 1 ? video.playbackUrl : undefined}
             />
+            {index === active && needsTap ? (
+              <button
+                type="button"
+                className="tap-play"
+                onClick={() => {
+                  const video = rootRef.current?.querySelectorAll("video")[index];
+                  if (!video) return;
+                  video.muted = muted;
+                  void video.play().then(
+                    () => setNeedsTap(false),
+                    () => setNeedsTap(true),
+                  );
+                }}
+              >
+                {m.feed.tapPlay}
+              </button>
+            ) : null}
+            <div className="feed-nav">
+              <button type="button" onClick={() => go(-1)} disabled={active === 0} aria-label={m.feed.prev}>
+                {m.feed.prev}
+              </button>
+              <button type="button" onClick={() => go(1)} disabled={active === items.length - 1} aria-label={m.feed.next}>
+                {m.feed.next}
+              </button>
+            </div>
             <div className="video-shade" />
             <div className="video-copy">
               <div className="creator-line">
@@ -206,7 +293,7 @@ export function FeedExperience({
               </p>
             </div>
             <div className="video-actions">
-              <button type="button" className="action-btn" onClick={() => setMuted((value) => !value)}>
+              <button type="button" className="action-btn" aria-pressed={!muted} aria-label={muted ? m.feed.unmute : m.feed.mute} onClick={() => setMuted((value) => !value)}>
                 <strong>{muted ? "♪" : "♫"}</strong>
                 {muted ? m.feed.unmute : m.feed.mute}
               </button>
@@ -301,8 +388,9 @@ export function FeedExperience({
                         className={gift.slug === chosen.slug ? "gift-option on" : "gift-option"}
                         onClick={() => setGiftSlug(gift.slug)}
                       >
-                        <span>{gift.symbol}</span>
+                        <span aria-hidden="true">{gift.symbol}</span>
                         <small>{gift.name}</small>
+                        <small>{formatMoney(gift.priceCents, locale)}</small>
                       </button>
                     ))}
                   </div>
@@ -346,9 +434,13 @@ export function FeedExperience({
                   <LightsStatus balance={lights} priceCents={chosen.priceCents} />
                   {error ? <p className="error-text">{error}</p> : null}
                   {lights >= chosen.priceCents ? (
-                    <button type="button" className="btn-primary" disabled={busy} onClick={sendGift}>
-                      {busy ? m.gifts.sending : m.gifts.send}
-                    </button>
+                    giftAttempt.armed ? (
+                      <GiftConfirm priceCents={chosen.priceCents} busy={busy} onYes={sendGift} onNo={giftAttempt.cancel} />
+                    ) : (
+                      <button type="button" className="btn-primary" disabled={busy} onClick={sendGift}>
+                        {busy ? m.gifts.sending : m.gifts.send}
+                      </button>
+                    )
                   ) : null}
                 </div>
               )

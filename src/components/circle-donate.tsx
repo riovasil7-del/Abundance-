@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
+import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
@@ -27,27 +28,31 @@ export function CircleDonate({
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [lights, setLights] = useState(lightBalance);
   const chosen = gifts.find((gift) => gift.slug === slug) ?? gifts[0];
+  const giftAttempt = useGiftAttempt(chosen?.priceCents);
 
-  async function send() {
+  function send() {
     if (!chosen) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/circles/${circleId}/donations`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token: crypto.randomUUID() }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
-        return;
+    giftAttempt.armOrSend(async (token) => {
+      setBusy(true);
+      setError(null);
+      try {
+        const response = await fetch(`/api/circles/${circleId}/donations`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setError(response.status === 402 ? m.gifts.notEnough : m.common.error);
+          return false;
+        }
+        if (typeof data.lightBalance === "number") setLights(data.lightBalance);
+        setReceipt(data as Receipt);
+        return true;
+      } finally {
+        setBusy(false);
       }
-      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
-      setReceipt(data as Receipt);
-    } finally {
-      setBusy(false);
-    }
+    });
   }
 
   if (!chosen) return null;
@@ -121,9 +126,13 @@ export function CircleDonate({
       {error ? <p className="error-text">{error}</p> : null}
       {!enabled ? <p className="muted">{m.circles.noVerified}</p> : null}
       {enabled && lights >= chosen.priceCents ? (
-        <button type="button" className="btn-primary" disabled={busy} onClick={send}>
-          {busy ? m.gifts.sending : m.circles.donate}
-        </button>
+        giftAttempt.armed ? (
+          <GiftConfirm priceCents={chosen.priceCents} busy={busy} onYes={send} onNo={giftAttempt.cancel} />
+        ) : (
+          <button type="button" className="btn-primary" disabled={busy} onClick={send}>
+            {busy ? m.gifts.sending : m.circles.donate}
+          </button>
+        )
       ) : null}
     </div>
   );

@@ -61,6 +61,13 @@ export function lightPack(slug: string | undefined | null) {
   return LIGHT_PACKS.find((pack) => pack.slug === slug) ?? null;
 }
 
+/**
+ * Gifts at or above this catalog price ask for a second yes.
+ * The number is visible in the gift sheet. A smaller gift sends on the first yes.
+ * One light is one cent, so 500 is $5.00.
+ */
+export const GIFT_CONFIRM_CENTS = 500;
+
 export const GIFT_CATALOG = [
   { slug: "candle", nameSk: "Sviečka", nameEn: "Candle", priceCents: 100, symbol: "🕯️", sortOrder: 1 },
   { slug: "bread", nameSk: "Chlieb", nameEn: "Bread", priceCents: 300, symbol: "🍞", sortOrder: 2 },
