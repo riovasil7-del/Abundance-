@@ -54,6 +54,9 @@ export default async function MePage() {
           {user.creatorProfile.displayName}
         </Link>
       ) : null}
+      <Link className="muted" href="/terms">
+        {messages.terms.link}
+      </Link>
       {hasRole(user, ["MODERATOR", "ADMIN"]) ? (
         <Link className="btn-primary" href="/admin">
           {messages.common.admin}

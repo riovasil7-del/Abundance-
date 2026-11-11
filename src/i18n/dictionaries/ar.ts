@@ -1,3 +1,4 @@
+/** Native review still needed for new terms, ideas, and category wording. */
 import type { Messages } from "../sk";
 
 /** Arabic, right to left. Confident for this simple copy; a native reading is still welcome. */
@@ -5,7 +6,7 @@ const ar: Messages = {
   metaDescription: "Hojnosť جماعة للأعمال الصالحة. يذهب ٨٥٪ من كل عطية إلى من يشارك العمل، و١٥٪ تُبقي المكان قائمًا. لا مسابقات تُخجل أحدًا.",
   tagline: "نحن من أم واحدة وإله واحد.",
   intro: "مقاطع قصيرة عن أعمال صالحة وحِرَف وأغانٍ وشكر. سند يبارك، بلا إذلال وبلا مراتب.",
-  nav: { home: "البداية", circles: "حلقات", upload: "أضف", wallet: "الكيس", me: "أنا" },
+  nav: { home: "البداية", circles: "حلقات", ideas: "فكرة", upload: "أضف", wallet: "الكيس", me: "أنا" },
   feed: {
     bless: "بركة", blessed: "مبارك", gift: "عطية", comments: "كلمات", report: "أبلغ",
     unmute: "افتح الصوت", mute: "أكتم", chain: "سلسلة الخير",
@@ -31,6 +32,7 @@ const ar: Messages = {
     loginFollowing: "ادخلوا لتروا من تتابعون.",
     emptyFollowing: "لا فيديو بعد ممن تتابعون.",
     noPromise: "هذه عينة من الجماعة. لا تعد بوصول متساوٍ ولا بدخل متساوٍ.",
+    allCategories: "All",
     reasons: {
       recent: "هذا حديث.",
       language: "اللغة توافق ما اخترتم.",
@@ -53,6 +55,15 @@ const ar: Messages = {
     stripe: "الدفع ينتظر سترايب. المبلغ ثُبّت على الخادم.",
     close: "أغلق", preview: "لمحة عن التقسيم",
     circleNet: "بعد ١٥٪ تُقسَم ٨٥٪ بالتساوي على من تم التحقق منهم.",
+    communityNote: "This gift does not go to the creator. It is written to the community fund (preparing). It is not a promise that water or bread is already delivered.",
+    communityWater: "The well goes to the water fund.",
+    communityFood: "The loaf goes to the food fund.",
+    tierCommunity: "Community fund (preparing)",
+    tierSmall: "A small light",
+    tierKind: "Warm gifts",
+    tierBright: "A large light",
+    tierGreat: "Sacred gifts",
+    recorded: "The gift is recorded",
     paidWithLights: "هذه العطية خرجت من أنوارك. ٨٥٪ كُتبت للإنسان و١٥٪ تُبقي السقف المشترك.",
     topUp: "أضف أنوارًا",
     lightsLeft: "الأنوار",
@@ -93,6 +104,7 @@ const ar: Messages = {
     city: "المدينة", bio: "بضع جمل عن جماعتكم", craft: "ماذا تشاركون", role: "كيف تريد أن تكون هنا",
     invalid: "البريد أو كلمة السر لا يطابقان.",
     taken: "يوجد حساب بهذا البريد أو الهاتف. إنسان واحد، حساب واحد.",
+    termsRequired: "Agree to the terms first.",
     created: "أهلًا.",
   },
   wallet: {
@@ -146,6 +158,8 @@ const ar: Messages = {
   },
   upload: {
     title: "شارك عملًا", video: "مقطع قصير", name: "العنوان", caption: "ماذا حدث", deed: "النوع",
+    category: "A category, if you want one",
+    categoryNone: "No category",
     circle: "أضف إلى حلقة", circleNone: "بلا حلقة",
     consent: "أؤكد أن المقطع لا يُذل أحدًا ولا يستجدي، وأن من ظهروا — خصوصًا الأطفال — وافقوا، أو وافق والدهم.",
     submit: "انشر",     wordsOnly: "كلمات فقط",
@@ -275,7 +289,9 @@ const ar: Messages = {
     retain: "أبقِ الحجز",
     reversed: "أنوار أُعيدت",
     title: "الرعاية", intro: "بهدوء وعدل. لا خجل علني — قرار فقط بما يبقى في الجماعة.",
-    reports: "البلاغات", comments: "كلمات محجوزة", creators: "التحقق", audit: "السجل",
+    reports: "البلاغات",
+    ideas: "Ideas to approve",
+    approveIdea: "Approve idea", comments: "كلمات محجوزة", creators: "التحقق", audit: "السجل",
     verify: "تحقق", reject: "ارفض", hide: "أخفِ", show: "أظهر", dismiss: "أرجئ", review: "نُظر فيه",
     noAccess: "هذه الصفحة للرعاية.", empty: "لا شيء ينتظر.",
   },
@@ -300,7 +316,44 @@ const ar: Messages = {
   countries: { SK: "سلوفاكيا", KE: "كينيا" },
   roles: { SUPPORTER: "سند", CREATOR: "من يشارك", MODERATOR: "رعاية", ADMIN: "إدارة" },
   verify: { UNVERIFIED: "غير متحقق", PENDING: "ينتظر", VERIFIED: "متحقق", REJECTED: "مرفوض" },
-  giftNames: { candle: "شمعة", bread: "خبز", dove: "حمامة", heart: "قلب", star: "نجمة" },
+  ideas: {
+    title: "Ideas", lead: "Good deeds and heartwarming moments. Choose one if you want. A video is never required.",
+    search: "Search ideas", all: "All", saved: "Saved", free: "Free", paid: "May cost something", minutes: "min",
+    film: "Record a video", live: "Go live", save: "Save for later", savedDone: "Saved",
+    dignity: "Ask the person you help before you film them. Video proof is never required.",
+    propose: "Suggest an idea", proposeTitle: "Title", proposeBody: "How to do it", proposeMinutes: "Minutes",
+    proposeFree: "It can be done for free", proposeSend: "Send for approval",
+    proposeSent: "The idea is waiting for a moderator. Others will not see it until it is approved.",
+    pending: "Waiting for approval", empty: "Nothing matched.", loginSave: "Sign in to save an idea.",
+  },
+  ideaCategories: {
+    neighbours: "Neighbours and elders", children: "Children and school", nature: "Nature", animals: "Animals",
+    sick: "Sick and lonely", quick: "Under 5 minutes", family: "Family", mood: "Good mood",
+  },
+  contentCategories: {
+    everyday: "Ordinary life", mood: "Good mood", dance: "Dance", music: "Music and singing",
+    praise: "Praise and prayer", talk: "Conversation", deed: "A good deed", family: "Family", nature: "Nature",
+  },
+  terms: {
+    title: "Terms", link: "Terms", agree: "I agree to the terms",
+    mustAgree: "An account is created only after you agree to the terms.",
+    need: "Before the first video or live session, accept the current terms.",
+    accept: "I agree to the terms", saved: "Your agreement is saved.",
+    lights: "One light is one cent. You buy a pack of lights in dollars and send a gift in lights. The server sets the price, not the phone.",
+    split: "85% of each gift goes to the creator and 15% goes to Hojnosť for the company and the servers. The split is done once on the server. The phone cannot change the amount.",
+    fund: "The small well and the loaf of bread do not go to the creator. They still keep 15% for Hojnosť, and 85% is written to the community fund for water or food. It is labelled community fund (preparing). It is not a promise that water or bread is already delivered.",
+    holds: "While a dispute about a gift is open or lost, nobody may release that payout hold. It can be released only after the dispute is won for the creator.",
+    age: "A creator who wants to go live or receive gifts declares that they are at least 18. That is not an identity check and not an age check. Someone who has not declared this cannot join a circle as a publisher and is not given a publish grant.",
+    dignity: "Ask the person you help before you film them. For a child, a parent agrees. Video proof of a deed is never required. We do not humiliate anyone and we do not beg.",
+  },
+  giftNames: {
+    heart: "Little heart", smile: "Smile", flower: "Flower", candle: "Candle", cloud: "Little cloud",
+    feather: "Angel feather", wing: "Angel wing", dove: "Dove of peace", olive: "Olive branch",
+    rainbow: "Rainbow of hope", harp: "Harp", star: "Star of Bethlehem", lamp: "Lamp of light",
+    grail: "Holy grail", choir: "Heavenly choir", gate: "Heaven's gate", loaf: "Loaf of bread",
+    well: "A small well", bread: "Bread",
+  },
+
   language: { label: "اللغة", choose: "اختر لغة" },
   tour: {
     skip: "تخطَّ", next: "التالي", back: "رجوع", done: "ادخل", reopen: "أظهر الترحيب من جديد",

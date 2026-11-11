@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
+import { GiftFundNote, GiftPicker } from "./gift-picker";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
@@ -82,9 +83,7 @@ export function AttributedGift({
       <h2>{m.live.gift}</h2>
       {receipt ? (
         <div data-screen="live-gift-receipt">
-          <p>
-            {m.gifts.fee} {formatMoney(receipt.feeCents, locale)} · {m.gifts.net} {formatMoney(receipt.netCents, locale)}
-          </p>
+          <p>{m.gifts.recorded}</p>
           <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
         </div>
       ) : (
@@ -109,15 +108,8 @@ export function AttributedGift({
               {m.bond.recipient} {recipients[0].name}
             </p>
           ) : null}
-          <div className="gift-grid">
-            {gifts.map((gift) => (
-              <button type="button" key={gift.slug} className={gift.slug === chosen.slug ? "gift-option on" : "gift-option"} onClick={() => setSlug(gift.slug)}>
-                <span aria-hidden="true">{gift.symbol}</span>
-                <small>{gift.name}</small>
-                <small>{formatMoney(gift.priceCents, locale)}</small>
-              </button>
-            ))}
-          </div>
+          <GiftPicker gifts={gifts} selected={chosen.slug} onSelect={setSlug} />
+          <GiftFundNote gift={chosen} />
           <LightsStatus balance={lights} priceCents={chosen.priceCents} />
           {lights >= chosen.priceCents ? (
             giftAttempt.armed ? (

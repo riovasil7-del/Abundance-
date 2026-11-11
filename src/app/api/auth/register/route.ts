@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CRAFT_KEYS, payoutHoldDays } from "@/config/app";
+import { CRAFT_KEYS, TERMS_VERSION, payoutHoldDays } from "@/config/app";
 import { audit } from "@/server/audit";
 import { hashPassword, setSessionCookie } from "@/server/auth";
 import { sessionSecretProblem } from "@/server/session-secret";
@@ -39,6 +39,8 @@ export async function POST(request: Request) {
           name: body.name.trim(),
           role: body.role,
           phone,
+          termsAcceptedAt: new Date(),
+          termsVersion: TERMS_VERSION,
         },
       });
       if (body.role === "CREATOR") {

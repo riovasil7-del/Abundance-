@@ -6,6 +6,8 @@ export async function openLiveSession(input: {
   host: { id: string; displayName: string };
   title?: string | null;
   circleId?: string | null;
+  contentCategory?: string | null;
+  ideaSlug?: string | null;
 }) {
   if (input.circleId) {
     const member = await db.circleParticipant.findUnique({
@@ -24,6 +26,8 @@ export async function openLiveSession(input: {
         hostId: input.host.id,
         circleId: input.circleId,
         title: input.title?.trim() || member.circle.title,
+        contentCategory: input.contentCategory ?? null,
+        ideaSlug: input.ideaSlug ?? null,
       },
     });
   }
@@ -38,6 +42,8 @@ export async function openLiveSession(input: {
       roomName: `solo_${input.host.id}_${suffix}`,
       hostId: input.host.id,
       title: input.title?.trim() || input.host.displayName,
+      contentCategory: input.contentCategory ?? null,
+      ideaSlug: input.ideaSlug ?? null,
     },
   });
 }

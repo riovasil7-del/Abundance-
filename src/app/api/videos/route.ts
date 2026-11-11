@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/server/auth";
+import { termsDecision } from "@/server/terms";
 import { jsonError } from "@/server/http";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 
@@ -11,6 +12,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
+  if (termsDecision(user) === "TERMS_REQUIRED") return jsonError(403, "TERMS_REQUIRED");
   const limit = memoryRateLimiter.consume(clientKey(request, "upload", user.id), 6, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
   const form = await request.formData().catch(() => null);

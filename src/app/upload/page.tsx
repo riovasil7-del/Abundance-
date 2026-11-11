@@ -1,12 +1,20 @@
 import Link from "next/link";
 import { StoryForm } from "@/components/story-form";
+import { TermsGate } from "@/components/terms-gate";
+import { isContentCategory } from "@/config/app";
+import { termsAreCurrent } from "@/server/terms";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 
-export default async function UploadPage() {
+export default async function UploadPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ title?: string; category?: string; idea?: string }>;
+}) {
+  const query = await searchParams;
   const locale = await getLocale();
   const messages = messagesFor(locale);
   const user = await getCurrentUser();
@@ -39,8 +47,12 @@ export default async function UploadPage() {
         <h1>{messages.upload.title}</h1>
         <Link href="/rules">{messages.upload.rulesLink}</Link>
       </div>
+      <TermsGate needed={!termsAreCurrent(user)} />
       <StoryForm
         ownerId={user.id}
+        initialTitle={query.title ?? ""}
+        initialCategory={isContentCategory(query.category) ? query.category : ""}
+        ideaSlug={query.idea ?? ""}
         circles={memberships.map((membership) => ({
           id: membership.circle.id,
           title: pickLocalized(locale, membership.circle.title, membership.circle.titleEn),

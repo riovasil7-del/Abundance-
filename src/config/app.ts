@@ -68,6 +68,50 @@ export function lightPack(slug: string | undefined | null) {
  */
 export const GIFT_CONFIRM_CENTS = 500;
 
+/** Bump this when the terms text changes. Sign-up and creator publish check it. */
+export const TERMS_VERSION = 1;
+
+export const CONTENT_CATEGORIES = [
+  "everyday",
+  "mood",
+  "dance",
+  "music",
+  "praise",
+  "talk",
+  "deed",
+  "family",
+  "nature",
+] as const;
+export type ContentCategory = (typeof CONTENT_CATEGORIES)[number];
+
+export function isContentCategory(value: string | null | undefined): value is ContentCategory {
+  return !!value && (CONTENT_CATEGORIES as readonly string[]).includes(value);
+}
+
+export const IDEA_CATEGORIES = [
+  "neighbours",
+  "children",
+  "nature",
+  "animals",
+  "sick",
+  "quick",
+  "family",
+  "mood",
+] as const;
+export type IdeaCategory = (typeof IDEA_CATEGORIES)[number];
+
+export function isIdeaCategory(value: string | null | undefined): value is IdeaCategory {
+  return !!value && (IDEA_CATEGORIES as readonly string[]).includes(value);
+}
+
+/** A suggested content chip for an idea. The creator can clear it. A deed is never required. */
+export function contentCategoryForIdea(category: string): ContentCategory {
+  if (category === "nature") return "nature";
+  if (category === "family") return "family";
+  if (category === "mood") return "mood";
+  return "deed";
+}
+
 /**
  * Extra camera publishers besides the host.
  * Three is the initial cap: each extra video track is heavy on a phone connection.
@@ -76,11 +120,24 @@ export const GIFT_CONFIRM_CENTS = 500;
 export const LIVE_MAX_COHOSTS = 3;
 
 export const GIFT_CATALOG = [
-  { slug: "candle", nameSk: "Sviečka", nameEn: "Candle", priceCents: 100, symbol: "🕯️", sortOrder: 1 },
-  { slug: "bread", nameSk: "Chlieb", nameEn: "Bread", priceCents: 300, symbol: "🍞", sortOrder: 2 },
-  { slug: "dove", nameSk: "Holubica", nameEn: "Dove", priceCents: 500, symbol: "🕊️", sortOrder: 3 },
-  { slug: "heart", nameSk: "Srdce", nameEn: "Heart", priceCents: 1000, symbol: "💛", sortOrder: 4 },
-  { slug: "star", nameSk: "Hviezda", nameEn: "Star", priceCents: 2500, symbol: "⭐", sortOrder: 5 },
+  { slug: "heart", nameSk: "Srdiečko", nameEn: "Little heart", priceCents: 1, symbol: "❤️", sortOrder: 1, destination: "creator" },
+  { slug: "smile", nameSk: "Úsmev", nameEn: "Smile", priceCents: 5, symbol: "😊", sortOrder: 2, destination: "creator" },
+  { slug: "flower", nameSk: "Kvietok", nameEn: "Flower", priceCents: 10, symbol: "🌸", sortOrder: 3, destination: "creator" },
+  { slug: "candle", nameSk: "Sviečka", nameEn: "Candle", priceCents: 20, symbol: "🕯️", sortOrder: 4, destination: "creator" },
+  { slug: "cloud", nameSk: "Oblačik", nameEn: "Little cloud", priceCents: 50, symbol: "☁️", sortOrder: 5, destination: "creator" },
+  { slug: "feather", nameSk: "Anjelské pierko", nameEn: "Angel feather", priceCents: 99, symbol: "🪶", sortOrder: 6, destination: "creator" },
+  { slug: "wing", nameSk: "Anjelské krídielko", nameEn: "Angel wing", priceCents: 199, symbol: "🪽", sortOrder: 7, destination: "creator" },
+  { slug: "dove", nameSk: "Holubica pokoja", nameEn: "Dove of peace", priceCents: 299, symbol: "🕊️", sortOrder: 8, destination: "creator" },
+  { slug: "olive", nameSk: "Olivová ratolesť", nameEn: "Olive branch", priceCents: 499, symbol: "🌿", sortOrder: 9, destination: "creator" },
+  { slug: "rainbow", nameSk: "Dúha nádeje", nameEn: "Rainbow of hope", priceCents: 999, symbol: "🌈", sortOrder: 10, destination: "creator" },
+  { slug: "harp", nameSk: "Harfa", nameEn: "Harp", priceCents: 1999, symbol: "🎵", sortOrder: 11, destination: "creator" },
+  { slug: "star", nameSk: "Betlehemská hviezda", nameEn: "Star of Bethlehem", priceCents: 2999, symbol: "⭐", sortOrder: 12, destination: "creator" },
+  { slug: "lamp", nameSk: "Lampa svetla", nameEn: "Lamp of light", priceCents: 4999, symbol: "🏮", sortOrder: 13, destination: "creator" },
+  { slug: "grail", nameSk: "Svätý grál", nameEn: "Holy grail", priceCents: 9999, symbol: "🏆", sortOrder: 14, destination: "creator" },
+  { slug: "choir", nameSk: "Nebeský zbor", nameEn: "Heavenly choir", priceCents: 19999, symbol: "👼", sortOrder: 15, destination: "creator" },
+  { slug: "gate", nameSk: "Nebeská brána", nameEn: "Heaven's gate", priceCents: 49999, symbol: "🌅", sortOrder: 16, destination: "creator" },
+  { slug: "loaf", nameSk: "Bochník chleba", nameEn: "Loaf of bread", priceCents: 100, symbol: "🍞", sortOrder: 17, destination: "food" },
+  { slug: "well", nameSk: "Studnička", nameEn: "A small well", priceCents: 500, symbol: "💧", sortOrder: 18, destination: "water" },
 ] as const;
 
 export const DEED_KINDS = ["good_deed", "craft", "song", "gratitude"] as const;

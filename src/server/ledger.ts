@@ -44,13 +44,20 @@ export async function recordDonation(input: {
   note?: string;
   liveSessionId?: string | null;
   sandbox?: boolean;
+  /** When set, the whole net is a community-fund credit. Shares must be empty. */
+  fund?: "water" | "food" | null;
 }, writer: Prisma.TransactionClient | PrismaClient = db): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
   const split = assertSplitMatchesPrice(input.priceCents, input.charge.split);
-  const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
-  if (allocated !== split.netCents) throw new Error("ALLOCATION_IMBALANCE");
-  if (input.shares.length === 0) throw new Error("NO_RECIPIENTS");
-  if (input.shares.some((share) => !Number.isInteger(share.netCents) || share.netCents < 0)) {
-    throw new Error("BAD_SHARE");
+  const fund = input.fund ?? null;
+  if (fund) {
+    if (input.shares.length !== 0) throw new Error("FUND_HAS_SHARES");
+  } else {
+    const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
+    if (allocated !== split.netCents) throw new Error("ALLOCATION_IMBALANCE");
+    if (input.shares.length === 0) throw new Error("NO_RECIPIENTS");
+    if (input.shares.some((share) => !Number.isInteger(share.netCents) || share.netCents < 0)) {
+      throw new Error("BAD_SHARE");
+    }
   }
 
   let status: "PENDING" | "HELD" = input.charge.mode === "stripe" ? "PENDING" : "HELD";
@@ -84,12 +91,15 @@ export async function recordDonation(input: {
       note: input.note,
       sandbox: input.sandbox ?? input.charge.mode === "demo",
       liveSessionId: input.liveSessionId ?? null,
-      allocations: {
-        create: input.shares.map((share) => ({
-          creatorId: share.creatorId,
-          netCents: share.netCents,
-        })),
-      },
+      allocations: fund
+        ? undefined
+        : {
+            create: input.shares.map((share) => ({
+              creatorId: share.creatorId,
+              netCents: share.netCents,
+            })),
+          },
+      fundCredit: fund ? { create: { fund, netCents: split.netCents } } : undefined,
     },
     include: { allocations: true },
   });

@@ -34,7 +34,7 @@ export function FamilyJoin({
         setNote(m.common.error);
         return;
       }
-      setNote(`${m.gifts.net}: ${formatMoney(data.netCents, locale)}`);
+      setNote(m.gifts.recorded);
       router.refresh();
     } finally {
       setBusy(false);

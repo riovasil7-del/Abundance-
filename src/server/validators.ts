@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CRAFT_KEYS, DEED_KINDS, FAMILY_TIERS_CENTS, REPORT_REASONS } from "../config/app";
 
 export const registerBody = z.object({
+  acceptTerms: z.literal(true),
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(160),
   password: z.string().min(8).max(200),
