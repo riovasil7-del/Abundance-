@@ -15,6 +15,7 @@ export type StoredVideo = {
 export interface VideoStorage {
   readonly driver: string;
   save(input: { data: Buffer; contentType: string; filename: string }): Promise<StoredVideo>;
+  saveProcessed?(png: Buffer): Promise<StoredVideo>;
 }
 
 const ALLOWED_TYPES = new Map<string, string>([
@@ -37,11 +38,21 @@ export class LocalVideoStorage implements VideoStorage {
 
   async save(input: { data: Buffer; contentType: string; filename: string }): Promise<StoredVideo> {
     const ext = assertMedia(input);
+    return this.write(input.data, ext);
+  }
+
+  /** Writes an already-redacted PNG. The caller must not pass the original. */
+  async saveProcessed(png: Buffer): Promise<StoredVideo> {
+    if (png.length < 8 || png[0] !== 0x89) throw new Error("UNSAFE_MEDIA");
+    return this.write(png, "png");
+  }
+
+  private async write(data: Buffer, ext: string): Promise<StoredVideo> {
     await mkdir(this.root, { recursive: true });
     const key = `${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${ext}`;
     const full = path.join(this.root, key);
     await mkdir(path.dirname(full), { recursive: true });
-    await writeFile(full, input.data);
+    await writeFile(full, data);
     return { key, playbackUrl: `/api/media/${key}` };
   }
 }
@@ -75,10 +86,14 @@ function assertMedia(input: { data: Buffer; contentType: string; filename: strin
 export class VercelBlobStorage implements VideoStorage {
   readonly driver = "vercel-blob";
 
+  async saveProcessed(png: Buffer): Promise<StoredVideo> {
+    return this.save({ data: png, contentType: "image/png", filename: "covered.png" });
+  }
+
   async save(input: { data: Buffer; contentType: string; filename: string }): Promise<StoredVideo> {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     if (!token) throw new Error("STORAGE_NOT_CONFIGURED");
-    const ext = assertMedia(input);
+    const ext = input.contentType === "image/png" ? "png" : assertMedia(input);
     const key = `${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${ext}`;
     const { put } = await import("@vercel/blob");
     const blob = await put(key, input.data, {
@@ -98,6 +113,10 @@ export class VercelBlobStorage implements VideoStorage {
 export class S3VideoStorage implements VideoStorage {
   readonly driver = "s3";
 
+  async saveProcessed(png: Buffer): Promise<StoredVideo> {
+    return this.save({ data: png, contentType: "image/png", filename: "covered.png" });
+  }
+
   async save(input: { data: Buffer; contentType: string; filename: string }): Promise<StoredVideo> {
     const bucket = process.env.S3_BUCKET;
     const accessKeyId = process.env.S3_ACCESS_KEY_ID;
@@ -106,7 +125,7 @@ export class S3VideoStorage implements VideoStorage {
     if (!bucket || !accessKeyId || !secretAccessKey || !publicBase) {
       throw new Error("STORAGE_NOT_CONFIGURED");
     }
-    const ext = assertMedia(input);
+    const ext = input.contentType === "image/png" ? "png" : assertMedia(input);
     const key = `${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${ext}`;
     const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
     const endpoint = process.env.S3_ENDPOINT;

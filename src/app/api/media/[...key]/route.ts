@@ -10,6 +10,7 @@ const TYPES: Record<string, string> = {
   mp4: "video/mp4",
   webm: "video/webm",
   mov: "video/quicktime",
+  png: "image/png",
 };
 
 export async function GET(_request: Request, context: { params: Promise<{ key: string[] }> }) {

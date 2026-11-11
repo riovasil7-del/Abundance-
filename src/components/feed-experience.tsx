@@ -77,7 +77,10 @@ export function FeedExperience({
     if (!root) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cancelled = false;
-    root.querySelectorAll("video").forEach((video, index) => {
+    root.querySelectorAll<HTMLElement>("[data-slide]").forEach((slide) => {
+      const video = slide.querySelector("video");
+      const index = Number(slide.dataset.index);
+      if (!video) return;
       video.muted = true;
       if (index !== active) {
         video.pause();
@@ -354,16 +357,22 @@ export function FeedExperience({
       {items.map((video, index) => (
         <article className="slide" data-slide data-index={index} key={video.id}>
           <div className="video-card">
-            {video.posterUrl ? <img className="video-poster" src={video.posterUrl} alt="" /> : null}
-            <video
-              className="video-el"
-              poster={video.posterUrl ?? undefined}
-              playsInline
-              loop
-              muted={muted || index !== active}
-              preload={videoPreload(index, active)}
-              src={Math.abs(index - active) <= 1 ? video.playbackUrl : undefined}
-            />
+            {video.playbackUrl && video.posterUrl ? <img className="video-poster" src={video.posterUrl} alt="" /> : null}
+            {video.playbackUrl ? (
+              <video
+                className="video-el"
+                poster={video.posterUrl ?? undefined}
+                playsInline
+                loop
+                muted={muted || index !== active}
+                preload={videoPreload(index, active)}
+                src={Math.abs(index - active) <= 1 ? video.playbackUrl : undefined}
+              />
+            ) : (
+              <div className="text-story" data-screen="text-story">
+                <p className="kicker">{m.upload.wordsOnly}</p>
+              </div>
+            )}
             {index === active && needsTap ? (
               <button
                 type="button"
