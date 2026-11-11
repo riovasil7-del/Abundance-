@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ReportNoteButton } from "@/components/report-note";
 import { AgeAttest } from "@/components/age-attest";
 import { ReopenIntroButton } from "@/components/intro-tour";
+import { LangSwitch } from "@/components/lang-switch";
+import { UnblockButton } from "@/components/unblock-button";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { formatMoney } from "@/lib/format";
@@ -16,6 +18,7 @@ export default async function MePage() {
     return (
       <div className="page">
         <h1>{messages.me.title}</h1>
+        <LangSwitch locale={locale} />
         <Link className="btn-primary" href="/login">
           {messages.auth.login}
         </Link>
@@ -33,6 +36,11 @@ export default async function MePage() {
     orderBy: { createdAt: "desc" },
     take: 30,
     include: { fromUser: { select: { name: true } } },
+  });
+  const blocks = await db.userBlock.findMany({
+    where: { blockerId: user.id },
+    include: { blocked: { select: { id: true, name: true } } },
+    orderBy: { createdAt: "desc" },
   });
   const families = await db.familyMembership.findMany({
     where: { supporterId: user.id, status: "ACTIVE" },
@@ -54,6 +62,17 @@ export default async function MePage() {
           {user.creatorProfile.displayName}
         </Link>
       ) : null}
+      <LangSwitch locale={locale} />
+      <section className="stack" data-screen="chat-blocks">
+        <h2>{messages.me.blockedTitle}</h2>
+        {blocks.length === 0 ? <p className="empty">{messages.me.blockedEmpty}</p> : null}
+        {blocks.map((block) => (
+          <div className="row" key={block.id}>
+            <span>{block.blocked.name}</span>
+            <UnblockButton userId={block.blocked.id} label={messages.me.unblock} />
+          </div>
+        ))}
+      </section>
       <Link className="muted" href="/terms">
         {messages.terms.link}
       </Link>

@@ -28,3 +28,12 @@ export async function POST(request: Request) {
   });
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return jsonError(401, "UNAUTHENTICATED");
+  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return jsonError(400, "INVALID");
+  await db.userBlock.deleteMany({ where: { blockerId: user.id, blockedId: parsed.data.userId } });
+  return NextResponse.json({ ok: true });
+}

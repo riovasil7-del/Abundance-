@@ -13,6 +13,7 @@ import { GiftFundNote, GiftPicker } from "./gift-picker";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 import { CollabPanel } from "./collab-panel";
+import { LiveChatPanel } from "./live-chat-panel";
 import { Sheet } from "./sheet";
 
 const roomOptions: RoomOptions = {
@@ -41,6 +42,8 @@ export function LiveStage({
   hostName,
   hostAvatar,
   isHost,
+  canModerate,
+  translateEnabled,
   loggedIn,
   gifts,
   initialBlessingNetCents,
@@ -55,6 +58,8 @@ export function LiveStage({
   hostName: string;
   hostAvatar: string;
   isHost: boolean;
+  canModerate: boolean;
+  translateEnabled: boolean;
   loggedIn: boolean;
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
@@ -79,6 +84,8 @@ export function LiveStage({
         hostName={hostName}
         hostAvatar={hostAvatar}
         isHost={isHost}
+        canModerate={canModerate}
+        translateEnabled={translateEnabled}
         loggedIn={loggedIn}
         gifts={gifts}
         initialBlessingNetCents={initialBlessingNetCents}
@@ -95,6 +102,8 @@ function Broadcast({
   hostName,
   hostAvatar,
   isHost,
+  canModerate,
+  translateEnabled,
   loggedIn,
   gifts,
   initialBlessingNetCents,
@@ -106,6 +115,8 @@ function Broadcast({
   hostName: string;
   hostAvatar: string;
   isHost: boolean;
+  canModerate: boolean;
+  translateEnabled: boolean;
   loggedIn: boolean;
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
@@ -460,31 +471,7 @@ function Broadcast({
         </span>
       ))}
 
-      <div className="live-chat-stream" aria-live={chatPaused ? "off" : "polite"}>
-        <button type="button" className="chat-pause" onClick={() => setChatPaused((value) => !value)}>
-          {chatPaused ? m.live.chatResume : m.live.chatPause}
-        </button>
-        {visibleChat.map((message) => (
-          <div className="live-chat-line" key={message.id}>
-            <strong>{message.author}</strong> {message.body}
-            {loggedIn ? (
-              <span className="live-chat-actions">
-                <button type="button" onClick={() => reportAuthor(message)}>
-                  {m.live.report}
-                </button>
-                <button type="button" onClick={() => blockAuthor(message.authorId)}>
-                  {m.live.block}
-                </button>
-                {isHost ? (
-                  <button type="button" onClick={() => removeMessage(message.id)}>
-                    {m.live.remove}
-                  </button>
-                ) : null}
-              </span>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      <LiveChatPanel sessionId={sessionId} loggedIn={loggedIn} canModerate={canModerate} translateEnabled={translateEnabled} />
 
       <div className="live-rail">
         <button type="button" aria-label={m.live.heart} onClick={() => void sendHeart()}>
@@ -549,26 +536,6 @@ function Broadcast({
           </button>
         ) : null}
       </div>
-
-      <form
-        className="live-compose"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (draft.trim()) void sendChat();
-        }}
-      >
-        <input
-          value={draft}
-          maxLength={280}
-          placeholder={loggedIn ? m.live.chatPlaceholder : m.feed.login}
-          disabled={!loggedIn}
-          onChange={(event) => setDraft(event.target.value)}
-        />
-        <button type="submit" disabled={!loggedIn || draft.trim().length === 0}>
-          {m.comments.send}
-        </button>
-      </form>
-      {chatNote ? <p className="live-note">{chatNote}</p> : null}
 
       {collabOpen ? (
         <Sheet title={m.bond.cohosts} onClose={() => setCollabOpen(false)}>

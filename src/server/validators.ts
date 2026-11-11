@@ -34,7 +34,7 @@ export const commentBody = z.object({
 });
 
 export const reportBody = z.object({
-  targetType: z.enum(["VIDEO", "COMMENT", "USER", "ENCOURAGEMENT", "UPDATE"]),
+  targetType: z.enum(["VIDEO", "COMMENT", "USER", "ENCOURAGEMENT", "UPDATE", "LIVE_CHAT"]),
   targetId: z.string().trim().min(1).max(80),
   reason: z.enum(REPORT_REASONS),
   details: z.string().trim().max(500).optional().or(z.literal("")),
