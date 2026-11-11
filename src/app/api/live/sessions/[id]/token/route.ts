@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/server/auth";
 import { jsonError } from "@/server/http";
-import { readLiveKitCredentials, tokenForParticipant } from "@/server/live-access";
+import { mayIssuePublishGrant, readLiveKitCredentials, tokenForParticipant } from "@/server/live-access";
 import { loadLiveAudience } from "@/server/live-sessions";
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -17,18 +17,19 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
   const user = await getCurrentUser();
   const identity = user?.id ?? `guest_${randomUUID()}`;
   const name = user?.name ?? "Hosť";
-  const { token, canPublish } = await tokenForParticipant({
+  const audience = user ? loaded.audience : { hostUserId: loaded.audience.hostUserId, circlePublisherUserIds: [] as string[] };
+  const { token } = await tokenForParticipant({
     credentials,
     userId: identity,
     name,
     room: loaded.session.roomName,
-    audience: user ? loaded.audience : { hostUserId: loaded.audience.hostUserId, circlePublisherUserIds: [] },
+    audience,
   });
 
   return NextResponse.json({
     token,
     url: credentials.url,
-    canPublish: user ? canPublish : false,
+    canPublish: mayIssuePublishGrant(user, audience),
     configured: true,
   });
 }

@@ -2,6 +2,7 @@
 
 import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useParticipants, useRoomContext, useTracks } from "@livekit/components-react";
 import { RoomEvent, Track, type RoomOptions } from "livekit-client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
@@ -353,9 +354,9 @@ function Broadcast({
       )}
 
       <div className="live-top">
-        <a className="live-back" href="/live">
+        <Link className="live-back" href="/live">
           {m.common.back}
-        </a>
+        </Link>
         <img src={hostAvatar} alt="" />
         <div>
           <strong>{hostName}</strong>

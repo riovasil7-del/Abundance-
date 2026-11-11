@@ -136,6 +136,22 @@ test("provider events do not restore twice, and a large gift is only partly rese
     reviewResolveDecision({ id: "staff", role: "MODERATOR" }, "donor", "release", { refunded: true, dispute: null }),
     "OK",
   );
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "MODERATOR" }, "donor", "release", { refunded: false, dispute: "open" }),
+    "RELEASE_BLOCKED",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "ADMIN" }, "donor", "release", { refunded: false, dispute: "lost" }),
+    "RELEASE_BLOCKED",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "ADMIN" }, "donor", "release", { refunded: false, dispute: "won" }),
+    "OK",
+  );
+  assert.equal(
+    reviewResolveDecision({ id: "staff", role: "MODERATOR" }, "donor", "retain", { refunded: false, dispute: "lost" }),
+    "OK",
+  );
 });
 
 test("earned, pending, frozen, and paid stay distinct", () => {
