@@ -3,11 +3,13 @@ import { audit } from "@/server/audit";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
+import { circlePublisherDecision } from "@/server/money";
 import { circleBody } from "@/server/validators";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
+  const decision = circlePublisherDecision(user);
+  if (decision !== "OK" || !user?.creatorProfile) return jsonError(decision === "UNAUTHENTICATED" ? 401 : 403, decision);
   const parsed = circleBody.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return jsonError(400, "INVALID");
 

@@ -148,13 +148,27 @@ export function reviewResolveDecision(
   reviewUserId: string,
   action: "restore" | "release" | "retain",
   payment: { refunded: boolean; dispute: string | null },
-): "UNAUTHENTICATED" | "FORBIDDEN" | "SELF_REVIEW" | "RESTORED_BLOCKED" | "OK" {
+): "UNAUTHENTICATED" | "FORBIDDEN" | "SELF_REVIEW" | "RESTORED_BLOCKED" | "RELEASE_BLOCKED" | "OK" {
   if (!actor) return "UNAUTHENTICATED";
   if (actor.role !== "MODERATOR" && actor.role !== "ADMIN") return "FORBIDDEN";
   if (actor.id === reviewUserId) return "SELF_REVIEW";
   if (action === "restore" && (payment.refunded || payment.dispute === "open" || payment.dispute === "lost")) {
     return "RESTORED_BLOCKED";
   }
+  // An open or lost dispute keeps the payout hold. Releasing it would make that money payable.
+  if (action === "release" && (payment.dispute === "open" || payment.dispute === "lost")) {
+    return "RELEASE_BLOCKED";
+  }
+  return "OK";
+}
+
+/** Join or create a blessing circle only after a creator has declared they are 18. That declaration is not an identity check. */
+export function circlePublisherDecision(
+  user: { adultAttestedAt: Date | null; creatorProfile?: unknown } | null,
+): "UNAUTHENTICATED" | "CREATOR_ONLY" | "AGE_REQUIRED" | "OK" {
+  if (!user) return "UNAUTHENTICATED";
+  if (!user.creatorProfile) return "CREATOR_ONLY";
+  if (!user.adultAttestedAt) return "AGE_REQUIRED";
   return "OK";
 }
 
