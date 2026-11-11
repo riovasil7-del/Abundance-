@@ -21,6 +21,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
     const existing = await prisma.user.count();
     if (existing > 0) throw new Error("ALREADY_SEEDED");
   }
+  await prisma.storyReceipt.deleteMany();
   await prisma.feedHide.deleteMany();
   await prisma.topicPreference.deleteMany();
   await prisma.feedTaste.deleteMany();

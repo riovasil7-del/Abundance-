@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     const caption = String(body?.caption ?? "").trim();
     const deed = parseDeed(String(body?.deedKind ?? ""));
     const visibility = parseVisibility(String(body?.visibility ?? "DRAFT"));
+    const clientToken = String(body?.clientToken ?? "").trim();
     if (!deed || !visibility || title.length < 2 || title.length > 120 || caption.length < 2 || caption.length > 800) {
       return jsonError(400, "INVALID");
     }
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       deedKind: deed,
       visibility,
       circleId: circle,
+      clientToken: clientToken.length >= 8 ? clientToken : undefined,
     });
     await audit({ actorId: user.id, action: "STORY_TEXT", entityType: "Video", entityId: created.story.id, metadata: { visibility, rules: CONTENT_RULES_VERSION } });
     return NextResponse.json({ id: created.story.id, slug: user.creatorProfile.slug, status: created.status, visibility: created.story.visibility });
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
   const deed = parseDeed(String(form.get("deedKind") ?? ""));
   const visibility = parseVisibility(String(form.get("visibility") ?? "DRAFT"));
   const peopleNote = form.get("peopleNote") === "COVERED" ? "COVERED" : form.get("peopleNote") === "NO_FACES" ? "NO_FACES" : null;
+  const clientToken = String(form.get("clientToken") ?? "").trim();
   const file = form.get("file");
   if (!deed || !visibility || !peopleNote || title.length < 2 || caption.length < 2) return jsonError(400, "INVALID");
   if (!(file instanceof File) || file.size === 0) return jsonError(400, "FILE_REQUIRED");
@@ -79,8 +82,12 @@ export async function POST(request: Request) {
       bytes: Buffer.from(await file.arrayBuffer()),
       regions,
       circleId: circle,
+      clientToken: clientToken.length >= 8 ? clientToken : undefined,
     });
-    if ("error" in created && created.error) return jsonError(created.error === "REVIEW_REQUIRED" ? 400 : 503, created.error);
+    if ("error" in created && created.error) {
+      const status = created.error === "REVIEW_REQUIRED" || created.error === "MEDIA_BLOCKED" ? 400 : 503;
+      return jsonError(status, created.error);
+    }
     await audit({
       actorId: user.id,
       action: "STORY_PHOTO",

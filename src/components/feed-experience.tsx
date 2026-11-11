@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { LOCALES } from "@/config/app";
 import { LANGUAGE_META } from "@/i18n/meta";
 import { formatMoney } from "@/lib/format";
-import { capTail, videoPreload } from "@/lib/gift-guard";
+import { capTail } from "@/lib/gift-guard";
+import { feedSourceAllowed, videoPreload } from "@/lib/low-data";
 import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
@@ -22,6 +23,7 @@ export function FeedExperience({
   loggedIn,
   viewerName,
   lightBalance = 0,
+  initialLowData = false,
 }: {
   videos: FeedVideo[];
   nextCursor?: string | null;
@@ -29,6 +31,7 @@ export function FeedExperience({
   loggedIn: boolean;
   viewerName?: string | null;
   lightBalance?: number;
+  initialLowData?: boolean;
 }) {
   const { locale, messages: m } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -51,6 +54,7 @@ export function FeedExperience({
   const [reportNote, setReportNote] = useState<string | null>(null);
   const [lights, setLights] = useState(lightBalance);
   const [needsTap, setNeedsTap] = useState(false);
+  const [lowData, setLowData] = useState(initialLowData);
   const [feedNote, setFeedNote] = useState<string | null>(null);
   const [topics, setTopics] = useState<{ topic: string; interested: boolean }[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
@@ -334,6 +338,24 @@ export function FeedExperience({
       <button type="button" onClick={() => void openTune()}>
         {m.feed.tune}
       </button>
+      <button
+        type="button"
+        aria-pressed={lowData}
+        onClick={() => {
+          const next = !lowData;
+          setLowData(next);
+          window.localStorage.setItem("hojnost-low-data", next ? "1" : "0");
+          if (loggedIn) {
+            void fetch("/api/account/data", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ lowData: next }),
+            });
+          }
+        }}
+      >
+        {m.data.low}
+      </button>
     </div>
     <div
       className="feed"
@@ -365,8 +387,8 @@ export function FeedExperience({
                 playsInline
                 loop
                 muted={muted || index !== active}
-                preload={videoPreload(index, active)}
-                src={Math.abs(index - active) <= 1 ? video.playbackUrl : undefined}
+                preload={videoPreload(index, active, lowData)}
+                src={feedSourceAllowed(index, active, lowData) ? video.playbackUrl ?? undefined : undefined}
               />
             ) : (
               <div className="text-story" data-screen="text-story">

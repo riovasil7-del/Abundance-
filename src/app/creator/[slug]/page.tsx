@@ -63,9 +63,14 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
       <p>{pickLocalized(locale, creator.bio, creator.bioEn)}</p>
       <p className="muted">{craft}</p>
       {self ? (
-        <Link className="btn-primary" href="/wallet">
-          {messages.creator.wallet}
-        </Link>
+        <div className="stack">
+          <Link className="btn-primary" href="/wallet">
+            {messages.creator.wallet}
+          </Link>
+          <Link className="btn-ghost" href="/studio">
+            {messages.studio.title}
+          </Link>
+        </div>
       ) : null}
 
       <section className="stack">

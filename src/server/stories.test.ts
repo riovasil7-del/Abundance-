@@ -84,6 +84,38 @@ test("a draft stays off every feed, another person cannot open it, and words nee
   }
 });
 
+test("a timed-out story publish with the same token does not create a second row", async () => {
+  const owner = await creator("Retry");
+  try {
+    const first = await createTextStory({
+      actorId: owner.id,
+      creatorId: owner.creatorProfile!.id,
+      title: "One attempt",
+      caption: "The timeout retries this same token.",
+      deedKind: "good_deed",
+      visibility: "DRAFT",
+      clientToken: "same-token-1234",
+    });
+    const second = await createTextStory({
+      actorId: owner.id,
+      creatorId: owner.creatorProfile!.id,
+      title: "One attempt changed",
+      caption: "This must not become a second story.",
+      deedKind: "good_deed",
+      visibility: "PUBLISHED",
+      clientToken: "same-token-1234",
+    });
+    assert.equal(second.replayed, true);
+    assert.equal(second.story?.id, first.story.id);
+    assert.equal(await db.video.count({ where: { creatorId: owner.creatorProfile!.id, title: { startsWith: "One attempt" } } }), 1);
+  } finally {
+    await db.storyReceipt.deleteMany({ where: { userId: owner.id } });
+    await db.video.deleteMany({ where: { creatorId: owner.creatorProfile!.id } });
+    await db.creatorProfile.deleteMany({ where: { userId: owner.id } });
+    await db.user.deleteMany({ where: { id: owner.id } });
+  }
+});
+
 test("a published photo stores the painted PNG and not the camera note", async () => {
   const owner = await creator("Painter");
   const raw = Buffer.alloc(24 * 24 * 4, 255);

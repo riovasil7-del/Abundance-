@@ -31,7 +31,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if ((title != null && (title.trim().length < 2 || title.trim().length > 120)) || (caption != null && (caption.trim().length < 2 || caption.trim().length > 800))) {
     return jsonError(400, "INVALID");
   }
-  const updated = await updateStory(user.id, id, { title, caption, visibility: visibility ?? undefined });
+  const captions = body?.captionsVtt == null ? undefined : String(body.captionsVtt).slice(0, 8000);
+  const updated = await updateStory(user.id, id, { title, caption, visibility: visibility ?? undefined, captionsVtt: captions });
   if ("error" in updated && updated.error) return jsonError(updated.error === "FORBIDDEN" ? 403 : 404, updated.error);
   return NextResponse.json({ id: updated.story.id, visibility: updated.story.visibility, status: updated.story.moderationStatus });
 }

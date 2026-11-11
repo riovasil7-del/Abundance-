@@ -67,6 +67,8 @@ model User {
   localeChosen Boolean @default(false)
   /// Self-declared "I am 18 or older". This is not an identity or age-provider check.
   adultAttestedAt DateTime?
+  /// When true, the feed does not preload the next video.
+  lowData         Boolean  @default(false)
   phone        String?  @unique
   /// Filled by a future KYC provider (Smile ID or similar). Null until then.
   kycSubjectId String?  @unique
@@ -94,6 +96,7 @@ model User {
   topicPreferences  TopicPreference[]
   feedHides         FeedHide[]
   feedTaste         FeedTaste?
+  storyReceipts     StoryReceipt[]
 }
 
 model CreatorProfile {
@@ -147,6 +150,8 @@ model Video {
   mediaKind        String           @default("VIDEO")
   /// TEXT_ONLY, NO_FACES, or COVERED. This is not a legal-consent check.
   peopleNote       String?
+  /// Captions typed by the creator. Not produced by speech recognition.
+  captionsVtt      String?
   durationSec      Int              @default(8)
   deedKind         String
   /// Language of the picture and the words. Not a device location.
@@ -615,4 +620,17 @@ model FeedTaste {
   user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   languages  String[]
   regionCode String?
+}
+
+/// One client token finalizes one story. A retry after a timeout returns the first row.
+model StoryReceipt {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String
+  storyId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, token])
+  @@index([storyId])
 }

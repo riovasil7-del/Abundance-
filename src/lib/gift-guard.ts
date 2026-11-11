@@ -1,4 +1,5 @@
 import { GIFT_CONFIRM_CENTS } from "../config/app";
+import { videoPreload as preloadChoice } from "./low-data";
 
 /** Live and feed comments keep only the newest lines. */
 export const COMMENT_MEMORY = 40;
@@ -20,7 +21,7 @@ export function capTail<T>(items: readonly T[], max = COMMENT_MEMORY): T[] {
   return items.slice(items.length - max);
 }
 
-/** Only the active video and its neighbor may fetch metadata. */
-export function videoPreload(index: number, active: number): "metadata" | "none" {
-  return Math.abs(index - active) <= 1 ? "metadata" : "none";
+/** Only the active video and its neighbor may fetch metadata. Low data skips the neighbor. */
+export function videoPreload(index: number, active: number, lowData = false): "metadata" | "none" {
+  return preloadChoice(index, active, lowData);
 }
