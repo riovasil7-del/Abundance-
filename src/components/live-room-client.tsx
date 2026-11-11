@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import type { GiftChoice } from "@/lib/types";
@@ -71,9 +72,9 @@ export function LiveRoomClient({
       <div className="page stack">
         <h1>{hostName}</h1>
         <p className="notice">{m.live.ended}</p>
-        <a className="btn-primary" href="/live">
+        <Link className="btn-primary" href="/live">
           {m.common.back}
-        </a>
+        </Link>
       </div>
     );
   }
