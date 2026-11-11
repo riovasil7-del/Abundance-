@@ -21,6 +21,10 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
     const existing = await prisma.user.count();
     if (existing > 0) throw new Error("ALREADY_SEEDED");
   }
+  await prisma.liveInvite.deleteMany();
+  await prisma.encouragement.deleteMany();
+  await prisma.creatorUpdate.deleteMany();
+  await prisma.follow.deleteMany();
   await prisma.rateLimitHit.deleteMany();
   await prisma.creditRelease.deleteMany();
   await prisma.creditAllocation.deleteMany();

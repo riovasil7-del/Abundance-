@@ -25,6 +25,7 @@ export const giftBody = z.object({
   anonymous: z.boolean().optional(),
   payItForwardFromId: z.string().trim().min(1).max(80).nullable().optional(),
   token: z.string().trim().min(8).max(80).regex(/^[A-Za-z0-9_.:-]+$/).optional(),
+  recipientCreatorId: z.string().trim().min(1).max(80).optional(),
 });
 
 export const commentBody = z.object({
@@ -32,7 +33,7 @@ export const commentBody = z.object({
 });
 
 export const reportBody = z.object({
-  targetType: z.enum(["VIDEO", "COMMENT", "USER"]),
+  targetType: z.enum(["VIDEO", "COMMENT", "USER", "ENCOURAGEMENT", "UPDATE"]),
   targetId: z.string().trim().min(1).max(80),
   reason: z.enum(REPORT_REASONS),
   details: z.string().trim().max(500).optional().or(z.literal("")),

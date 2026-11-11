@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReportNoteButton } from "@/components/report-note";
 import { AgeAttest } from "@/components/age-attest";
 import { ReopenIntroButton } from "@/components/intro-tour";
 import { messagesFor } from "@/i18n";
@@ -22,6 +23,17 @@ export default async function MePage() {
       </div>
     );
   }
+  const following = await db.follow.findMany({
+    where: { followerId: user.id },
+    orderBy: { createdAt: "desc" },
+    include: { creator: { include: { creatorProfile: true } } },
+  });
+  const notes = await db.encouragement.findMany({
+    where: { toUserId: user.id, moderationStatus: "VISIBLE" },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+    include: { fromUser: { select: { name: true } } },
+  });
   const families = await db.familyMembership.findMany({
     where: { supporterId: user.id, status: "ACTIVE" },
     include: { creator: true },
@@ -47,6 +59,29 @@ export default async function MePage() {
           {messages.common.admin}
         </Link>
       ) : null}
+      <section className="stack" data-screen="following">
+        <h2>{messages.bond.followingList}</h2>
+        {following.length === 0 ? <p className="empty">{messages.bond.followingEmpty}</p> : null}
+        {following.map((row) =>
+          row.creator.creatorProfile ? (
+            <Link key={row.id} href={`/creator/${row.creator.creatorProfile.slug}`} className="card" style={{ textDecoration: "none" }}>
+              <strong>{row.creator.creatorProfile.displayName}</strong>
+            </Link>
+          ) : null,
+        )}
+      </section>
+      <section className="stack" data-screen="private-inbox">
+        <h2>{messages.bond.inbox}</h2>
+        <p className="muted">{messages.bond.thanksHint}</p>
+        {notes.length === 0 ? <p className="empty">{messages.bond.inboxEmpty}</p> : null}
+        {notes.map((note) => (
+          <article key={note.id} className="card">
+            <strong>{note.fromUser.name}</strong>
+            <p>{note.kind === "HELPFUL" ? messages.bond.reaction : note.body}</p>
+            <ReportNoteButton id={note.id} />
+          </article>
+        ))}
+      </section>
       <section className="stack">
         <h2>{messages.me.family}</h2>
         {families.length === 0 ? <p className="empty">{messages.me.none}</p> : null}

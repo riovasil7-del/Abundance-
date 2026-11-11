@@ -4,6 +4,8 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import type { GiftChoice } from "@/lib/types";
+import { AttributedGift } from "./attributed-gift";
+import { CollabPanel } from "./collab-panel";
 import { useI18n } from "./providers";
 
 const LiveStage = dynamic(() => import("./live-stage").then((mod) => mod.LiveStage), { ssr: false });
@@ -63,6 +65,8 @@ export function LiveRoomClient({
         <p className="kicker">{m.live.title}</p>
         <h1>{title}</h1>
         <div className="notice">{m.live.notConfigured}</div>
+        <CollabPanel sessionId={sessionId} loggedIn={loggedIn} />
+        {loggedIn ? <AttributedGift sessionId={sessionId} gifts={gifts} initialLightBalance={lightBalance} /> : null}
       </div>
     );
   }
