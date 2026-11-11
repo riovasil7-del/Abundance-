@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/server/auth";
 import { jsonError } from "@/server/http";
-import { canPublishToRoom, readLiveKitCredentials, tokenForParticipant } from "@/server/live-access";
+import { canPublishToRoom, mayIssuePublishGrant, readLiveKitCredentials, tokenForParticipant } from "@/server/live-access";
 import { serverPublishGrant } from "@/server/community-rules";
 import { loadLiveAudience } from "@/server/live-sessions";
 
@@ -20,7 +20,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const clientRequestedPublish = Boolean(raw && typeof raw === "object" && "canPublish" in raw && raw.canPublish);
   const identity = user?.id ?? `guest_${randomUUID()}`;
   const name = user?.name ?? "Hosť";
-  const audience = user ? loaded.audience : { hostUserId: loaded.audience.hostUserId, circlePublisherUserIds: [], cohostUserIds: [] };
+  const audience = user ? loaded.audience : { hostUserId: loaded.audience.hostUserId, circlePublisherUserIds: [], cohostUserIds: [] as string[] };
   const grant = serverPublishGrant(identity, audience, clientRequestedPublish, canPublishToRoom);
   const { token } = await tokenForParticipant({
     credentials,
@@ -33,7 +33,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   return NextResponse.json({
     token,
     url: credentials.url,
-    canPublish: grant.canPublish,
+    canPublish: mayIssuePublishGrant(user, audience) && grant.canPublish,
     configured: true,
   });
 }
