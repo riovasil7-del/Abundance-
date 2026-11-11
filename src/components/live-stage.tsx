@@ -1,13 +1,16 @@
 "use client";
 
-import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useParticipants, useRoomContext, useTracks } from "@livekit/components-react";
-import { RoomEvent, Track, type RoomOptions } from "livekit-client";
+import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useConnectionState, useParticipants, useRoomContext, useTracks } from "@livekit/components-react";
+import { ConnectionState, RoomEvent, Track, type RoomOptions } from "livekit-client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
+import { capTail } from "@/lib/gift-guard";
 import type { GiftChoice, Receipt } from "@/lib/types";
+import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
+import { Sheet } from "./sheet";
 
 const roomOptions: RoomOptions = {
   adaptiveStream: true,
@@ -131,6 +134,14 @@ function Broadcast({
   const primed = useRef(false);
   const heartStamps = useRef<number[]>([]);
   const chosen = gifts.find((gift) => gift.slug === slug) ?? gifts[0];
+  const connection = useConnectionState();
+  const [chatPaused, setChatPaused] = useState(false);
+  const pausedRef = useRef(false);
+  const [mediaNote, setMediaNote] = useState<string | null>(null);
+  const giftAttempt = useGiftAttempt(chosen?.priceCents);
+  useEffect(() => {
+    pausedRef.current = chatPaused;
+  }, [chatPaused]);
 
   function showGift(event: GiftEvent) {
     if (seenGifts.current.has(event.id)) return;
@@ -177,9 +188,9 @@ function Broadcast({
           window.setTimeout(() => setHearts((current) => current.filter((heart) => heart.id !== event.id)), 2600);
         }
         if (event.type === "chat" && event.id && event.body && event.author && event.authorId) {
-          if (blocked.includes(event.authorId)) return;
+          if (pausedRef.current || blocked.includes(event.authorId)) return;
           const line = { id: event.id, author: event.author, authorId: event.authorId, body: event.body };
-          setMessages((current) => (current.some((item) => item.id === line.id) ? current : [...current, line].slice(-40)));
+          setMessages((current) => (current.some((item) => item.id === line.id) ? current : capTail([...current, line])));
         }
         if (event.type === "chat-remove" && event.id) {
           setMessages((current) => current.filter((item) => item.id !== event.id));
@@ -215,7 +226,9 @@ function Broadcast({
         blessingNetCents: number;
         gifts: GiftEvent[];
       };
-      setMessages(data.messages.filter((message) => !blocked.includes(message.authorId)));
+      if (!pausedRef.current) {
+        setMessages(capTail(data.messages.filter((message) => !blocked.includes(message.authorId))));
+      }
       setBlessingNet(data.blessingNetCents);
       if (!primed.current) {
         data.gifts.forEach((gift) => seenGifts.current.add(gift.id));
@@ -238,7 +251,10 @@ function Broadcast({
         if (publication.kind === Track.Kind.Video) publication.setSubscribed(!audioOnly);
       });
     });
-    if (canPublish) room.localParticipant.setCameraEnabled(!audioOnly, { facingMode: facing }).catch(() => undefined);
+    if (canPublish) {
+      room.localParticipant.setCameraEnabled(!audioOnly, { facingMode: facing }).catch(() => setMediaNote(m.live.cameraNeed));
+      room.localParticipant.setMicrophoneEnabled(!muted).catch(() => setMediaNote(m.live.cameraNeed));
+    }
   }, [audioOnly, canPublish, facing, room]);
 
   async function sendHeart() {
@@ -279,34 +295,37 @@ function Broadcast({
     }
   }
 
-  async function sendGift() {
+  function sendGift() {
     if (!chosen) return;
-    setBusy(true);
-    try {
-      const response = await fetch(`/api/live/sessions/${sessionId}/gifts`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token: crypto.randomUUID() }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setChatNote(response.status === 402 ? m.gifts.notEnough : m.common.error);
-        return;
+    giftAttempt.armOrSend(async (token) => {
+      setBusy(true);
+      try {
+        const response = await fetch(`/api/live/sessions/${sessionId}/gifts`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ giftSlug: chosen.slug, anonymous, token }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setChatNote(response.status === 402 ? m.gifts.notEnough : m.common.error);
+          return false;
+        }
+        if (typeof data.lightBalance === "number") setLights(data.lightBalance);
+        setReceipt(data as Receipt);
+        showGift({
+          id: data.transactionId,
+          symbol: chosen.symbol,
+          name: chosen.name,
+          donorName: anonymous ? "" : m.me.title,
+          netCents: data.netCents,
+          grossCents: data.grossCents,
+          feeCents: data.feeCents,
+        });
+        return true;
+      } finally {
+        setBusy(false);
       }
-      if (typeof data.lightBalance === "number") setLights(data.lightBalance);
-      setReceipt(data as Receipt);
-      showGift({
-        id: data.transactionId,
-        symbol: chosen.symbol,
-        name: chosen.name,
-        donorName: anonymous ? "" : m.me.title,
-        netCents: data.netCents,
-        grossCents: data.grossCents,
-        feeCents: data.feeCents,
-      });
-    } finally {
-      setBusy(false);
-    }
+    });
   }
 
   async function removeMessage(id: string) {
@@ -344,7 +363,16 @@ function Broadcast({
   return (
     <div className="live-fill" data-screen="live-room">
       {audioOnly || tracks.length === 0 ? (
-        <div className="live-audio-only">{audioOnly ? "♪" : "…"}</div>
+        <div className="live-audio-only">
+          <span aria-hidden="true">{audioOnly ? "♪" : "…"}</span>
+          <p>
+            {audioOnly
+              ? m.live.audioOnly
+              : connection === ConnectionState.Reconnecting
+                ? m.live.reconnecting
+                : m.live.cameraNeed}
+          </p>
+        </div>
       ) : (
         <div className={tracks.length > 1 ? "live-video many" : "live-video"}>
           {tracks.map((track) => (
@@ -370,6 +398,16 @@ function Broadcast({
         </div>
       </div>
 
+      {connection === ConnectionState.Reconnecting ? (
+        <p className="live-note" role="status">
+          {m.live.reconnecting}
+        </p>
+      ) : null}
+      {mediaNote ? (
+        <p className="live-note" role="status">
+          {mediaNote}
+        </p>
+      ) : null}
       {thanks ? <div className="live-thanks">{thanks}</div> : null}
       {bursts.map((burst) => (
         <div className="gift-burst" key={burst.id}>
@@ -384,7 +422,10 @@ function Broadcast({
         </span>
       ))}
 
-      <div className="live-chat-stream">
+      <div className="live-chat-stream" aria-live={chatPaused ? "off" : "polite"}>
+        <button type="button" className="chat-pause" onClick={() => setChatPaused((value) => !value)}>
+          {chatPaused ? m.live.chatResume : m.live.chatPause}
+        </button>
         {visibleChat.map((message) => (
           <div className="live-chat-line" key={message.id}>
             <strong>{message.author}</strong> {message.body}
@@ -408,7 +449,7 @@ function Broadcast({
       </div>
 
       <div className="live-rail">
-        <button type="button" onClick={() => void sendHeart()}>
+        <button type="button" aria-label={m.live.heart} onClick={() => void sendHeart()}>
           ♥<span>{m.live.heart}</span>
         </button>
         {loggedIn && !isHost ? (
@@ -483,8 +524,8 @@ function Broadcast({
       {chatNote ? <p className="live-note">{chatNote}</p> : null}
 
       {giftOpen ? (
-        <div className="sheet-back" onClick={() => setGiftOpen(false)}>
-          <div className="sheet" onClick={(event) => event.stopPropagation()} data-screen="live-gift">
+        <Sheet title={m.live.gift} onClose={() => setGiftOpen(false)}>
+          <div data-screen="live-gift">
             {receipt ? (
               <div data-screen="live-gift-receipt">
                 <p className="kicker">{m.gifts.receiptTitle}</p>
@@ -517,8 +558,9 @@ function Broadcast({
                 <div className="gift-grid">
                   {gifts.map((gift) => (
                     <button type="button" key={gift.slug} className={gift.slug === chosen.slug ? "gift-option on" : "gift-option"} onClick={() => setSlug(gift.slug)}>
-                      <span>{gift.symbol}</span>
+                      <span aria-hidden="true">{gift.symbol}</span>
                       <small>{gift.name}</small>
+                      <small>{formatMoney(gift.priceCents, locale)}</small>
                     </button>
                   ))}
                 </div>
@@ -537,15 +579,22 @@ function Broadcast({
                   <span>{m.gifts.anonymous}</span>
                 </label>
                 <LightsStatus balance={lights} priceCents={chosen.priceCents} />
+                <p className="muted">
+                  {m.gifts.fiat}: {formatMoney(chosen.priceCents, locale)}
+                </p>
                 {lights >= chosen.priceCents ? (
-                  <button type="button" className="btn-primary" disabled={busy} onClick={() => void sendGift()}>
-                    {busy ? m.gifts.sending : m.gifts.send}
-                  </button>
+                  giftAttempt.armed ? (
+                    <GiftConfirm priceCents={chosen.priceCents} busy={busy} onYes={sendGift} onNo={giftAttempt.cancel} />
+                  ) : (
+                    <button type="button" className="btn-primary" disabled={busy} onClick={sendGift}>
+                      {busy ? m.gifts.sending : m.gifts.send}
+                    </button>
+                  )
                 ) : null}
               </div>
             ) : null}
           </div>
-        </div>
+        </Sheet>
       ) : null}
     </div>
   );

@@ -17,6 +17,10 @@ const cs: Messages = {
     chain: "Řetěz dobra",
     empty: "Zatím tu nejsou žádná videa.",
     login: "Přihlaste se, když chcete požehnat nebo darovat.",
+    stage: "Videa dobrých skutků",
+    next: "Další",
+    prev: "Předchozí",
+    tapPlay: "Ťuknutím přehrát",
   },
   gifts: {
     title: "Dar, který žehná",
@@ -39,6 +43,11 @@ const cs: Messages = {
     topUp: "Doplnit světýlka",
     lightsLeft: "Světýlka",
     notEnough: "Na tento dar světýlka nestačí.",
+    confirmAsk: "Poslat tento dar?",
+    confirmNote: "Dar od této částky počká na druhé ano, aby jedno ťuknutí nemohlo utratit omylem:",
+    confirmYes: "Ano, poslat",
+    confirmNo: "Teď ne",
+    fiat: "Cena",
   },
   comments: {
     title: "Slova požehnání",
@@ -47,6 +56,8 @@ const cs: Messages = {
     flagged: "Tato slova jsme zadrželi ke kontrole. Ponížení sem nepatří.",
     empty: "Buďte první, kdo řekne něco laskavého.",
     hint: "Pište tak, jak byste to řekli u jednoho stolu.",
+    pause: "Pozastavit slova",
+    resume: "Znovu ukazovat slova",
   },
   report: {
     title: "Nahlásit",
@@ -217,6 +228,10 @@ const cs: Messages = {
     failed: "Spojení se nepodařilo. Zkuste jen zvuk, nebo to zkuste znovu.",
     ended: "Toto vysílání skončilo.",
     listTitle: "Kdo je teď živě",
+    reconnecting: "Místnost se znovu připojuje. Už poslaný dar se nepošle podruhé.",
+    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.",
+    chatPause: "Pozastavit rozhovor",
+    chatResume: "Ukazovat nová slova",
   },
   setup: {
     title: "První naplnění",

@@ -24,6 +24,10 @@ export const en: Messages = {
     chain: "Chain of good",
     empty: "No videos yet.",
     login: "Sign in to bless or give.",
+    stage: "Good-deed videos",
+    next: "Next",
+    prev: "Previous",
+    tapPlay: "Tap to play",
   },
   gifts: {
     title: "A gift that blesses",
@@ -46,6 +50,11 @@ export const en: Messages = {
     topUp: "Add lights",
     lightsLeft: "Lights",
     notEnough: "There are not enough lights for this gift.",
+    confirmAsk: "Send this gift?",
+    confirmNote: "A gift at or above this amount waits for a second yes, so one tap cannot spend it by accident:",
+    confirmYes: "Yes, send it",
+    confirmNo: "Not now",
+    fiat: "Price",
   },
   comments: {
     title: "Words of blessing",
@@ -54,6 +63,8 @@ export const en: Messages = {
     flagged: "We held these words for review. Humiliation does not belong here.",
     empty: "Be the first to say something kind.",
     hint: "Write it the way you would say it at one table.",
+    pause: "Pause words",
+    resume: "Resume words",
   },
   report: {
     title: "Report",
@@ -228,6 +239,10 @@ export const en: Messages = {
     failed: "The connection did not open. Try audio only, or try again.",
     ended: "This stream has ended.",
     listTitle: "Who is live now",
+    reconnecting: "The room is reconnecting. Gifts already sent are not sent again.",
+    cameraNeed: "The camera or microphone is not on. You can stay with audio only.",
+    chatPause: "Pause the conversation",
+    chatResume: "Show new words",
   },
   setup: {
     title: "First fill",

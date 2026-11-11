@@ -22,6 +22,10 @@ export const sk = {
     chain: "Reťaz dobra",
     empty: "Zatiaľ tu nie sú žiadne videá.",
     login: "Prihláste sa, ak chcete požehnať alebo darovať.",
+    stage: "Videá dobrých skutkov",
+    next: "Ďalšie",
+    prev: "Predošlé",
+    tapPlay: "Ťuknutím prehrať",
   },
   gifts: {
     title: "Dar, ktorý žehná",
@@ -44,6 +48,11 @@ export const sk = {
     topUp: "Doplň kredity",
     lightsLeft: "Svetielka",
     notEnough: "Na tento dar svetielka nestačia.",
+    confirmAsk: "Poslať tento dar?",
+    confirmNote: "Dar od tejto sumy počká na druhé áno, aby jedno ťuknutie nemohlo minúť omylom:",
+    confirmYes: "Áno, poslať",
+    confirmNo: "Teraz nie",
+    fiat: "Cena",
   },
   comments: {
     title: "Slová požehnania",
@@ -52,6 +61,8 @@ export const sk = {
     flagged: "Tieto slová sme zadržali na kontrolu. Poníženie sem nepatrí.",
     empty: "Buďte prvý, kto povie niečo láskavé.",
     hint: "Píšte tak, ako by ste to povedali pri jednom stole.",
+    pause: "Pozastaviť slová",
+    resume: "Znova ukazovať slová",
   },
   report: {
     title: "Nahlásiť",
@@ -226,6 +237,10 @@ export const sk = {
     failed: "Spojenie sa nepodarilo. Skúste len zvuk, alebo to skúste znova.",
     ended: "Toto vysielanie sa skončilo.",
     listTitle: "Kto je teraz naživo",
+    reconnecting: "Izba sa znova pripája. Už poslaný dar sa nepošle druhý raz.",
+    cameraNeed: "Kamera alebo mikrofón nie sú zapnuté. Môžete ostať len pri zvuku.",
+    chatPause: "Pozastaviť rozhovor",
+    chatResume: "Ukazovať nové slová",
   },
   setup: {
     title: "Prvé naplnenie",
