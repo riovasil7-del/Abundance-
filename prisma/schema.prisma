@@ -103,6 +103,7 @@ model User {
   storyReceipts     StoryReceipt[]
   ideasProposed     Idea[]
   ideaSaves         IdeaSave[]
+  chatMutes         LiveChatMute[] @relation("ChatMuted")
 }
 
 model CreatorProfile {
@@ -369,6 +370,7 @@ model LiveSession {
   messages     LiveMessage[]
   transactions LedgerTransaction[]
   invites      LiveInvite[]
+  chatMutes    LiveChatMute[]
 
   @@index([status, startedAt])
 }
@@ -380,11 +382,26 @@ model LiveMessage {
   userId           String
   user             User             @relation(fields: [userId], references: [id])
   body             String
+  /// chat or join. Gifts stay on the ledger and are mixed into the overlay when read.
+  kind             String           @default("chat")
   moderationStatus ModerationStatus @default(VISIBLE)
   moderationNote   String?
   createdAt        DateTime         @default(now())
 
   @@index([sessionId, createdAt])
+}
+
+/// A person removed from one room's chat for everyone. Not a personal block.
+model LiveChatMute {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation("ChatMuted", fields: [userId], references: [id], onDelete: Cascade)
+  actorId   String
+  createdAt DateTime    @default(now())
+
+  @@unique([sessionId, userId])
 }
 
 model UserBlock {

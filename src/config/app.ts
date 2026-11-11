@@ -146,7 +146,7 @@ export type DeedKind = (typeof DEED_KINDS)[number];
 export const CRAFT_KEYS = ["weaving", "garden", "song", "kitchen"] as const;
 export type CraftKey = (typeof CRAFT_KEYS)[number];
 
-export const REPORT_REASONS = ["begging", "humiliation", "consent", "spam", "other"] as const;
+export const REPORT_REASONS = ["begging", "humiliation", "consent", "spam", "harassment", "inappropriate", "other"] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
 
 export const LOCALES = [

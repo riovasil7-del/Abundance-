@@ -46,6 +46,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
   await prisma.blessing.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.userBlock.deleteMany();
+  await prisma.liveChatMute.deleteMany();
   await prisma.liveMessage.deleteMany();
   await prisma.ideaSave.deleteMany();
   await prisma.idea.deleteMany();

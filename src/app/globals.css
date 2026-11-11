@@ -92,7 +92,7 @@ img, video { max-width: 100%; display: block; }
 .tour-dots span { width: 8px; height: 8px; border-radius: 99px; background: rgba(111, 78, 29, 0.25); }
 .tour-dots span.on { background: var(--gold-deep); }
 html[dir="rtl"] .live-rail { right: auto; left: 10px; }
-html[dir="rtl"] .live-chat-stream { left: 84px; right: 10px; }
+html[dir="rtl"] .live-chat-stream { left: auto; right: 8px; }
 html[dir="rtl"] .live-thanks { right: 16px; left: 84px; }
 
 main { min-height: calc(100dvh - var(--header-h)); padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -352,16 +352,28 @@ textarea { min-height: 96px; resize: vertical; }
 .live-total { margin-inline-start: auto; text-align: end; font-size: 0.75rem; }
 .live-total strong { font-size: 0.95rem; }
 .live-chat-stream {
-  position: absolute; left: 10px; right: 84px; bottom: 72px; z-index: 2;
-  max-height: 28dvh; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
-  overflow: hidden;
+  position: absolute; left: 8px; bottom: 68px; z-index: 2;
+  width: min(68%, 240px); max-height: 30dvh;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
+  overflow: hidden; pointer-events: auto;
 }
 .chat-pause {
   align-self: flex-start; border: 0; border-radius: 999px; min-height: 32px; padding: 0 10px;
   background: rgba(255, 250, 243, 0.9); color: #3e2a12; font-size: 0.75rem;
 }
 .live-chat-line {
-  background: rgba(20, 14, 10, 0.5); color: #fffaf3; border-radius: 14px; padding: 6px 10px; font-size: 0.92rem;
+  background: rgba(20, 14, 10, 0.42); color: #fffaf3; border-radius: 14px; padding: 6px 10px; font-size: 0.86rem;
+}
+.live-chat-quiet { font-size: 0.75rem; opacity: 0.9; }
+.live-chat-author { border: 0; background: transparent; color: inherit; font-weight: 700; padding: 0; min-height: 0; }
+.live-chat-menu {
+  position: absolute; left: 8px; right: 72px; bottom: 64px; z-index: 6;
+  background: rgba(255, 250, 243, 0.96); color: #3e2a12; border-radius: 16px; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.live-chat-menu button, .live-chat-menu select, .live-chat-menu textarea { width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .live-chat-line, .gift-burst, .heart-float { animation: none; transition: none; }
 }
 .live-chat-actions { display: flex; gap: 8px; margin-top: 4px; }
 .live-chat-actions button { border: 0; background: transparent; color: #f6ead7; font-size: 0.72rem; padding: 0; min-height: 0; }

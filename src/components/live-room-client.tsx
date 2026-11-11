@@ -4,8 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import type { GiftChoice } from "@/lib/types";
-import { AttributedGift } from "./attributed-gift";
-import { CollabPanel } from "./collab-panel";
+import { LiveChatPanel } from "./live-chat-panel";
 import { useI18n } from "./providers";
 
 const LiveStage = dynamic(() => import("./live-stage").then((mod) => mod.LiveStage), { ssr: false });
@@ -18,6 +17,8 @@ export function LiveRoomClient({
   configured,
   loggedIn,
   isHost,
+  canModerate,
+  translateEnabled,
   gifts,
   blessingNetCents,
   lightBalance,
@@ -29,6 +30,8 @@ export function LiveRoomClient({
   configured: boolean;
   loggedIn: boolean;
   isHost: boolean;
+  canModerate: boolean;
+  translateEnabled: boolean;
   gifts: GiftChoice[];
   blessingNetCents: number;
   lightBalance: number;
@@ -61,12 +64,13 @@ export function LiveRoomClient({
 
   if (!configured) {
     return (
-      <div className="page stack" data-screen="live-unconfigured">
-        <p className="kicker">{m.live.title}</p>
-        <h1>{title}</h1>
-        <div className="notice">{m.live.notConfigured}</div>
-        <CollabPanel sessionId={sessionId} loggedIn={loggedIn} />
-        {loggedIn ? <AttributedGift sessionId={sessionId} gifts={gifts} initialLightBalance={lightBalance} /> : null}
+      <div className="live-shell" data-screen="live-room">
+        <div className="live-audio-only" data-screen="live-stage">
+          <p>{title}</p>
+          <p>{hostName}</p>
+          <p>{m.live.audioOnly}</p>
+        </div>
+        <LiveChatPanel sessionId={sessionId} loggedIn={loggedIn} canModerate={canModerate} translateEnabled={translateEnabled} />
       </div>
     );
   }
@@ -96,6 +100,8 @@ export function LiveRoomClient({
           hostName={hostName}
           hostAvatar={hostAvatar}
           isHost={isHost}
+          canModerate={canModerate}
+          translateEnabled={translateEnabled}
           loggedIn={loggedIn}
           gifts={gifts}
           initialBlessingNetCents={blessingNetCents}

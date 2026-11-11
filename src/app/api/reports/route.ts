@@ -3,13 +3,14 @@ import { audit } from "@/server/audit";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
+import { CHAT_REPORT_LIMIT, CHAT_REPORT_WINDOW_MS } from "@/lib/live-chat";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { reportBody } from "@/server/validators";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return jsonError(401, "UNAUTHENTICATED");
-  const limit = memoryRateLimiter.consume(clientKey(request, "report", user.id), 10, 60 * 60 * 1000);
+  const limit = memoryRateLimiter.consume(clientKey(request, "report", user.id), CHAT_REPORT_LIMIT, CHAT_REPORT_WINDOW_MS);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
   const parsed = reportBody.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return jsonError(400, "INVALID");
