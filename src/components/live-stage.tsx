@@ -4,6 +4,7 @@ import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useConnectionState, usePart
 import { ConnectionState, RoomEvent, Track, type RoomOptions } from "livekit-client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { mediaFailureKind } from "@/lib/live-start";
 import { remoteVideoSubscribed } from "@/lib/low-data";
 import { formatMoney } from "@/lib/format";
 import { capTail } from "@/lib/gift-guard";
@@ -293,8 +294,17 @@ function Broadcast({
     };
     room.on(RoomEvent.TrackPublished, onPublished);
     if (canPublish) {
-      room.localParticipant.setCameraEnabled(cameraOn && subscribe, { facingMode: facing }).catch(() => setMediaNote(m.live.cameraNeed));
-      room.localParticipant.setMicrophoneEnabled(!muted).catch(() => setMediaNote(m.live.cameraNeed));
+      const wantedCamera = cameraOn && subscribe;
+      room.localParticipant.setCameraEnabled(wantedCamera, { facingMode: facing }).catch((error: unknown) => {
+        if (!wantedCamera) return;
+        const name = error instanceof Error ? error.name : undefined;
+        setCameraOn(false);
+        setMediaNote(mediaFailureKind(name) === "denied" ? m.live.allowMedia : m.live.cameraNeed);
+      });
+      room.localParticipant.setMicrophoneEnabled(!muted).catch(() => {
+        if (muted) return;
+        setMediaNote(m.live.allowMedia);
+      });
     }
     return () => {
       room.off(RoomEvent.TrackPublished, onPublished);
@@ -453,7 +463,7 @@ function Broadcast({
         </p>
       ) : null}
       {mediaNote ? (
-        <p className="live-note" role="status">
+        <p className="live-note" role="alert">
           {mediaNote}
         </p>
       ) : null}
@@ -489,9 +499,22 @@ function Broadcast({
         ) : null}
         {canPublish ? (
           <>
-            <button type="button" onClick={() => setCameraOn((value) => !value)} aria-pressed={cameraOn && !audioOnly}>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !(cameraOn && !audioOnly);
+                setCameraOn(next);
+                if (!next) return;
+                room.localParticipant.setCameraEnabled(true, { facingMode: facing }).then(() => setMediaNote(null)).catch(() => {
+                  setCameraOn(false);
+                  setMediaNote(m.live.allowMedia);
+                });
+                room.localParticipant.setMicrophoneEnabled(true).catch(() => setMediaNote(m.live.allowMedia));
+              }}
+              aria-pressed={cameraOn && !audioOnly}
+            >
               {cameraOn && !audioOnly ? "●" : "○"}
-              <span>{cameraOn && !audioOnly ? m.studio.cameraOff : m.studio.cameraOn}</span>
+              <span>{mediaNote ? m.live.enableMedia : cameraOn && !audioOnly ? m.studio.cameraOff : m.studio.cameraOn}</span>
             </button>
             <button
               type="button"
@@ -508,7 +531,7 @@ function Broadcast({
               onClick={() => {
                 const next = !muted;
                 setMuted(next);
-                room.localParticipant.setMicrophoneEnabled(!next).catch(() => undefined);
+                room.localParticipant.setMicrophoneEnabled(!next).catch(() => setMediaNote(m.live.allowMedia));
               }}
             >
               {muted ? "🔇" : "🎤"}

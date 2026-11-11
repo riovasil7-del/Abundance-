@@ -208,7 +208,7 @@ const ig: Messages = {
     failed: "Njikọ emeghị. Nwaa ụda naanị, ma ọ bụ nwaa ọzọ.",
     ended: "Mgbasa a agwụla.", listTitle: "Onye nọ ozugbo ugbu a",
     reconnecting: "Ime ụlọ na-ejikọta ọzọ. Onyinye e zigalarị anaghị aga ọzọ.",
-    cameraNeed: "Igwefoto ma ọ bụ igwe okwu adịghị. Ị nwere ike ịnọ na ụda.",
+    cameraNeed: "Igwefoto ma ọ bụ igwe okwu adịghị. Ị nwere ike ịnọ na ụda.", ageFirst: "Buru ụzọ kwado 18+ n'okpuru Mụ. Ọ bụghị nyocha afọ.", needCreator: "Naanị onye na-ekesa nwere ike igbasa ozi.", allowMedia: "Kwe ka igwefoto na igweokwu dị na ihe nchọgharị, wee nwaa ọzọ.", startFailed: "Mgbasa ozi amaliteghị. Nwaa ọzọ.", enableMedia: "Gbanye igwefoto na igweokwu", circleOnly: "Naanị ndị otu okirikiri a nwere ike igbasa ozi ebe a.",
     excludeMine: "Zochie na mkparịta ụka m", reportMod: "Kọọrọ onye nlekọta", removeEveryone: "Wepụ maka onye ọ bụla", removedAll: "Onye a anaghịzi ede ebe a.", chatMuted: "Ị nweghịzi ike ide ebe a.", joined: "{name} abanyela", giftLine: "{name} · {gift}", translate: "Tụgharịa", chatPause: "Kwụsị mkparịta ụka",
     chatResume: "Gosi okwu ọhụrụ",
   },

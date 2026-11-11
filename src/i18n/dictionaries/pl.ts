@@ -208,7 +208,7 @@ const pl: Messages = {
     failed: "Połączenie nie powstało. Spróbuj tylko dźwięku albo jeszcze raz.",
     ended: "Ta transmisja się skończyła.", listTitle: "Kto jest teraz na żywo",
     reconnecting: "Pokój łączy się ponownie. Już wysłany dar nie pójdzie drugi raz.",
-    cameraNeed: "Kamera albo mikrofon są wyłączone. Możesz zostać przy samym dźwięku.",
+    cameraNeed: "Kamera albo mikrofon są wyłączone. Możesz zostać przy samym dźwięku.", ageFirst: "Najpierw potwierdź 18+ w Ja. To nie jest sprawdzenie wieku.", needCreator: "Nadawać może tylko osoba, która się dzieli.", allowMedia: "Zezwól na kamerę i mikrofon w przeglądarce i spróbuj ponownie.", startFailed: "Transmisja się nie zaczęła. Spróbuj ponownie.", enableMedia: "Włącz kamerę i mikrofon", circleOnly: "W tym kręgu nadawać mogą tylko jego członkowie.",
     excludeMine: "Ukryj z mojego czatu", reportMod: "Zgłoś moderatorowi", removeEveryone: "Usuń z czatu dla wszystkich", removedAll: "Ta osoba już tu nie pisze.", chatMuted: "Nie możesz już tu pisać.", joined: "{name} dołączył", giftLine: "{name} · {gift}", translate: "Przetłumacz", chatPause: "Wstrzymaj rozmowę",
     chatResume: "Pokazuj nowe słowa",
   },

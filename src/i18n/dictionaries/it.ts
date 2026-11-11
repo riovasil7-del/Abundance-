@@ -208,7 +208,7 @@ const it: Messages = {
     failed: "Il collegamento non si è aperto. Prova solo l'audio, oppure riprova.",
     ended: "Questa diretta è finita.", listTitle: "Chi è in diretta",
     reconnecting: "La stanza si sta ricollegando. Un dono già inviato non parte una seconda volta.",
-    cameraNeed: "Camera o microfono sono spenti. Puoi restare solo con l'audio.",
+    cameraNeed: "Camera o microfono sono spenti. Puoi restare solo con l'audio.", ageFirst: "Prima conferma 18+ in Io. Non è una verifica dell'età.", needCreator: "Solo chi condivide può trasmettere.", allowMedia: "Consenti fotocamera e microfono nel browser, poi riprova.", startFailed: "La diretta non è partita. Riprova.", enableMedia: "Accendi fotocamera e microfono", circleOnly: "Solo i membri di questo cerchio possono trasmettere qui.",
     excludeMine: "Togli dalla mia chat", reportMod: "Segnala a un moderatore", removeEveryone: "Togli dalla chat per tutti", removedAll: "Questa persona non scrive più qui.", chatMuted: "Non puoi più scrivere qui.", joined: "{name} è entrato", giftLine: "{name} · {gift}", translate: "Traduci", chatPause: "Pausa della conversazione",
     chatResume: "Mostra parole nuove",
   },

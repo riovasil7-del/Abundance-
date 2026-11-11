@@ -211,7 +211,7 @@ const sw: Messages = {
     failed: "Muunganiko haujafunguka. Jaribu sauti tu, au jaribu tena.",
     ended: "Matangazo haya yameisha.", listTitle: "Nani yuko moja kwa moja",
     reconnecting: "Chumba kinaunganisha tena. Sadaka iliyotumwa haitumwi tena.",
-    cameraNeed: "Kamera au maikrofoni haipo. Unaweza kubaki na sauti tu.",
+    cameraNeed: "Kamera au maikrofoni haipo. Unaweza kubaki na sauti tu.", ageFirst: "Kwanza thibitisha 18+ chini ya Mimi. Si ukaguzi wa umri.", needCreator: "Anayeshiriki pekee ndiye anayeweza kutangaza.", allowMedia: "Ruhusu kamera na kipaza sauti kwenye kivinjari, kisha jaribu tena.", startFailed: "Matangazo hayajaanza. Jaribu tena.", enableMedia: "Washa kamera na kipaza sauti", circleOnly: "Ni wanachama wa duara hili pekee wanaoweza kutangaza hapa.",
     excludeMine: "Ficha kwenye mazungumzo yangu", reportMod: "Ripoti kwa msimamizi", removeEveryone: "Ondoa kwa wote", removedAll: "Mtu huyu haandiki tena hapa.", chatMuted: "Huwezi kuandika tena hapa.", joined: "{name} amejiunga", giftLine: "{name} · {gift}", translate: "Tafsiri", chatPause: "Simamisha mazungumzo",
     chatResume: "Onyesha maneno mapya",
   },

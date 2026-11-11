@@ -1,6 +1,7 @@
 "use client";
 
 import { CONTENT_CATEGORIES } from "@/config/app";
+import { liveStartNotice, mediaFailureKind, type LiveStartNotice } from "@/lib/live-start";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useI18n } from "./providers";
@@ -27,6 +28,34 @@ export function StartLiveButton({
   const [title, setTitle] = useState(initialTitle);
   const [category, setCategory] = useState(initialCategory);
 
+  function noticeText(notice: LiveStartNotice) {
+    if (notice === "age") return m.live.ageFirst;
+    if (notice === "terms") return m.terms.need;
+    if (notice === "creator") return m.live.needCreator;
+    if (notice === "config") return m.live.notConfigured;
+    if (notice === "circle") return m.live.circleOnly;
+    return m.live.startFailed;
+  }
+
+  async function prepareMedia() {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) return "skip" as const;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      stream.getTracks().forEach((track) => track.stop());
+      return "ok" as const;
+    } catch (error) {
+      const name = error instanceof Error ? error.name : undefined;
+      try {
+        const audio = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audio.getTracks().forEach((track) => track.stop());
+        return "ok" as const;
+      } catch (audioError) {
+        const audioName = audioError instanceof Error ? audioError.name : name;
+        return mediaFailureKind(audioName);
+      }
+    }
+  }
+
   async function start() {
     if (!configured) {
       setNote(m.live.notConfigured);
@@ -35,6 +64,11 @@ export function StartLiveButton({
     setBusy(true);
     setNote(null);
     try {
+      const media = await prepareMedia();
+      if (media === "denied") {
+        setNote(m.live.allowMedia);
+        return;
+      }
       const response = await fetch("/api/live/sessions", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -46,19 +80,14 @@ export function StartLiveButton({
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (data.error === "TERMS_REQUIRED") {
-        setNote(m.terms.need);
-        return;
-      }
-      if (response.status === 503 || data.error === "LIVE_NOT_CONFIGURED") {
-        setNote(m.live.notConfigured);
-        return;
-      }
-      if (!response.ok || !data.id) {
-        setNote(m.common.error);
+      const notice = liveStartNotice(typeof data.error === "string" ? data.error : undefined, response.ok && Boolean(data.id));
+      if (notice) {
+        setNote(noticeText(notice));
         return;
       }
       router.push(`/live/${data.id}`);
+    } catch {
+      setNote(m.live.startFailed);
     } finally {
       setBusy(false);
     }
@@ -86,7 +115,7 @@ export function StartLiveButton({
       <button type="button" className="btn-primary" disabled={busy} onClick={start}>
         {label ?? (circleId ? m.live.circle : m.live.start)}
       </button>
-      {note ? <p className="notice">{note}</p> : null}
+      {note ? <p className="notice" role="alert">{note}</p> : null}
     </div>
   );
 }
