@@ -40,6 +40,8 @@ enum LedgerStatus {
   PAID_OUT
   FAILED
   REFUNDED
+  /// Creator share is held for a refund or dispute. It is not payable and it is not a negative balance.
+  FROZEN
 }
 
 enum PaymentMode {
@@ -63,6 +65,8 @@ model User {
   locale       String   @default("sk")
   /// True only after the person chooses a language. Device detection does not set this.
   localeChosen Boolean @default(false)
+  /// Self-declared "I am 18 or older". This is not an identity or age-provider check.
+  adultAttestedAt DateTime?
   phone        String?  @unique
   /// Filled by a future KYC provider (Smile ID or similar). Null until then.
   kycSubjectId String?  @unique
@@ -80,6 +84,7 @@ model User {
   blocksGiven       UserBlock[]         @relation("BlocksGiven")
   blocksReceived    UserBlock[]         @relation("BlocksReceived")
   creditEntries     CreditEntry[]
+  accountReviews    AccountReview[]
 }
 
 model CreatorProfile {
@@ -112,6 +117,7 @@ model CreatorProfile {
   familyMembers  FamilyMembership[] @relation("CreatorFamily")
   payouts        PayoutRequest[]
   hostedLive     LiveSession[]
+  payoutHolds    PayoutReservation[]
 }
 
 model Video {
@@ -202,11 +208,15 @@ model LedgerTransaction {
   familyMembership      FamilyMembership? @relation(fields: [familyMembershipId], references: [id])
   holdUntil             DateTime?
   note                  String?
+  /// Demo or unconfigured-Stripe value. Never payable, even after the hold date.
+  sandbox               Boolean           @default(false)
   liveSessionId         String?
   liveSession           LiveSession?  @relation(fields: [liveSessionId], references: [id])
   createdAt             DateTime      @default(now())
 
   allocations LedgerAllocation[]
+  moneyEvents MoneyEvent[]
+  payoutHolds PayoutReservation[]
 
   @@index([donorId, createdAt])
   @@index([circleId])
@@ -354,10 +364,131 @@ model CreditEntry {
   packSlug                String?
   idempotencyKey          String   @unique
   stripeCheckoutSessionId String?  @unique
+  stripePaymentIntentId   String?  @unique
   ledgerTransactionId     String?  @unique
   createdAt               DateTime @default(now())
 
   @@index([userId, createdAt])
+
+  allocations CreditAllocation[] @relation("PackAllocations")
+  releases    CreditRelease[] @relation("PackReleases")
+}
+
+/// Immutable note of a monetary fact. Amounts on LedgerTransaction are not a second ledger.
+model MoneyEvent {
+  id            String             @id @default(cuid())
+  transactionId String?
+  transaction   LedgerTransaction? @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  kind          String
+  grossCents    Int
+  feeCents      Int
+  netCents      Int
+  stripeEventId String?            @unique
+  note          String?
+  createdAt     DateTime           @default(now())
+
+  @@index([transactionId])
+}
+
+/// One row per Stripe event id. A replay finds this row and does not move money again.
+model WebhookDelivery {
+  id        String   @id
+  eventType String
+  outcome   String
+  createdAt DateTime @default(now())
+}
+
+/// Notices that can arrive before the credit or the gift row exists.
+model PaymentMarker {
+  key       String   @id
+  kind      String
+  createdAt DateTime @default(now())
+}
+
+/// Spent lights that cannot be pulled back without driving a balance below zero.
+model AccountReview {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  packEntryId   String?
+  kind          String
+  reversedCents Int
+  frozenCents   Int
+  reviewCents   Int
+  stripeEventId String?  @unique
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+
+  @@index([userId, status])
+}
+
+/// Which pack lot funded a spend, or which unspent lights a reversal consumed.
+model CreditAllocation {
+  id               String   @id @default(cuid())
+  packEntryId      String
+  packEntry        CreditEntry @relation("PackAllocations", fields: [packEntryId], references: [id], onDelete: Restrict)
+  spendEntryId     String?
+  reversalEntryId  String?
+  lights           Int
+  createdAt        DateTime @default(now())
+
+  @@index([packEntryId])
+  @@index([spendEntryId])
+}
+
+/// Gives unspent lights back to a lot after a dispute is won. Append-only.
+model CreditRelease {
+  id             String   @id @default(cuid())
+  packEntryId    String
+  packEntry      CreditEntry @relation("PackReleases", fields: [packEntryId], references: [id], onDelete: Restrict)
+  lights         Int
+  idempotencyKey String   @unique
+  createdAt      DateTime @default(now())
+
+  @@index([packEntryId])
+}
+
+/// Holds part of a creator's payout. A large gift can be reserved in part.
+model PayoutReservation {
+  id             String          @id @default(cuid())
+  creatorId      String
+  creator        CreatorProfile  @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  transactionId  String?
+  transaction    LedgerTransaction? @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  packEntryId    String
+  amountCents    Int
+  status         String          @default("ACTIVE")
+  generation     Int
+  idempotencyKey String          @unique
+  createdAt      DateTime        @default(now())
+
+  @@index([creatorId, status])
+  @@index([packEntryId, status])
+}
+
+/// Provider state for one checkout. Stops a refund and a won dispute from both restoring lights.
+model PaymentCase {
+  id               String   @id @default(cuid())
+  sessionId        String?  @unique
+  paymentIntentId  String?  @unique
+  userId           String?
+  packEntryId      String?
+  refunded         Boolean  @default(false)
+  held             Boolean  @default(false)
+  restored         Boolean  @default(false)
+  dispute          String?
+  generation       Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+/// Shared limit for financial actions. The key is action plus user id, not a device fingerprint.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }
 
 model PayoutRequest {

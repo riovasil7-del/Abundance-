@@ -43,6 +43,7 @@ export async function recordDonation(input: {
   holdDays: number;
   note?: string;
   liveSessionId?: string | null;
+  sandbox?: boolean;
 }, writer: Prisma.TransactionClient | PrismaClient = db): Promise<Prisma.LedgerTransactionGetPayload<{ include: { allocations: true } }>> {
   const split = assertSplitMatchesPrice(input.priceCents, input.charge.split);
   const allocated = input.shares.reduce((sum, share) => sum + share.netCents, 0);
@@ -52,11 +53,17 @@ export async function recordDonation(input: {
     throw new Error("BAD_SHARE");
   }
 
-  const status = input.charge.mode === "stripe" ? "PENDING" : "HELD";
+  let status: "PENDING" | "HELD" = input.charge.mode === "stripe" ? "PENDING" : "HELD";
+  if (input.charge.mode === "stripe" && input.charge.stripePaymentIntentId) {
+    const marker = await writer.paymentMarker.findUnique({
+      where: { key: `settle:${input.charge.stripePaymentIntentId}` },
+    });
+    if (marker?.kind === "DEFERRED_SETTLE") status = "HELD";
+  }
   const paymentMode: PaymentMode =
     input.charge.mode === "stripe" ? "STRIPE" : input.charge.mode === "credits" ? "CREDITS" : "DEMO";
 
-  return writer.ledgerTransaction.create({
+  const transaction = await writer.ledgerTransaction.create({
     data: {
       donorId: input.donorId,
       kind: input.kind,
@@ -75,6 +82,7 @@ export async function recordDonation(input: {
       familyMembershipId: input.familyMembershipId ?? null,
       holdUntil: holdUntil(input.holdDays),
       note: input.note,
+      sandbox: input.sandbox ?? input.charge.mode === "demo",
       liveSessionId: input.liveSessionId ?? null,
       allocations: {
         create: input.shares.map((share) => ({
@@ -85,6 +93,17 @@ export async function recordDonation(input: {
     },
     include: { allocations: true },
   });
+  await writer.moneyEvent.create({
+    data: {
+      transactionId: transaction.id,
+      kind: status === "HELD" && input.charge.mode === "stripe" ? "DONATION_SETTLED" : "DONATION_RECORDED",
+      grossCents: split.grossCents,
+      feeCents: split.feeCents,
+      netCents: split.netCents,
+      note: input.charge.mode === "credits" ? "lights" : input.charge.mode,
+    },
+  });
+  return transaction;
 }
 
 export function sharesFromNet(creatorIdsInOrder: string[], netCents: number): RecipientShare[] {
@@ -102,9 +121,24 @@ export function allocationBucket(
   holdUntilDate: Date | null,
   now = new Date(),
 ): WalletBucket | null {
-  if (status === "FAILED" || status === "REFUNDED" || status === "PENDING" || status === "PAID_OUT") {
+  if (status === "FAILED" || status === "REFUNDED" || status === "PENDING" || status === "PAID_OUT" || status === "FROZEN") {
     return null;
   }
+  if (status !== "HELD" && status !== "AVAILABLE") return null;
+  if (holdUntilDate && holdUntilDate.getTime() > now.getTime()) return "pending";
+  return "available";
+}
+
+export type EarningBucket = "pending" | "available" | "frozen" | "paid";
+
+/** Earned creator cents, kept distinct. Stripe that has not settled is not earned. */
+export function earningBucket(
+  status: string,
+  holdUntilDate: Date | null,
+  now = new Date(),
+): EarningBucket | null {
+  if (status === "PAID_OUT") return "paid";
+  if (status === "FROZEN") return "frozen";
   if (status !== "HELD" && status !== "AVAILABLE") return null;
   if (holdUntilDate && holdUntilDate.getTime() > now.getTime()) return "pending";
   return "available";

@@ -7,13 +7,15 @@ import { holdDaysFor } from "@/server/catalog";
 import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
 import { splitDonation } from "@/server/fees";
-import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { adultDecision } from "@/server/money";
+import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return jsonError(401, "UNAUTHENTICATED");
-  const limit = memoryRateLimiter.consume(clientKey(request, "donate", user.id), 30, 60 * 60 * 1000);
+  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  const limit = await consumeDurableLimit("donate", user.id, 30, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
   const parsed = giftBody.safeParse(await request.json().catch(() => null));
@@ -23,8 +25,12 @@ export async function POST(request: Request) {
   const gift = await db.gift.findUnique({ where: { slug: body.giftSlug } });
   if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
 
-  const video = await db.video.findUnique({ where: { id: body.videoId }, include: { creator: true } });
+  const video = await db.video.findUnique({
+    where: { id: body.videoId },
+    include: { creator: { include: { user: { select: { adultAttestedAt: true } } } } },
+  });
   if (!video || video.moderationStatus !== "VISIBLE") return jsonError(404, "NOT_FOUND");
+  if (!video.creator.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
   if (user.creatorProfile?.id === video.creatorId) return jsonError(400, "SELF_GIFT");
 
   if (body.payItForwardFromId) {

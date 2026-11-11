@@ -6,19 +6,29 @@ import { holdDaysFor } from "@/server/catalog";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { recordDonation } from "@/server/ledger";
+import { financialDenial } from "@/server/money";
 import { createCharge } from "@/server/payments";
+import { adultDecision } from "@/server/money";
+import { consumeDurableLimit } from "@/server/ratelimit";
 import { familyBody } from "@/server/validators";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user) return jsonError(401, "UNAUTHENTICATED");
+  if (!user || financialDenial(user)) return jsonError(401, "UNAUTHENTICATED");
+  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  const limit = await consumeDurableLimit("family", user.id, 10, 60 * 60 * 1000);
+  if (!limit.ok) return jsonError(429, "RATE_LIMITED");
   const parsed = familyBody.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return jsonError(400, "INVALID");
   const tier = parsed.data.tierCents;
   if (!(FAMILY_TIERS_CENTS as readonly number[]).includes(tier)) return jsonError(400, "INVALID");
 
-  const creator = await db.creatorProfile.findUnique({ where: { id: parsed.data.creatorId } });
+  const creator = await db.creatorProfile.findUnique({
+    where: { id: parsed.data.creatorId },
+    include: { user: { select: { adultAttestedAt: true } } },
+  });
   if (!creator) return jsonError(404, "NOT_FOUND");
+  if (!creator.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
   if (user.creatorProfile?.id === creator.id) return jsonError(400, "SELF_GIFT");
 
   const existing = await db.familyMembership.findUnique({

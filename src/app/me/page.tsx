@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AgeAttest } from "@/components/age-attest";
 import { ReopenIntroButton } from "@/components/intro-tour";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
@@ -33,7 +34,9 @@ export default async function MePage() {
         <h1>{user.name}</h1>
         <p className="lede">{messages.roles[user.role]}</p>
         <p>{messages.me.oneAccount}</p>
+        <p className="notice">{user.adultAttestedAt ? messages.age.declared : messages.age.need}</p>
       </div>
+      {user.adultAttestedAt ? null : <AgeAttest />}
       {user.creatorProfile ? (
         <Link className="btn-ghost" href={`/creator/${user.creatorProfile.slug}`}>
           {user.creatorProfile.displayName}

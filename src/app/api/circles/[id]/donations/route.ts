@@ -8,13 +8,15 @@ import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
 import { splitDonation } from "@/server/fees";
 import { sharesFromNet } from "@/server/ledger";
-import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { adultDecision } from "@/server/money";
+import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return jsonError(401, "UNAUTHENTICATED");
-  const limit = memoryRateLimiter.consume(clientKey(request, "donate", user.id), 30, 60 * 60 * 1000);
+  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  const limit = await consumeDurableLimit("donate", user.id, 30, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
   const { id } = await context.params;
@@ -27,9 +29,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
   const circle = await db.blessingCircle.findUnique({
     where: { id },
-    include: { participants: { include: { creator: true } } },
+    include: { participants: { include: { creator: { include: { user: { select: { adultAttestedAt: true } } } } } } },
   });
   if (!circle || circle.status !== "OPEN") return jsonError(404, "NOT_FOUND");
+  if (circle.participants.some((participant) => !participant.creator.user.adultAttestedAt)) {
+    return jsonError(403, "CREATOR_AGE_REQUIRED");
+  }
 
   const recipients = orderedVerified(circle.participants);
   if (recipients.length === 0) return jsonError(422, "NO_VERIFIED_PARTICIPANTS");

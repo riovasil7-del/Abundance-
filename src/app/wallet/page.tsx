@@ -54,6 +54,8 @@ export default async function WalletPage({ searchParams }: { searchParams: Promi
           {lights} {messages.wallet.unit}
         </div>
         <p className="lede">{messages.wallet.lightsLead}</p>
+        {!stripeConfigured() ? <p className="notice">{messages.wallet.demoNotRevenue}</p> : null}
+        {wallet.reviewCents > 0 ? <p className="notice">{messages.wallet.review}</p> : null}
       </section>
       <LightShop
         locale={locale}
@@ -79,6 +81,31 @@ export default async function WalletPage({ searchParams }: { searchParams: Promi
               <div className="money-xl">{formatMoney(wallet.pendingCents, locale)}</div>
             </div>
           </div>
+          <div className="pair">
+            <div>
+              <div className="muted">{messages.wallet.frozen}</div>
+              <div className="money-xl">{formatMoney(wallet.frozenCents, locale)}</div>
+            </div>
+            <div>
+              <div className="muted">{messages.wallet.paid}</div>
+              <div className="money-xl">{formatMoney(wallet.paidCents, locale)}</div>
+            </div>
+          </div>
+          <p className="muted">
+            {messages.wallet.earned}: {formatMoney(wallet.earnedCents, locale)}
+          </p>
+          {wallet.reservedCents > 0 ? (
+            <p className="notice">
+              {messages.wallet.reserved}: {formatMoney(wallet.reservedCents, locale)}
+            </p>
+          ) : null}
+          {wallet.demoEarningsCents > 0 ? (
+            <p className="notice">
+              {messages.wallet.demoEarnings}: {formatMoney(wallet.demoEarningsCents, locale)}
+            </p>
+          ) : null}
+          <p className="notice">{messages.wallet.paidNone}</p>
+          <p className="muted">{messages.wallet.processingNote}</p>
           <PayoutButton />
         </section>
       ) : (

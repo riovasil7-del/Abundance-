@@ -51,9 +51,11 @@ export async function loadLiveAudience(sessionId: string): Promise<{
   return {
     session,
     audience: {
-      hostUserId: session.host.userId,
+      hostUserId: session.host.user.adultAttestedAt ? session.host.userId : "",
       circlePublisherUserIds: session.circle
-        ? session.circle.participants.map((participant) => participant.creator.userId)
+        ? session.circle.participants
+            .filter((participant) => participant.creator.user.adultAttestedAt)
+            .map((participant) => participant.creator.userId)
         : null,
     },
   };
@@ -63,10 +65,10 @@ function fetchSession(sessionId: string) {
   return db.liveSession.findUnique({
     where: { id: sessionId },
     include: {
-      host: true,
+      host: { include: { user: true } },
       circle: {
         include: {
-          participants: { include: { creator: true }, orderBy: { joinedAt: "asc" } },
+          participants: { include: { creator: { include: { user: true } } }, orderBy: { joinedAt: "asc" } },
         },
       },
     },

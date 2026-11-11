@@ -60,7 +60,7 @@ Vložte presne tieto mená. Hodnotu prilepte bez úvodzoviek.
 
 Prázdny Stripe je v poriadku. Peňaženka potom predá svetielka jedným ťuknutím (ukážkový režim) a dar sa strhne z nich. Na obrazovke ostáva 15 % a 85 %.
 
-Keď Stripe kľúče vyplníte, nákup balíčka ide cez Stripe Checkout. Svetielka sa pripíšu až po zaplatení, na existujúcej adrese webhooku `https://vaša-doména/api/stripe/webhook`. V Stripe dashboarde pri tejto adrese zapnite udalosť `checkout.session.completed` (a ponechajte aj `payment_intent.succeeded` pre staršie dary). Novú premennú prostredia netreba. `STRIPE_WEBHOOK_SECRET` je ten istý podpis, ktorý už tabuľka vyššie spomína.
+Keď Stripe kľúče vyplníte, nákup balíčka ide cez Stripe Checkout. Svetielka sa pripíšu až po zaplatení, na existujúcej adrese webhooku `https://vaša-doména/api/stripe/webhook`. V Stripe dashboarde pri tejto adrese zapnite udalosti `checkout.session.completed`, `payment_intent.succeeded`, `charge.refunded` a `charge.dispute.created`. Opakovaná udalosť svetielka nepripíše druhý raz. Vrátenie a spor nestrhnú tvorcovi dostupný zostatok pod nulu. Novú premennú prostredia netreba. `STRIPE_WEBHOOK_SECRET` je ten istý podpis, ktorý už tabuľka vyššie spomína.
 
 ## 4. Kam sa ukladajú videá
 

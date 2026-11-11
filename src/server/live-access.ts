@@ -17,6 +17,15 @@ export function canPublishToRoom(userId: string, audience: LiveAudience): boolea
   return Boolean(audience.circlePublisherUserIds?.includes(userId));
 }
 
+/** A publish grant requires the age declaration and a creator profile, then the room audience. */
+export function mayIssuePublishGrant(
+  user: { id: string; adultAttestedAt: Date | null; creatorProfile?: unknown } | null,
+  audience: LiveAudience,
+): boolean {
+  if (!user?.adultAttestedAt || !user.creatorProfile) return false;
+  return canPublishToRoom(user.id, audience);
+}
+
 export function videoGrant(room: string, canPublish: boolean): VideoGrant {
   return {
     room,
