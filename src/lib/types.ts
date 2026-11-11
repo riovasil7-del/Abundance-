@@ -26,6 +26,7 @@ export type FeedVideo = {
   blessedByMe: boolean;
   commentCount: number;
   chainCount: number;
+  reasons: string[];
   creator: {
     id: string;
     slug: string;

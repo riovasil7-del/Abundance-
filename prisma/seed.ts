@@ -21,6 +21,9 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
     const existing = await prisma.user.count();
     if (existing > 0) throw new Error("ALREADY_SEEDED");
   }
+  await prisma.feedHide.deleteMany();
+  await prisma.topicPreference.deleteMany();
+  await prisma.feedTaste.deleteMany();
   await prisma.liveInvite.deleteMany();
   await prisma.encouragement.deleteMany();
   await prisma.creatorUpdate.deleteMany();
@@ -161,6 +164,31 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       },
       include: { creatorProfile: true },
     }),
+    marta: await prisma.user.create({
+      data: {
+        email: "marta@hojnost.local",
+        passwordHash,
+        name: "Marta Kováčová",
+        role: "CREATOR",
+        locale: "sk",
+        adultAttestedAt: new Date("2020-01-01"),
+        creatorProfile: {
+          create: {
+            slug: "marta",
+            displayName: "Marta Kováčová",
+            city: "Bratislava",
+            countryCode: "SK",
+            craftKey: "kitchen",
+            avatarUrl: "/avatars/new.svg",
+            verificationStatus: "VERIFIED",
+            payoutHoldDays: 7,
+            bio: "V Bratislave varím polievku pre susedov, ktorí prídu sami. Nie je to súťaž.",
+            bioEn: "In Bratislava I cook soup for neighbours who come home alone. It is not a contest.",
+          },
+        },
+      },
+      include: { creatorProfile: true },
+    }),
   };
 
   const profile = {
@@ -168,6 +196,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
     joseph: creators.joseph.creatorProfile!,
     grace: creators.grace.creatorProfile!,
     daniel: creators.daniel.creatorProfile!,
+    marta: creators.marta.creatorProfile!,
   };
 
   const gifts = Object.fromEntries(
@@ -223,6 +252,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         playbackUrl: "/media/amina.mp4",
         posterUrl: "/media/amina.jpg",
         deedKind: "craft",
+        language: "en",
         consentConfirmed: true,
         createdAt: daysAgo(0.05),
       },
@@ -238,6 +268,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         playbackUrl: "/media/joseph.mp4",
         posterUrl: "/media/joseph.jpg",
         deedKind: "good_deed",
+        language: "sw",
         consentConfirmed: true,
         createdAt: daysAgo(2),
       },
@@ -253,6 +284,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         playbackUrl: "/media/grace.mp4",
         posterUrl: "/media/grace.jpg",
         deedKind: "song",
+        language: "en",
         consentConfirmed: true,
         createdAt: daysAgo(3),
       },
@@ -271,6 +303,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         playbackUrl: "/media/well.mp4",
         posterUrl: "/media/well.jpg",
         deedKind: "good_deed",
+        language: "en",
         consentConfirmed: true,
         createdAt: daysAgo(4),
       },
@@ -286,15 +319,50 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
         playbackUrl: "/media/daniel.mp4",
         posterUrl: "/media/daniel.jpg",
         deedKind: "gratitude",
+        language: "en",
         consentConfirmed: true,
         createdAt: daysAgo(5),
+      },
+    }),
+    marta: await prisma.video.create({
+      data: {
+        creatorId: profile.marta.id,
+        title: "Polievka pre susedný vchod",
+        titleEn: "Soup for the next entrance",
+        caption: "Hrniec polievky pre ľudí vo vedľajšom vchode. Natočila som len hrniec, nikoho iného.",
+        captionEn: "A pot of soup for the people in the next entrance. I filmed only the pot. Nobody else is in it.",
+        storageKey: "seed/marta",
+        playbackUrl: "/media/well.mp4",
+        posterUrl: "/media/well.jpg",
+        deedKind: "good_deed",
+        language: "sk",
+        consentConfirmed: true,
+        createdAt: daysAgo(1),
       },
     }),
   };
 
   for (const video of Object.values(videos)) {
+    if (video.id === videos.marta.id) continue;
     await prisma.blessing.create({ data: { userId: elena.id, videoId: video.id } });
   }
+
+  await prisma.follow.createMany({
+    data: [
+      { followerId: elena.id, creatorId: creators.amina.id },
+      { followerId: elena.id, creatorId: creators.joseph.id },
+    ],
+  });
+  await prisma.report.create({
+    data: {
+      reporterId: elena.id,
+      targetType: "VIDEO",
+      targetId: videos.daniel.id,
+      reason: "other",
+      details: "A quiet report so this story sits lower. Not a public shaming.",
+      status: "OPEN",
+    },
+  });
 
   await prisma.comment.create({
     data: {
@@ -353,6 +421,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       netCents: star.netCents,
       status: "AVAILABLE",
       paymentMode: "DEMO",
+      sandbox: true,
       holdUntil: daysAgo(13),
       createdAt: daysAgo(20),
       allocations: { create: [{ creatorId: profile.amina.id, netCents: star.netCents }] },
@@ -371,6 +440,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       netCents: heart.netCents,
       status: "HELD",
       paymentMode: "DEMO",
+      sandbox: true,
       holdUntil: daysAhead(6),
       createdAt: daysAgo(1),
       allocations: { create: [{ creatorId: profile.joseph.id, netCents: heart.netCents }] },
@@ -392,6 +462,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       netCents: dove.netCents,
       status: "AVAILABLE",
       paymentMode: "DEMO",
+      sandbox: true,
       holdUntil: daysAgo(8),
       createdAt: daysAgo(15),
       note: "circle",
@@ -413,6 +484,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       netCents: candle.netCents,
       status: "HELD",
       paymentMode: "DEMO",
+      sandbox: true,
       anonymous: false,
       payItForwardFromId: starTx.id,
       holdUntil: daysAhead(5),
@@ -433,6 +505,7 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       netCents: familySplit.netCents,
       status: "AVAILABLE",
       paymentMode: "DEMO",
+      sandbox: true,
       familyMembershipId: family.id,
       holdUntil: daysAgo(5),
       createdAt: daysAgo(12),

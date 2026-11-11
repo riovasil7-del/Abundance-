@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { LOCALES } from "@/config/app";
+import { LANGUAGE_META } from "@/i18n/meta";
 import { formatMoney } from "@/lib/format";
 import { capTail, videoPreload } from "@/lib/gift-guard";
 import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
@@ -10,14 +12,19 @@ import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 import { Sheet } from "./sheet";
 
+type FeedView = "forYou" | "following" | "community";
+const TOPICS = ["good_deed", "craft", "song", "gratitude", "weaving", "garden", "kitchen"] as const;
+
 export function FeedExperience({
   videos,
+  nextCursor = null,
   gifts,
   loggedIn,
   viewerName,
   lightBalance = 0,
 }: {
   videos: FeedVideo[];
+  nextCursor?: string | null;
   gifts: GiftChoice[];
   loggedIn: boolean;
   viewerName?: string | null;
@@ -26,9 +33,11 @@ export function FeedExperience({
   const { locale, messages: m } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState(videos);
+  const [view, setView] = useState<FeedView>("forYou");
+  const [cursor, setCursor] = useState<string | null>(nextCursor);
   const [active, setActive] = useState(0);
   const [muted, setMuted] = useState(true);
-  const [sheet, setSheet] = useState<null | "gift" | "comments" | "report">(null);
+  const [sheet, setSheet] = useState<null | "gift" | "comments" | "report" | "why" | "tune">(null);
   const [giftSlug, setGiftSlug] = useState(gifts[0]?.slug ?? "");
   const [anonymous, setAnonymous] = useState(false);
   const [forwardId, setForwardId] = useState("");
@@ -42,6 +51,10 @@ export function FeedExperience({
   const [reportNote, setReportNote] = useState<string | null>(null);
   const [lights, setLights] = useState(lightBalance);
   const [needsTap, setNeedsTap] = useState(false);
+  const [feedNote, setFeedNote] = useState<string | null>(null);
+  const [topics, setTopics] = useState<{ topic: string; interested: boolean }[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [regionCode, setRegionCode] = useState<string | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -100,6 +113,77 @@ export function FeedExperience({
       });
     };
   }, []);
+
+  async function loadView(nextView: FeedView, nextCursor: string | null, replace: boolean) {
+    const params = new URLSearchParams({ view: nextView });
+    if (nextCursor) params.set("cursor", nextCursor);
+    const response = await fetch(`/api/feed?${params.toString()}`);
+    const data = await response.json().catch(() => ({}));
+    if (data.needsLogin) {
+      setFeedNote(m.feed.loginFollowing);
+      if (replace) {
+        setItems([]);
+        setActive(0);
+      }
+      setCursor(null);
+      return;
+    }
+    const incoming = (data.items ?? []) as FeedVideo[];
+    setItems((current) => {
+      if (replace) return incoming;
+      const seen = new Set(current.map((item) => item.id));
+      return [...current, ...incoming.filter((item) => !seen.has(item.id))];
+    });
+    if (replace) setActive(0);
+    setCursor(data.nextCursor ?? null);
+    setFeedNote(incoming.length === 0 && replace ? (nextView === "following" ? m.feed.emptyFollowing : m.feed.empty) : null);
+  }
+
+  async function openTune() {
+    if (!loggedIn) {
+      window.location.href = "/login";
+      return;
+    }
+    const response = await fetch("/api/feed/preferences");
+    if (response.ok) {
+      const data = await response.json();
+      setTopics(data.topics ?? []);
+      setLanguages(data.languages ?? []);
+      setRegionCode(data.regionCode ?? null);
+    }
+    setSheet("tune");
+  }
+
+  async function savePreference(body: Record<string, unknown>) {
+    const response = await fetch("/api/feed/preferences", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (response.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
+    if (!response.ok) return;
+    const data = await response.json();
+    setTopics(data.topics ?? []);
+    setLanguages(data.languages ?? []);
+    setRegionCode(data.regionCode ?? null);
+    await loadView(view, null, true);
+  }
+
+  useEffect(() => {
+    if (!cursor || active < items.length - 1) return;
+    let cancelled = false;
+    void loadView(view, cursor, false).then(() => {
+      if (cancelled) return;
+    });
+    return () => {
+      cancelled = true;
+    };
+    // cursor advances after a successful page, which is the retry guard
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, cursor, items.length, view]);
 
   function go(step: number) {
     const root = rootRef.current;
@@ -219,11 +303,41 @@ export function FeedExperience({
     return <p className="page empty">{m.feed.empty}</p>;
   }
 
+  const viewLabel = { forYou: m.feed.forYou, following: m.feed.following, community: m.feed.community };
+  const topicLabel = (topic: string) =>
+    topic in m.deeds ? m.deeds[topic as keyof typeof m.deeds] : topic in m.crafts ? m.crafts[topic as keyof typeof m.crafts] : topic;
+
   return (
+    <div className="feed-page" data-screen="feed">
+    <div className="feed-switch" role="tablist" aria-label={m.feed.switcher}>
+      {(["forYou", "following", "community"] as const).map((next) => (
+        <button
+          key={next}
+          type="button"
+          role="tab"
+          id={`feed-tab-${next}`}
+          aria-selected={view === next}
+          aria-controls="feed-panel"
+          onClick={() => {
+            setView(next);
+            setCursor(null);
+            setFeedNote(null);
+            void loadView(next, null, true);
+          }}
+        >
+          {viewLabel[next]}
+        </button>
+      ))}
+      <button type="button" onClick={() => void openTune()}>
+        {m.feed.tune}
+      </button>
+    </div>
     <div
       className="feed"
+      id="feed-panel"
+      role="tabpanel"
+      aria-labelledby={`feed-tab-${view}`}
       ref={rootRef}
-      data-screen="feed"
       tabIndex={0}
       aria-label={m.feed.stage}
       onKeyDown={(event) => {
@@ -287,6 +401,9 @@ export function FeedExperience({
                 </div>
               </div>
               <h2>{video.title}</h2>
+              <button type="button" className="why-btn" onClick={() => setSheet("why")}>
+                {m.feed.why}
+              </button>
               <p>{video.caption}</p>
               <p className="place">
                 {video.deedLabel}
@@ -343,7 +460,12 @@ export function FeedExperience({
       ))}
 
       {sheet ? (
-        <Sheet title={sheet === "gift" ? m.gifts.title : sheet === "comments" ? m.comments.title : m.report.title} onClose={() => setSheet(null)}>
+        <Sheet
+          title={
+            sheet === "gift" ? m.gifts.title : sheet === "comments" ? m.comments.title : sheet === "why" ? m.feed.whyTitle : sheet === "tune" ? m.feed.tune : m.report.title
+          }
+          onClose={() => setSheet(null)}
+        >
             {sheet === "gift" && current && chosen ? (
               receipt ? (
                 <div data-screen="gift-receipt">
@@ -468,6 +590,86 @@ export function FeedExperience({
               </div>
             ) : null}
 
+            {sheet === "why" && current ? (
+              <div data-screen="why-feed">
+                <p>{m.feed.noPromise}</p>
+                <ul>
+                  {(current.reasons.length ? current.reasons : ["recent"]).map((reasonCode) => (
+                    <li key={reasonCode}>{m.feed.reasons[reasonCode as keyof typeof m.feed.reasons] ?? reasonCode}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {sheet === "tune" ? (
+              <div className="stack" data-screen="feed-tune">
+                <p className="muted">{m.feed.noPromise}</p>
+                {TOPICS.map((topic) => {
+                  const row = topics.find((item) => item.topic === topic);
+                  return (
+                    <div key={topic} className="split-row">
+                      <span>{topicLabel(topic)}</span>
+                      <span>
+                        <button type="button" className={row?.interested ? "choice on" : "choice"} onClick={() => void savePreference({ action: "topic", topic, interested: true })}>
+                          {m.feed.interested}
+                        </button>
+                        <button type="button" className={row && !row.interested ? "choice on" : "choice"} onClick={() => void savePreference({ action: "topic", topic, interested: false })}>
+                          {m.feed.notInterested}
+                        </button>
+                      </span>
+                    </div>
+                  );
+                })}
+                {current ? (
+                  <button type="button" className="btn-ghost" onClick={() => void savePreference({ action: "hide", creatorId: current.creator.id })}>
+                    {m.feed.hideCreator}: {current.creator.displayName}
+                  </button>
+                ) : null}
+                <fieldset>
+                  <legend>{m.feed.languages}</legend>
+                  {LOCALES.map((code) => (
+                    <label key={code} className="check-row">
+                      <input
+                        type="checkbox"
+                        checked={languages.includes(code)}
+                        onChange={(event) => {
+                          const next = event.target.checked ? [...languages, code].slice(0, 4) : languages.filter((item) => item !== code);
+                          setLanguages(next);
+                          void savePreference({ action: "languages", languages: next });
+                        }}
+                      />
+                      <span>{LANGUAGE_META[code].nativeName}</span>
+                    </label>
+                  ))}
+                </fieldset>
+                <label className="field">
+                  <span>{m.feed.region}</span>
+                  <select
+                    value={regionCode ?? ""}
+                    onChange={(event) => void savePreference({ action: "region", regionCode: event.target.value || null })}
+                  >
+                    <option value="">{m.feed.anywhere}</option>
+                    <option value="KE">{m.countries.KE}</option>
+                    <option value="SK">{m.countries.SK}</option>
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  onClick={() => {
+                    void fetch("/api/feed/preferences", { method: "DELETE" }).then(async (response) => {
+                      if (!response.ok) return;
+                      const data = await response.json();
+                      setTopics(data.topics ?? []);
+                      setLanguages(data.languages ?? []);
+                      setRegionCode(null);
+                      await loadView(view, null, true);
+                    });
+                  }}
+                >
+                  {m.feed.reset}
+                </button>
+              </div>
+            ) : null}
             {sheet === "report" ? (
               <div>
                 <p className="kicker">{m.report.title}</p>
@@ -489,6 +691,8 @@ export function FeedExperience({
             ) : null}
         </Sheet>
       ) : null}
+      {items.length === 0 ? <p className="empty page">{feedNote ?? m.feed.empty}</p> : null}
+    </div>
     </div>
   );
 }
