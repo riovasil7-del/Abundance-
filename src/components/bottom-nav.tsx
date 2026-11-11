@@ -10,6 +10,7 @@ export function BottomNav() {
   const items = [
     { href: "/", label: messages.nav.home, icon: HomeIcon },
     { href: "/circles", label: messages.nav.circles, icon: CircleIcon },
+    { href: "/ideas", label: messages.nav.ideas, icon: IdeaIcon },
     { href: "/upload", label: messages.nav.upload, icon: PlusIcon },
     { href: "/wallet", label: messages.nav.wallet, icon: WalletIcon },
     { href: "/me", label: messages.nav.me, icon: PersonIcon },
@@ -43,6 +44,14 @@ function CircleIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="7" />
       <circle cx="12" cy="12" r="2.2" />
+    </svg>
+  );
+}
+function IdeaIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 18h6M10 21h4" />
+      <path d="M12 3a6 6 0 0 0-3 11c.4.4.8 1 1 1.6V17h4v-1.4c.2-.6.6-1.2 1-1.6A6 6 0 0 0 12 3z" />
     </svg>
   );
 }

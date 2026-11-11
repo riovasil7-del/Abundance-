@@ -46,6 +46,7 @@ export const DICTIONARIES: Record<Locale, Messages> = {
  * Languages written with care. Amharic, Hausa, Yoruba, Igbo, and Zulu
  * should be read by a native speaker before they are treated as final.
  * Kiswahili is close, and a native pass would still help.
+ * Terms, idea, and category wording outside Slovak and English also needs that native pass.
  */
 export const REVIEW_BEFORE_FINAL: readonly Locale[] = ["sw", "am", "ha", "yo", "ig", "zu"];
 

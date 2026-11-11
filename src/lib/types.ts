@@ -6,6 +6,8 @@ export type GiftChoice = {
   priceCents: number;
   feeCents: number;
   netCents: number;
+  /** creator gifts pay a person. water and food are written to the community fund. */
+  destination?: "creator" | "water" | "food";
 };
 
 export type FeedGift = {
@@ -22,6 +24,7 @@ export type FeedVideo = {
   playbackUrl: string | null;
   posterUrl: string | null;
   deedLabel: string;
+  categoryLabel: string | null;
   blessingCount: number;
   blessedByMe: boolean;
   commentCount: number;

@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { pathToFileURL } from "node:url";
-import { GIFT_CATALOG } from "../src/config/app";
+import { GIFT_CATALOG, TERMS_VERSION } from "../src/config/app";
+import { IDEA_SEED } from "../src/config/ideas";
 import { allocateEvenly, splitDonation } from "../src/server/fees";
 
 const prisma = new PrismaClient();
@@ -46,6 +47,9 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
   await prisma.comment.deleteMany();
   await prisma.userBlock.deleteMany();
   await prisma.liveMessage.deleteMany();
+  await prisma.ideaSave.deleteMany();
+  await prisma.idea.deleteMany();
+  await prisma.fundCredit.deleteMany();
   await prisma.ledgerAllocation.deleteMany();
   await prisma.ledgerTransaction.deleteMany();
   await prisma.liveSession.deleteMany();
@@ -212,6 +216,8 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
               priceCents: gift.priceCents,
               symbol: gift.symbol,
               sortOrder: gift.sortOrder,
+              destination: gift.destination,
+              active: true,
             },
           })
           .then((row) => [gift.slug, row] as const),
@@ -514,6 +520,37 @@ export async function seedDatabase(options: { reset?: boolean } = {}) {
       allocations: { create: [{ creatorId: profile.grace.id, netCents: familySplit.netCents }] },
     },
   });
+
+  await prisma.user.updateMany({
+    data: { termsAcceptedAt: new Date("2020-01-01"), termsVersion: TERMS_VERSION },
+  });
+  for (const item of IDEA_SEED) {
+    await prisma.idea.upsert({
+      where: { slug: item.slug },
+      update: {
+        title: item.title,
+        titleEn: item.titleEn,
+        description: item.description,
+        descriptionEn: item.descriptionEn,
+        category: item.category,
+        estimatedMinutes: item.minutes,
+        isFree: item.isFree,
+        status: "approved",
+      },
+      create: {
+        slug: item.slug,
+        title: item.title,
+        titleEn: item.titleEn,
+        description: item.description,
+        descriptionEn: item.descriptionEn,
+        category: item.category,
+        estimatedMinutes: item.minutes,
+        isFree: item.isFree,
+        status: "approved",
+        locale: "sk",
+      },
+    });
+  }
 
   await prisma.auditLog.createMany({
     data: [

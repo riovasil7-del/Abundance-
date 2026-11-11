@@ -6,8 +6,7 @@ import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
-import { splitDonation } from "@/server/fees";
-import { sharesFromNet } from "@/server/ledger";
+import { planGift } from "@/server/gift-plan";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -25,7 +24,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const body = parsed.data;
 
   const gift = await db.gift.findUnique({ where: { slug: body.giftSlug } });
-  if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
+  if (!gift || !gift.active || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
 
   const circle = await db.blessingCircle.findUnique({
     where: { id },
@@ -37,8 +36,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   }
 
   const recipients = orderedVerified(circle.participants);
-  if (recipients.length === 0) return jsonError(422, "NO_VERIFIED_PARTICIPANTS");
-  if (user.creatorProfile && recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)) {
+  const fundGift = gift.destination === "water" || gift.destination === "food";
+  if (!fundGift && recipients.length === 0) return jsonError(422, "NO_VERIFIED_PARTICIPANTS");
+  if (!fundGift && user.creatorProfile && recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)) {
     return jsonError(400, "SELF_GIFT");
   }
 
@@ -47,10 +47,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     if (!prior) return jsonError(400, "UNKNOWN_CHAIN");
   }
 
-  const shares = sharesFromNet(
-    recipients.map((recipient) => recipient.creatorId),
-    splitDonation(gift.priceCents).netCents,
+  const planned = planGift(
+    gift.priceCents,
+    gift.destination,
+    fundGift ? [] : recipients.map((recipient) => recipient.creatorId),
   );
+  const shares = planned.shares;
 
   let spent;
   try {
@@ -58,8 +60,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       donorId: user.id,
       priceCents: gift.priceCents,
       token: body.token ?? randomUUID(),
-      kind: "CIRCLE",
+      kind: fundGift ? "GIFT" : "CIRCLE",
       shares,
+      fund: planned.fund,
       circleId: circle.id,
       giftId: gift.id,
       anonymous: Boolean(body.anonymous),
@@ -99,6 +102,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     paymentMode: "credits",
     status: transaction.status,
     lightBalance: spent.balance,
+    fund: planned.fund,
     shares: shares.map((share) => ({
       name: recipients.find((recipient) => recipient.creatorId === share.creatorId)?.displayName ?? "",
       netCents: share.netCents,

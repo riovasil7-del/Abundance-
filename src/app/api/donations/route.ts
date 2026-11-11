@@ -4,9 +4,9 @@ import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { holdDaysFor } from "@/server/catalog";
+import { planGift } from "@/server/gift-plan";
 import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
-import { splitDonation } from "@/server/fees";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   const body = parsed.data;
 
   const gift = await db.gift.findUnique({ where: { slug: body.giftSlug } });
-  if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
+  if (!gift || !gift.active || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
 
   const video = await db.video.findUnique({
     where: { id: body.videoId },
@@ -31,7 +31,8 @@ export async function POST(request: Request) {
   });
   if (!video || video.moderationStatus !== "VISIBLE") return jsonError(404, "NOT_FOUND");
   if (!video.creator.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
-  if (user.creatorProfile?.id === video.creatorId) return jsonError(400, "SELF_GIFT");
+  const planned = planGift(gift.priceCents, gift.destination, [video.creatorId]);
+  if (!planned.fund && user.creatorProfile?.id === video.creatorId) return jsonError(400, "SELF_GIFT");
 
   if (body.payItForwardFromId) {
     const prior = await db.ledgerTransaction.findUnique({ where: { id: body.payItForwardFromId } });
@@ -45,7 +46,8 @@ export async function POST(request: Request) {
       priceCents: gift.priceCents,
       token: body.token ?? randomUUID(),
       kind: "GIFT",
-      shares: [{ creatorId: video.creatorId, netCents: splitDonation(gift.priceCents).netCents }],
+      shares: planned.shares,
+      fund: planned.fund,
       videoId: video.id,
       giftId: gift.id,
       anonymous: Boolean(body.anonymous),
@@ -84,6 +86,7 @@ export async function POST(request: Request) {
     paymentMode: "credits",
     status: transaction.status,
     lightBalance: spent.balance,
-    shares: [{ name: video.creator.displayName, netCents: transaction.netCents }],
+    fund: planned.fund,
+    shares: planned.fund ? [] : [{ name: video.creator.displayName, netCents: transaction.netCents }],
   });
 }

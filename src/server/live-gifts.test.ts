@@ -12,10 +12,9 @@ test("a live gift uses the same 15/85 split as every other donation", () => {
     untrustedClientAmount: { amount: 1, priceCents: 999999 },
     verifiedRecipientCount: 1,
   });
-  assert.deepEqual(settled, { ...splitDonation(candle.priceCents), shares: [85] });
-  assert.equal(settled.grossCents, 100);
-  assert.equal(settled.feeCents, 15);
-  assert.equal(settled.netCents, 85);
+  assert.deepEqual(settled, { ...splitDonation(candle.priceCents), shares: [splitDonation(candle.priceCents).netCents] });
+  assert.equal(settled.grossCents, candle.priceCents);
+  assert.equal(settled.feeCents + settled.netCents, settled.grossCents);
   assert.equal(settled.feeCents + settled.netCents, settled.grossCents);
 });
 

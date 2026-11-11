@@ -126,7 +126,13 @@ export function RegisterForm() {
       city: String(formData.get("city") ?? ""),
       bio: String(formData.get("bio") ?? ""),
       craftKey: String(formData.get("craftKey") ?? "") || undefined,
+      acceptTerms: formData.get("acceptTerms") === "on",
     };
+    if (!payload.acceptTerms) {
+      setError(m.terms.mustAgree);
+      setBusy(false);
+      return;
+    }
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -212,6 +218,12 @@ export function RegisterForm() {
           </label>
         </>
       ) : null}
+      <label className="check-row">
+        <input name="acceptTerms" type="checkbox" required />
+        <span>
+          {m.terms.agree} <Link href="/terms">{m.terms.link}</Link>
+        </span>
+      </label>
       {error ? <p className="error-text">{error}</p> : null}
       <button className="btn-primary" disabled={busy} type="submit">
         {m.auth.submitRegister}

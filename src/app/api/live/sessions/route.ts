@@ -6,16 +6,21 @@ import { adultDecision } from "@/server/money";
 import { jsonError } from "@/server/http";
 import { readLiveKitCredentials } from "@/server/live-access";
 import { openLiveSession } from "@/server/live-sessions";
+import { isContentCategory } from "@/config/app";
+import { termsDecision } from "@/server/terms";
 
 const bodySchema = z.object({
   title: z.string().trim().max(120).optional(),
   circleId: z.string().trim().min(1).max(80).optional(),
+  contentCategory: z.string().trim().max(40).optional(),
+  ideaSlug: z.string().trim().max(80).optional(),
 });
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
   if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  if (termsDecision(user) === "TERMS_REQUIRED") return jsonError(403, "TERMS_REQUIRED");
   if (!readLiveKitCredentials()) return jsonError(503, "LIVE_NOT_CONFIGURED");
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
@@ -26,6 +31,8 @@ export async function POST(request: Request) {
       host: user.creatorProfile,
       title: parsed.data.title,
       circleId: parsed.data.circleId,
+      contentCategory: isContentCategory(parsed.data.contentCategory) ? parsed.data.contentCategory : null,
+      ideaSlug: parsed.data.ideaSlug ?? null,
     });
     await audit({
       actorId: user.id,

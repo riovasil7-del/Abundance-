@@ -8,7 +8,7 @@ export function AdminActions({
   kind,
   id,
 }: {
-  kind: "creator" | "comment" | "video" | "report" | "review";
+  kind: "creator" | "comment" | "video" | "report" | "review" | "idea";
   id: string;
 }) {
   const router = useRouter();
@@ -23,6 +23,15 @@ export function AdminActions({
     router.refresh();
   }
 
+  if (kind === "idea") {
+    return (
+      <div className="admin-actions">
+        <button type="button" className="btn-gold" onClick={() => post(`/api/admin/ideas/${id}`, { status: "approved" })}>
+          {m.admin.approveIdea}
+        </button>
+      </div>
+    );
+  }
   if (kind === "review") {
     return (
       <div className="admin-actions">

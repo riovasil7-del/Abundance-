@@ -1,5 +1,5 @@
 import { unlink } from "node:fs/promises";
-import { DEED_KINDS } from "../config/app";
+import { DEED_KINDS, isContentCategory } from "../config/app";
 import { mediaPublishDecision } from "../lib/low-data";
 import { db } from "./db";
 import { reviewComment } from "./moderation";
@@ -22,6 +22,12 @@ export function storyAccess(
 
 export function parseVisibility(value: string): StoryVisibility | null {
   return (STORY_VISIBILITY as readonly string[]).includes(value) ? (value as StoryVisibility) : null;
+}
+
+export function parseContentCategory(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  return isContentCategory(trimmed) ? trimmed : null;
 }
 
 export function parseDeed(value: string): (typeof DEED_KINDS)[number] | null {
@@ -49,6 +55,8 @@ export async function createTextStory(input: {
   visibility: StoryVisibility;
   circleId?: string | null;
   clientToken?: string;
+  contentCategory?: string | null;
+  ideaSlug?: string | null;
 }) {
   const prior = await existingReceipt(input.actorId, input.clientToken);
   if (prior) {
@@ -68,6 +76,8 @@ export async function createTextStory(input: {
       visibility: input.visibility,
       mediaKind: "NONE",
       peopleNote: "TEXT_ONLY",
+      contentCategory: input.contentCategory ?? null,
+      ideaSlug: input.ideaSlug ?? null,
       consentConfirmed: false,
       moderationStatus: review.status === "VISIBLE" ? "VISIBLE" : "FLAGGED",
     },
@@ -91,6 +101,8 @@ export async function createPhotoStory(input: {
   regions: unknown;
   circleId?: string | null;
   clientToken?: string;
+  contentCategory?: string | null;
+  ideaSlug?: string | null;
 }) {
   const prior = await existingReceipt(input.actorId, input.clientToken);
   if (prior) {
@@ -117,6 +129,8 @@ export async function createPhotoStory(input: {
       visibility: input.visibility,
       mediaKind: "PHOTO",
       peopleNote: input.peopleNote,
+      contentCategory: input.contentCategory ?? null,
+      ideaSlug: input.ideaSlug ?? null,
       consentConfirmed: false,
       moderationStatus: review.status === "VISIBLE" ? "VISIBLE" : "FLAGGED",
     },

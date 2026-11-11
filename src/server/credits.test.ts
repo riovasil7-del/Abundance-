@@ -72,8 +72,9 @@ test("buying a pack is idempotent, and a gift spends lights at 15/85", { skip: !
     assert.equal(spent.transaction.netCents, split.netCents);
     assert.equal(spent.transaction.feeCents + spent.transaction.netCents, price);
     assert.equal(spent.transaction.paymentMode, "CREDITS");
-    assert.equal(split.feeCents, 15);
-    assert.equal(split.netCents, 85);
+    assert.equal(gift.priceCents, 20);
+    assert.equal(split.feeCents, 3);
+    assert.equal(split.netCents, 17);
 
     const replay = await spendLights({
       donorId: donor.id,

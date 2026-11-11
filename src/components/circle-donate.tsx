@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatMoney } from "@/lib/format";
 import type { GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
+import { GiftFundNote, GiftPicker } from "./gift-picker";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 
@@ -60,29 +61,12 @@ export function CircleDonate({
     return (
       <div className="card" data-screen="circle-receipt">
         <p className="kicker">{m.gifts.receiptTitle}</p>
-        <div className="net-hero">
-          <span>85%</span>
-          <strong>{formatMoney(receipt.netCents, locale)}</strong>
-        </div>
-        <div className="split">
-          <div className="split-row">
-            <span>{m.gifts.gross}</span>
-            <span>{formatMoney(receipt.grossCents, locale)}</span>
-          </div>
-          <div className="split-row">
-            <span>{m.gifts.fee}</span>
-            <span>{formatMoney(receipt.feeCents, locale)}</span>
-          </div>
-          <div className="split-row net">
-            <span>{m.gifts.net}</span>
-            <span>{formatMoney(receipt.netCents, locale)}</span>
-          </div>
-        </div>
+        <p>
+          <strong>{formatMoney(receipt.grossCents, locale)}</strong>
+        </p>
+        <p className="muted">{m.gifts.recorded}</p>
         {receipt.shares.map((share) => (
-          <div className="split-row" key={share.name}>
-            <span>{share.name}</span>
-            <span>{formatMoney(share.netCents, locale)}</span>
-          </div>
+          <p key={share.name}>{share.name}</p>
         ))}
         <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
       </div>
@@ -92,32 +76,11 @@ export function CircleDonate({
   return (
     <div className="card stack">
       <h2>{m.circles.donate}</h2>
-      <p className="muted">{m.gifts.circleNet}</p>
-      <div className="gift-grid">
-        {gifts.map((gift) => (
-          <button type="button" key={gift.slug} className={gift.slug === chosen.slug ? "gift-option on" : "gift-option"} onClick={() => setSlug(gift.slug)}>
-            <span>{gift.symbol}</span>
-            <small>{gift.name}</small>
-          </button>
-        ))}
-      </div>
-      <p className="kicker">{m.circles.preview}</p>
-      <div className="split">
-        <div className="split-row">
-          <span>15%</span>
-          <span>{formatMoney(chosen.feeCents, locale)}</span>
-        </div>
-        <div className="split-row net">
-          <span>85%</span>
-          <span>{formatMoney(chosen.netCents, locale)}</span>
-        </div>
-        {chosen.shares.map((share) => (
-          <div className="split-row" key={share.name}>
-            <span>{share.name}</span>
-            <span>{formatMoney(share.netCents, locale)}</span>
-          </div>
-        ))}
-      </div>
+      <GiftPicker gifts={gifts} selected={chosen.slug} onSelect={setSlug} />
+      <GiftFundNote gift={chosen} />
+      {chosen.destination === "creator" || !chosen.destination
+        ? chosen.shares.map((share) => <p key={share.name}>{share.name}</p>)
+        : null}
       <label className="check-row">
         <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
         <span>{m.gifts.anonymous}</span>

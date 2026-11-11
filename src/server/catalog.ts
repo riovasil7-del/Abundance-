@@ -5,11 +5,12 @@ import { db } from "./db";
 import { splitDonation } from "./fees";
 
 export async function loadGiftChoices(locale: Locale): Promise<GiftChoice[]> {
-  const gifts = await db.gift.findMany({ orderBy: { sortOrder: "asc" } });
+  const gifts = await db.gift.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } });
   const names = messagesFor(locale).giftNames;
   return gifts.map((gift) => {
     const split = splitDonation(gift.priceCents);
     const named = names[gift.slug as keyof typeof names];
+    const destination = gift.destination === "water" || gift.destination === "food" ? gift.destination : "creator";
     return {
       slug: gift.slug,
       name: named ?? (locale === "sk" ? gift.nameSk : gift.nameEn),
@@ -17,6 +18,7 @@ export async function loadGiftChoices(locale: Locale): Promise<GiftChoice[]> {
       priceCents: split.grossCents,
       feeCents: split.feeCents,
       netCents: split.netCents,
+      destination,
     };
   });
 }

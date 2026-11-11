@@ -78,6 +78,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </div>
               </header>
               <main>{children}</main>
+              <footer className="site-footer">
+                <Link href="/terms">{messages.terms.link}</Link>
+              </footer>
               <BottomNav />
             </div>
           </div>

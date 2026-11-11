@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { LOCALES } from "@/config/app";
+import { CONTENT_CATEGORIES, LOCALES } from "@/config/app";
 import { LANGUAGE_META } from "@/i18n/meta";
 import { formatMoney } from "@/lib/format";
 import { capTail } from "@/lib/gift-guard";
 import { feedSourceAllowed, videoPreload } from "@/lib/low-data";
 import type { FeedVideo, GiftChoice, Receipt } from "@/lib/types";
 import { GiftConfirm, useGiftAttempt } from "./gift-confirm";
+import { GiftFundNote, GiftPicker } from "./gift-picker";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 import { Sheet } from "./sheet";
@@ -37,6 +38,7 @@ export function FeedExperience({
   const rootRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState(videos);
   const [view, setView] = useState<FeedView>("forYou");
+  const [category, setCategory] = useState("");
   const [cursor, setCursor] = useState<string | null>(nextCursor);
   const [active, setActive] = useState(0);
   const [muted, setMuted] = useState(true);
@@ -121,9 +123,10 @@ export function FeedExperience({
     };
   }, []);
 
-  async function loadView(nextView: FeedView, nextCursor: string | null, replace: boolean) {
+  async function loadView(nextView: FeedView, nextCursor: string | null, replace: boolean, nextCategory = category) {
     const params = new URLSearchParams({ view: nextView });
     if (nextCursor) params.set("cursor", nextCursor);
+    if (nextCategory) params.set("category", nextCategory);
     const response = await fetch(`/api/feed?${params.toString()}`);
     const data = await response.json().catch(() => ({}));
     if (data.needsLogin) {
@@ -306,8 +309,34 @@ export function FeedExperience({
     }
   }
 
+  const categoryChips = (
+    <div className="chip-row page" role="group" aria-label={m.feed.allCategories}>
+      <button type="button" className={category === "" ? "chip on" : "chip"} onClick={() => { setCategory(""); void loadView(view, null, true, ""); }}>
+        {m.feed.allCategories}
+      </button>
+      {CONTENT_CATEGORIES.map((item) => (
+        <button
+          type="button"
+          key={item}
+          className={category === item ? "chip on" : "chip"}
+          onClick={() => {
+            setCategory(item);
+            void loadView(view, null, true, item);
+          }}
+        >
+          {m.contentCategories[item]}
+        </button>
+      ))}
+    </div>
+  );
+
   if (items.length === 0) {
-    return <p className="page empty">{m.feed.empty}</p>;
+    return (
+      <div className="page stack">
+        {categoryChips}
+        <p className="empty">{m.feed.empty}</p>
+      </div>
+    );
   }
 
   const viewLabel = { forYou: m.feed.forYou, following: m.feed.following, community: m.feed.community };
@@ -316,6 +345,7 @@ export function FeedExperience({
 
   return (
     <div className="feed-page" data-screen="feed">
+    {categoryChips}
     <div className="feed-switch" role="tablist" aria-label={m.feed.switcher}>
       {(["forYou", "following", "community"] as const).map((next) => (
         <button
@@ -437,7 +467,7 @@ export function FeedExperience({
               </button>
               <p>{video.caption}</p>
               <p className="place">
-                {video.deedLabel}
+                {video.categoryLabel ? <span className="pill">{video.categoryLabel}</span> : null} {video.deedLabel}
                 {video.chainCount > 0 ? ` · ${m.feed.chain} ${video.chainCount}` : ""}
               </p>
             </div>
@@ -501,27 +531,11 @@ export function FeedExperience({
               receipt ? (
                 <div data-screen="gift-receipt">
                   <p className="kicker">{m.gifts.receiptTitle}</p>
-                  <div className="net-hero">
-                    <span>85%</span>
-                    <strong>{formatMoney(receipt.netCents, locale)}</strong>
-                  </div>
+                  <p className="kicker">{m.gifts.recorded}</p>
                   <p>
-                    {receipt.shares.map((share) => share.name).join(", ")} · {m.gifts.net}
+                    <strong>{formatMoney(receipt.grossCents, locale)}</strong>
+                    {receipt.shares.length ? ` · ${receipt.shares.map((share) => share.name).join(", ")}` : ""}
                   </p>
-                  <div className="split">
-                    <div className="split-row">
-                      <span>{m.gifts.gross}</span>
-                      <span>{formatMoney(receipt.grossCents, locale)}</span>
-                    </div>
-                    <div className="split-row">
-                      <span>{m.gifts.fee}</span>
-                      <span>{formatMoney(receipt.feeCents, locale)}</span>
-                    </div>
-                    <div className="split-row net">
-                      <span>{m.gifts.net}</span>
-                      <span>{formatMoney(receipt.netCents, locale)}</span>
-                    </div>
-                  </div>
                   <p className="muted">{paymentNote(receipt.paymentMode, m)}</p>
                   <button type="button" className="btn-primary" onClick={() => setSheet(null)}>
                     {m.gifts.close}
@@ -533,35 +547,8 @@ export function FeedExperience({
                   <h2>
                     {current.creator.displayName}
                   </h2>
-                  <div className="gift-grid" style={{ marginTop: 12 }}>
-                    {gifts.map((gift) => (
-                      <button
-                        type="button"
-                        key={gift.slug}
-                        className={gift.slug === chosen.slug ? "gift-option on" : "gift-option"}
-                        onClick={() => setGiftSlug(gift.slug)}
-                      >
-                        <span aria-hidden="true">{gift.symbol}</span>
-                        <small>{gift.name}</small>
-                        <small>{formatMoney(gift.priceCents, locale)}</small>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="muted">{m.gifts.preview}</p>
-                  <div className="split">
-                    <div className="split-row">
-                      <span>{m.gifts.gross}</span>
-                      <span>{formatMoney(chosen.priceCents, locale)}</span>
-                    </div>
-                    <div className="split-row">
-                      <span>{m.gifts.fee}</span>
-                      <span>{formatMoney(chosen.feeCents, locale)}</span>
-                    </div>
-                    <div className="split-row net">
-                      <span>{m.gifts.net}</span>
-                      <span>{formatMoney(chosen.netCents, locale)}</span>
-                    </div>
-                  </div>
+                  <GiftPicker gifts={gifts} selected={chosen.slug} onSelect={setGiftSlug} />
+                  <GiftFundNote gift={chosen} />
                   <label className="check-row">
                     <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
                     <span>

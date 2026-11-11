@@ -5,7 +5,8 @@ import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
-import { createPhotoStory, createTextStory, parseDeed, parseVisibility } from "@/server/stories";
+import { createPhotoStory, createTextStory, parseContentCategory, parseDeed, parseVisibility } from "@/server/stories";
+import { termsDecision } from "@/server/terms";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,7 @@ async function circleFor(userId: string, creatorId: string, circleIdRaw: string)
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
+  if (termsDecision(user) === "TERMS_REQUIRED") return jsonError(403, "TERMS_REQUIRED");
   const limit = memoryRateLimiter.consume(clientKey(request, "story", user.id), 12, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");
 
@@ -46,6 +48,8 @@ export async function POST(request: Request) {
       visibility,
       circleId: circle,
       clientToken: clientToken.length >= 8 ? clientToken : undefined,
+      contentCategory: parseContentCategory(String(body?.contentCategory ?? "")),
+      ideaSlug: String(body?.ideaSlug ?? "").trim().slice(0, 80) || null,
     });
     await audit({ actorId: user.id, action: "STORY_TEXT", entityType: "Video", entityId: created.story.id, metadata: { visibility, rules: CONTENT_RULES_VERSION } });
     return NextResponse.json({ id: created.story.id, slug: user.creatorProfile.slug, status: created.status, visibility: created.story.visibility });
@@ -83,6 +87,8 @@ export async function POST(request: Request) {
       regions,
       circleId: circle,
       clientToken: clientToken.length >= 8 ? clientToken : undefined,
+      contentCategory: parseContentCategory(String(form.get("contentCategory") ?? "")),
+      ideaSlug: String(form.get("ideaSlug") ?? "").trim().slice(0, 80) || null,
     });
     if ("error" in created && created.error) {
       const status = created.error === "REVIEW_REQUIRED" || created.error === "MEDIA_BLOCKED" ? 400 : 503;

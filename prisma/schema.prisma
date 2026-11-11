@@ -69,6 +69,10 @@ model User {
   adultAttestedAt DateTime?
   /// When true, the feed does not preload the next video.
   lowData         Boolean  @default(false)
+  /// When the person accepted the terms. Not an identity check.
+  termsAcceptedAt DateTime?
+  /// Matches TERMS_VERSION in config. 0 means the current terms are not accepted.
+  termsVersion    Int      @default(0)
   phone        String?  @unique
   /// Filled by a future KYC provider (Smile ID or similar). Null until then.
   kycSubjectId String?  @unique
@@ -97,6 +101,8 @@ model User {
   feedHides         FeedHide[]
   feedTaste         FeedTaste?
   storyReceipts     StoryReceipt[]
+  ideasProposed     Idea[]
+  ideaSaves         IdeaSave[]
 }
 
 model CreatorProfile {
@@ -152,6 +158,9 @@ model Video {
   peopleNote       String?
   /// Captions typed by the creator. Not produced by speech recognition.
   captionsVtt      String?
+  /// Optional content chip. A good deed is one choice, never required.
+  contentCategory  String?
+  ideaSlug         String?
   durationSec      Int              @default(8)
   deedKind         String
   /// Language of the picture and the words. Not a device location.
@@ -204,6 +213,10 @@ model Gift {
   priceCents   Int
   symbol       String
   sortOrder    Int                 @default(0)
+  /// Inactive gifts stay for old ledger rows and are hidden from the sheet.
+  active       Boolean             @default(true)
+  /// creator, water, or food. water and food are community-fund gifts.
+  destination  String              @default("creator")
   transactions LedgerTransaction[]
 }
 
@@ -245,6 +258,7 @@ model LedgerTransaction {
   allocations LedgerAllocation[]
   moneyEvents MoneyEvent[]
   payoutHolds PayoutReservation[]
+  fundCredit  FundCredit?
 
   @@index([donorId, createdAt])
   @@index([circleId])
@@ -346,6 +360,8 @@ model LiveSession {
   circleId  String?
   circle    BlessingCircle? @relation(fields: [circleId], references: [id])
   title     String
+  contentCategory String?
+  ideaSlug  String?
   status    String    @default("LIVE")
   startedAt DateTime  @default(now())
   endedAt   DateTime?
@@ -633,4 +649,52 @@ model StoryReceipt {
 
   @@unique([userId, token])
   @@index([storyId])
+}
+
+/// The 85 percent of a community-fund gift. The platform fee stays on the transaction.
+/// This is a ledger account, not a promise that water or bread has been delivered.
+model FundCredit {
+  id            String            @id @default(cuid())
+  transactionId String            @unique
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  /// water or food
+  fund          String
+  netCents      Int
+  createdAt     DateTime          @default(now())
+
+  @@index([fund])
+}
+
+model Idea {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  description      String
+  titleEn          String?
+  descriptionEn    String?
+  /// neighbours, children, nature, animals, sick, quick, family, mood
+  category         String
+  estimatedMinutes Int
+  isFree           Boolean  @default(true)
+  locale           String   @default("sk")
+  /// approved or pending
+  status           String   @default("pending")
+  createdById      String?
+  createdBy        User?    @relation(fields: [createdById], references: [id])
+  createdAt        DateTime @default(now())
+  saves            IdeaSave[]
+
+  @@index([status, category])
+}
+
+model IdeaSave {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ideaId    String
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, ideaId])
+  @@index([userId])
 }

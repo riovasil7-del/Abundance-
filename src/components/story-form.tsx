@@ -2,14 +2,28 @@
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useRouter } from "next/navigation";
-import { DEED_KINDS } from "@/config/app";
+import { CONTENT_CATEGORIES, DEED_KINDS } from "@/config/app";
 import { saveDeviceDraft } from "@/lib/draft-store";
 import { useI18n } from "./providers";
 
 type Region = { x: number; y: number; w: number; h: number };
 type Mode = "TEXT" | "NO_FACES" | "COVERED";
 
-export function StoryForm({ circles, ownerId }: { circles: { id: string; title: string }[]; ownerId: string }) {
+export function StoryForm({
+  circles,
+  ownerId,
+  initialTitle = "",
+  initialCaption = "",
+  initialCategory = "",
+  ideaSlug = "",
+}: {
+  circles: { id: string; title: string }[];
+  ownerId: string;
+  initialTitle?: string;
+  initialCaption?: string;
+  initialCategory?: string;
+  ideaSlug?: string;
+}) {
   const { messages: m } = useI18n();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("TEXT");
@@ -76,13 +90,15 @@ export function StoryForm({ circles, ownerId }: { circles: { id: string; title: 
             caption: data.get("caption"),
             deedKind: data.get("deedKind"),
             circleId: data.get("circleId"),
+            contentCategory: data.get("contentCategory"),
+            ideaSlug,
             visibility,
             clientToken: tokenRef.current,
           }),
         });
         const body = await response.json().catch(() => ({}));
         if (!response.ok) {
-          setError(m.common.error);
+          setError(body.error === "TERMS_REQUIRED" ? m.terms.need : m.common.error);
           return;
         }
         tokenRef.current = crypto.randomUUID();
@@ -147,11 +163,11 @@ export function StoryForm({ circles, ownerId }: { circles: { id: string; title: 
       <p className="muted">{m.upload.noTrack}</p>
       <label className="field">
         <span>{m.upload.name}</span>
-        <input name="title" required minLength={2} maxLength={120} />
+        <input name="title" required minLength={2} maxLength={120} defaultValue={initialTitle} />
       </label>
       <label className="field">
         <span>{m.upload.caption}</span>
-        <textarea name="caption" required minLength={2} maxLength={800} />
+        <textarea name="caption" required minLength={2} maxLength={800} defaultValue={initialCaption} />
       </label>
       <label className="field">
         <span>{m.upload.deed}</span>
@@ -163,6 +179,18 @@ export function StoryForm({ circles, ownerId }: { circles: { id: string; title: 
           ))}
         </select>
       </label>
+      <label className="field">
+        <span>{m.upload.category}</span>
+        <select name="contentCategory" defaultValue={initialCategory}>
+          <option value="">{m.upload.categoryNone}</option>
+          {CONTENT_CATEGORIES.map((item) => (
+            <option key={item} value={item}>
+              {m.contentCategories[item]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <input type="hidden" name="ideaSlug" value={ideaSlug} />
       <label className="field">
         <span>{m.upload.circle}</span>
         <select name="circleId" defaultValue="">

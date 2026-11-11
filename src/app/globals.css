@@ -109,7 +109,7 @@ main { min-height: calc(100dvh - var(--header-h)); padding-bottom: calc(var(--na
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   background: rgba(255, 253, 248, 0.96);
   border-top: 1px solid var(--line);
   backdrop-filter: blur(12px);
@@ -122,7 +122,7 @@ main { min-height: calc(100dvh - var(--header-h)); padding-bottom: calc(var(--na
   justify-content: center;
   gap: 2px;
   color: var(--muted);
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   min-height: 44px;
   text-align: center;
   padding: 0 2px;
@@ -272,7 +272,14 @@ textarea { min-height: 96px; resize: vertical; }
   padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
   box-shadow: var(--shadow);
 }
-.gift-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 8px; }
+.gift-sheet { display: flex; flex-direction: column; gap: 14px; }
+.gift-tier h3 { margin: 0; font-size: 0.95rem; }
+.chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 12px; white-space: nowrap; }
+.chip.on { background: #fff6e4; border-color: var(--gold-deep); }
+.site-footer { text-align: center; padding: 8px 16px 4px; font-size: 0.78rem; }
+.site-footer a { color: var(--muted); }
+.gift-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .gift-option {
   border: 1px solid var(--line); background: #fff; border-radius: 16px; min-height: 74px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px;

@@ -1,4 +1,4 @@
-import type { Locale } from "../config/app";
+import { isContentCategory, type ContentCategory, type Locale } from "../config/app";
 import { pickLocalized } from "../lib/format";
 import type { FeedVideo } from "../lib/types";
 import { messagesFor } from "../i18n";
@@ -22,11 +22,18 @@ export function parseFeedView(value: string | null): FeedView {
   return "forYou";
 }
 
+export function matchesContentCategory(value: string | null | undefined, filter: string | null): boolean {
+  if (!filter) return true;
+  if (!isContentCategory(filter)) return true;
+  return value === filter;
+}
+
 export async function loadFeedPage(input: {
   locale: Locale;
   userId: string | null;
   view: FeedView;
   cursor: string | null;
+  category?: string | null;
 }): Promise<{ items: FeedVideo[]; nextCursor: string | null; needsLogin: boolean }> {
   if (input.view === "following" && !input.userId) {
     return { items: [], nextCursor: null, needsLogin: true };
@@ -52,6 +59,7 @@ export async function loadFeedPage(input: {
     where: {
       moderationStatus: "VISIBLE",
       visibility: "PUBLISHED",
+      ...(isContentCategory(input.category) ? { contentCategory: input.category } : {}),
       ...(input.view === "following" ? { creator: { userId: { in: followedUserIds } } } : {}),
       ...(input.view === "community"
         ? { OR: [{ deedKind: { in: ["good_deed", "craft", "gratitude"] } }, { circleId: { not: null } }] }
@@ -150,6 +158,7 @@ function toFeedVideo(
     playbackUrl: string | null;
     posterUrl: string | null;
     deedKind: string;
+    contentCategory: string | null;
     _count: { blessings: number; comments: number };
     blessings: { id: string }[] | false;
     creator: {
@@ -189,6 +198,9 @@ function toFeedVideo(
     playbackUrl: video.playbackUrl,
     posterUrl: video.posterUrl,
     deedLabel: messages.deeds[video.deedKind as keyof typeof messages.deeds] ?? video.deedKind,
+    categoryLabel: isContentCategory(video.contentCategory)
+      ? messages.contentCategories[video.contentCategory as ContentCategory]
+      : null,
     blessingCount: video._count.blessings,
     blessedByMe: Array.isArray(video.blessings) && video.blessings.length > 0,
     commentCount: video._count.comments,

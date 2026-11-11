@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     userId: user?.id ?? null,
     view: parseFeedView(url.searchParams.get("view")),
     cursor: url.searchParams.get("cursor"),
+    category: url.searchParams.get("category"),
   });
   return NextResponse.json(page);
 }

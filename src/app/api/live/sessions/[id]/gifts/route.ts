@@ -7,6 +7,7 @@ import { jsonError } from "@/server/http";
 import { randomUUID } from "node:crypto";
 import { CreditError, catalogPriceCents, spendLights } from "@/server/credits";
 import { liveGiftShares } from "@/server/community-rules";
+import { planGift } from "@/server/gift-plan";
 import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
 import { publishRoomEvent } from "@/server/live-events";
 import { adultDecision } from "@/server/money";
@@ -36,7 +37,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (!session.host.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
 
   const gift = await db.gift.findUnique({ where: { slug: parsed.data.giftSlug } });
-  if (!gift || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
+  if (!gift || !gift.active || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");
+  const fundGift = gift.destination === "water" || gift.destination === "food";
 
   const acceptedInvites = await db.liveInvite.findMany({
     where: { sessionId: session.id, status: "ACCEPTED", consentAt: { not: null } },
@@ -64,6 +66,58 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     ].map((person) => [person.creatorId, person]),
   );
   const priceCents = catalogPriceCents(gift.priceCents, raw);
+  if (fundGift) {
+    const planned = planGift(priceCents, gift.destination, []);
+    let spent;
+    try {
+      spent = await spendLights({
+        donorId: user.id,
+        priceCents,
+        token: parsed.data.token ?? randomUUID(),
+        kind: "GIFT",
+        shares: [],
+        fund: planned.fund,
+        giftId: gift.id,
+        anonymous: Boolean(parsed.data.anonymous),
+        holdDays: 0,
+        liveSessionId: session.id,
+        note: "live-fund",
+      });
+    } catch (error) {
+      if (error instanceof CreditError) {
+        return jsonError(error.code === "INSUFFICIENT_LIGHTS" ? 402 : 400, error.code);
+      }
+      throw error;
+    }
+    const transaction = spent.transaction;
+    if (transaction.feeCents !== planned.split.feeCents || transaction.netCents !== planned.split.netCents) {
+      return jsonError(500, "SPLIT_MISMATCH");
+    }
+    if (!spent.replayed) {
+      const burst = liveGiftBurst({
+        catalogPriceCents: gift.priceCents,
+        untrustedClientAmount: raw,
+        verifiedRecipientCount: 1,
+        transactionId: transaction.id,
+        symbol: gift.symbol,
+        name: gift.nameSk,
+        donorName: parsed.data.anonymous ? "" : user.name,
+      });
+      await publishRoomEvent(session.roomName, burst);
+    }
+    return NextResponse.json({
+      transactionId: transaction.id,
+      grossCents: transaction.grossCents,
+      feeCents: transaction.feeCents,
+      netCents: transaction.netCents,
+      currency: transaction.currency,
+      paymentMode: "credits",
+      status: transaction.status,
+      lightBalance: spent.balance,
+      fund: planned.fund,
+      shares: [],
+    });
+  }
   const shared = liveGiftShares({
     priceCents,
     selectedCreatorId: parsed.data.recipientCreatorId ?? null,
