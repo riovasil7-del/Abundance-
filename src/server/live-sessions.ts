@@ -50,16 +50,18 @@ export async function loadLiveAudience(sessionId: string): Promise<{
   if (!session) return null;
   const accepted = await db.liveInvite.findMany({
     where: { sessionId, status: "ACCEPTED", consentAt: { not: null } },
-    select: { inviteeId: true },
+    include: { invitee: true },
   });
   return {
     session,
     audience: {
-      hostUserId: session.host.userId,
+      hostUserId: session.host.user.adultAttestedAt ? session.host.userId : "",
       circlePublisherUserIds: session.circle
-        ? session.circle.participants.map((participant) => participant.creator.userId)
+        ? session.circle.participants
+            .filter((participant) => participant.creator.user.adultAttestedAt)
+            .map((participant) => participant.creator.userId)
         : null,
-      cohostUserIds: accepted.map((invite) => invite.inviteeId),
+      cohostUserIds: accepted.filter((invite) => invite.invitee.adultAttestedAt).map((invite) => invite.inviteeId),
     },
   };
 }
@@ -68,10 +70,10 @@ function fetchSession(sessionId: string) {
   return db.liveSession.findUnique({
     where: { id: sessionId },
     include: {
-      host: true,
+      host: { include: { user: true } },
       circle: {
         include: {
-          participants: { include: { creator: true }, orderBy: { joinedAt: "asc" } },
+          participants: { include: { creator: { include: { user: true } } }, orderBy: { joinedAt: "asc" } },
         },
       },
     },
