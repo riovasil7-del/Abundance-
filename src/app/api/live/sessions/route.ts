@@ -8,6 +8,20 @@ import { readLiveKitCredentials } from "@/server/live-access";
 import { openLiveSession } from "@/server/live-sessions";
 import { isContentCategory } from "@/config/app";
 import { termsDecision } from "@/server/terms";
+import { db } from "@/server/db";
+import { toPublicLiveCard, visibleLiveSessions } from "@/lib/live-list";
+
+export async function GET(request: Request) {
+  const categoryParam = new URL(request.url).searchParams.get("category");
+  const category = isContentCategory(categoryParam) ? categoryParam : null;
+  const rows = await db.liveSession.findMany({
+    where: { status: "LIVE" },
+    include: { host: true },
+    orderBy: { startedAt: "desc" },
+  });
+  const sessions = visibleLiveSessions(rows, category).map(toPublicLiveCard);
+  return NextResponse.json({ sessions }, { headers: { "cache-control": "no-store" } });
+}
 
 const bodySchema = z.object({
   title: z.string().trim().max(120).optional(),
