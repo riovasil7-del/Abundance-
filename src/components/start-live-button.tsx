@@ -34,6 +34,8 @@ export function StartLiveButton({
     if (notice === "creator") return m.live.needCreator;
     if (notice === "config") return m.live.notConfigured;
     if (notice === "circle") return m.live.circleOnly;
+    if (notice === "parent") return m.guardian.locked;
+    if (notice === "minorLive") return m.guardian.noLive;
     return m.live.startFailed;
   }
 

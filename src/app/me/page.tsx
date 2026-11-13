@@ -7,6 +7,7 @@ import { UnblockButton } from "@/components/unblock-button";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { formatMoney } from "@/lib/format";
+import { consentActive } from "@/server/age-gate";
 import { getCurrentUser, hasRole } from "@/server/auth";
 import { db } from "@/server/db";
 
@@ -54,7 +55,15 @@ export default async function MePage() {
         <h1>{user.name}</h1>
         <p className="lede">{messages.roles[user.role]}</p>
         <p>{messages.me.oneAccount}</p>
-        <p className="notice">{user.adultAttestedAt ? messages.age.declared : messages.age.need}</p>
+        <p className="notice">
+          {user.adultAttestedAt
+            ? messages.age.declared
+            : user.minorDeclaredAt
+              ? consentActive(user.parentalConsent)
+                ? messages.guardian.canPost
+                : messages.guardian.locked
+              : messages.age.need}
+        </p>
       </div>
       {user.adultAttestedAt ? null : <AgeAttest />}
       {user.creatorProfile ? (

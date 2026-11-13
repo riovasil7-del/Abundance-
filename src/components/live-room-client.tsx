@@ -10,12 +10,14 @@ import { useI18n } from "./providers";
 
 const LiveStage = dynamic(() => import("./live-stage").then((mod) => mod.LiveStage), { ssr: false });
 
-function roomNotice(notice: LiveStartNotice | null, m: { live: { ageFirst: string; needCreator: string; notConfigured: string; circleOnly: string; startFailed: string; failed: string }; terms: { need: string } }) {
+function roomNotice(notice: LiveStartNotice | null, m: { live: { ageFirst: string; needCreator: string; notConfigured: string; circleOnly: string; startFailed: string; failed: string }; terms: { need: string }; guardian: { locked: string; noLive: string } }) {
   if (notice === "age") return m.live.ageFirst;
   if (notice === "terms") return m.terms.need;
   if (notice === "creator") return m.live.needCreator;
   if (notice === "config") return m.live.notConfigured;
   if (notice === "circle") return m.live.circleOnly;
+  if (notice === "parent") return m.guardian.locked;
+  if (notice === "minorLive") return m.guardian.noLive;
   if (notice === "failed") return m.live.startFailed;
   return m.live.failed;
 }

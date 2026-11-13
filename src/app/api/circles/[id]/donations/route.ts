@@ -7,6 +7,7 @@ import { jsonError } from "@/server/http";
 import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
 import { planGift } from "@/server/gift-plan";
+import { giftReceiveDecision } from "@/server/age-gate";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -28,12 +29,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
   const circle = await db.blessingCircle.findUnique({
     where: { id },
-    include: { participants: { include: { creator: { include: { user: { select: { adultAttestedAt: true } } } } } } },
+    include: { participants: { include: { creator: { include: { user: { select: { adultAttestedAt: true, minorDeclaredAt: true } } } } } } },
   });
   if (!circle || circle.status !== "OPEN") return jsonError(404, "NOT_FOUND");
-  if (circle.participants.some((participant) => !participant.creator.user.adultAttestedAt)) {
-    return jsonError(403, "CREATOR_AGE_REQUIRED");
-  }
+  const blocked = circle.participants.map((participant) => giftReceiveDecision(participant.creator.user)).find((decision) => decision !== "OK");
+  if (blocked) return jsonError(403, blocked === "MINOR_NO_GIFTS" ? "MINOR_NO_GIFTS" : "CREATOR_AGE_REQUIRED");
 
   const recipients = orderedVerified(circle.participants);
   const fundGift = gift.destination === "water" || gift.destination === "food";

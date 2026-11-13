@@ -341,6 +341,7 @@ const yo: Messages = {
     mustAgree: "Àkọọ́lẹ̀ ń wáyé lẹ́yìn ìfọwọ́sí.", need: "Kí o tó ṣe fídíò àkọ́kọ́ tàbí ìgbóhùnsáfẹ́fẹ́, gba òfin lọ́wọ́lọ́wọ́.", accept: "Mo gba àwọn òfin", saved: "A ti pamọ́ ìfọwọ́sí.",
     lights: "Ìmọ́lẹ̀ kan jẹ́ kọbọ kan. O ra àpò ní dọ́là, o sì fi ìmọ́lẹ̀ ránṣẹ́. Apèsè ló ń yan iye.", split: "Ọgọ́rin nínú ọgọ́rùn-ún ẹ̀bùn tuntun kọ̀ọ̀kan lọ sí ẹni, ogún lọ sí Hojnosť fún iṣẹ́, àwọn apèsè, owó ìsanwó àti ìtọ́jú. Ẹ̀bùn tí a ti kọ tẹ́lẹ̀ ń fi pínpín ọjọ́ yẹn pamọ́. Pínpín náà ń ṣẹlẹ̀ lẹ́ẹ̀kan lórí apèsè.", fund: "Kànga àti búrẹ́dì kò lọ sí ẹni. Ogún dúró pẹ̀lú Hojnosť, ọgọ́rin lọ sí àpò àwùjọ fún omi tàbí oúnjẹ, tí a ń pè ní àpò àwùjọ (a ń palẹ̀mọ́). Kì í ṣe ìfijíṣẹ́.",
     holds: "Nígbà tí àríyànjiyàn bá ṣí sílẹ̀ tàbí bàjẹ́, kò sí ẹni tó lè tú ìsanwó yẹn.", age: "Ẹni tó fẹ́ gbé jáde tàbí gba ẹ̀bùn ń sọ fún ara rẹ̀ pé ó ti pé ó kéré tán ọdún 18. Kì í ṣe ìdánimọ̀.", dignity: "Bèèrè àṣẹ ẹni tí o ń ràn lọ́wọ́ kí o tó yà á. Fídíò gẹ́gẹ́ bí ẹ̀rí kò jẹ́ dandan.",
+    minors: "Ẹni tó kéré ju 18 lọ lè fi ọ̀rọ̀ àti àwòrán kún lẹ́yìn tí òbí bá gba. Síbẹ̀ kò lè gba ẹ̀bùn tàbí gbóhùn sóde títí tí ó bá jẹ́rìí 18+. Ìfọwọ́sí òbí kì í ṣe àyẹ̀wò ìdánimọ̀, ó sì lè fagile rẹ̀ nípa ìjápọ̀ kan náà.",
   },
   giftNames: {
     heart: "Ọkàn kékeré", smile: "Ẹ̀rín", flower: "Odòdó", candle: "Àbẹ́là", cloud: "Ìkùukùu kékeré",
@@ -363,6 +364,7 @@ const yo: Messages = {
     dignityTitle: "Ọlá",
     dignityBody: "A kì í bẹ̀bẹ̀, a kì í sì í tẹ ẹnikẹ́ni. Ẹni tí a yàwòrán gbọ́dọ̀ gbà. Fún ọmọdé, òbí ni ó ń gbà. Bí nǹkan bá dunni, a lè jábọ̀.",
   },
+  guardian: { ask: "Ọjọ́ orí wo ni ọ?", birth: "Ọjọ́ ìbí", adult: "Mo ti 18+", minor: "Mo kéré ju 18", notCheck: "Kì í ṣe àyẹ̀wò ọjọ́ orí tàbí ìdánimọ̀.", locked: "A ti ṣí àkọọ́lẹ̀. Títí òbí yóò fi gba, o kò lè fi kún, gbóhùn sóde, tàbí gba ẹ̀bùn.", parentEmail: "Ímeèlì òbí", send: "Fi ìfọwọ́sí ránṣẹ́", linkReady: "A kò lè fi ìwé ránṣẹ́ báyìí. Fún òbí ní ìjápọ̀ yìí.", sent: "A ti fi ìjápọ̀ ránṣẹ́ sí ímeèlì òbí.", canPost: "Òbí ti gba. O lè fi ọ̀rọ̀ àti àwòrán kún. Ẹ̀bùn àti ìgbóhùn sóde wà ní títì títí 18+.", noLive: "Ìgbóhùn sóde bẹ̀rẹ̀ láti 18+.", noGifts: "Ẹni tó jẹ́rìí 18+ nìkan ló lè gba ẹ̀bùn.", mailSubject: "Ìfọwọ́sí òbí fún Hojnosť", mailBody: "Ọmọ rẹ fẹ́ fi nǹkan kún lórí Hojnosť. Ṣí ìjápọ̀ náà kí o jẹ́rìí pé òbí ni ọ́. Kì í ṣe àyẹ̀wò ìdánimọ̀.", title: "Ìfọwọ́sí òbí", intro: "Hojnosť jẹ́ ibi tútù fún iṣẹ́ rere. Kò sí ìjà tàbí àtòjọ ipò.", rules: "Ọmọ lè fi ọ̀rọ̀ àti àwòrán kún lẹ́yìn tí o bá gba. Ẹ̀bùn àti ìgbóhùn sóde wà ní títì títí 18+.", name: "Orúkọ rẹ", confirm: "Èmi ni òbí tàbí olùtọ́jú ọmọ yìí.", approve: "Mo gba gẹ́gẹ́ bí òbí", revoke: "Fagile ìfọwọ́sí", approved: "A ti fi ìfọwọ́sí pamọ́. Ọmọ lè fi kún. Ẹ̀bùn àti ìgbóhùn sóde wà ní títì títí 18+.", revoked: "A ti fagile ìfọwọ́sí. Ọmọ kò lè fi kún fún ìgbà díẹ̀.", missing: "Ìjápọ̀ yìí kò ṣiṣẹ́ mọ́.", child: "Ọmọ" },
   age: {
     need: "Láti gbóhùn tàbí gba, jẹ́wọ́ pé o ti pé ọdún 18. Èyí kì í ṣe ìjẹ́rìí ìdánimọ̀ tàbí ọjọ́ orí.",
     declared: "O ti jẹ́wọ́ pé o ti pé ọdún 18. Èyí kì í ṣe ọjọ́ orí tàbí ìdánimọ̀ tí a ti jẹ́rìí.",

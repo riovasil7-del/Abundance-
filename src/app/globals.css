@@ -262,6 +262,7 @@ textarea { min-height: 96px; resize: vertical; }
 .action-btn strong { font-size: 0.95rem; }
 .action-btn.on { background: #f3d48a; }
 
+.age-gate { position: fixed; inset: 0; z-index: 45; background: rgba(42, 36, 28, 0.45); display: flex; align-items: flex-end; justify-content: center; }
 .sheet-back { position: fixed; inset: 0; background: rgba(42, 36, 28, 0.35); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
 .sheet {
   width: min(480px, 100%);

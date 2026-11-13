@@ -1,5 +1,5 @@
 /** Which on-screen message a failed go-live attempt should show. */
-export type LiveStartNotice = "age" | "terms" | "creator" | "config" | "circle" | "failed";
+export type LiveStartNotice = "age" | "terms" | "creator" | "config" | "circle" | "parent" | "minorLive" | "failed";
 
 export function liveStartNotice(error: string | undefined, ok: boolean): LiveStartNotice | null {
   if (ok && !error) return null;
@@ -8,6 +8,8 @@ export function liveStartNotice(error: string | undefined, ok: boolean): LiveSta
   if (error === "CREATOR_ONLY" || error === "UNAUTHENTICATED") return "creator";
   if (error === "LIVE_NOT_CONFIGURED") return "config";
   if (error === "NOT_IN_CIRCLE") return "circle";
+  if (error === "PARENT_REQUIRED") return "parent";
+  if (error === "MINOR_NO_LIVE") return "minorLive";
   return "failed";
 }
 

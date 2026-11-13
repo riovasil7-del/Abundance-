@@ -8,6 +8,7 @@ import { jsonError } from "@/server/http";
 import { recordDonation } from "@/server/ledger";
 import { financialDenial } from "@/server/money";
 import { createCharge } from "@/server/payments";
+import { giftReceiveDecision } from "@/server/age-gate";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { familyBody } from "@/server/validators";
@@ -25,10 +26,11 @@ export async function POST(request: Request) {
 
   const creator = await db.creatorProfile.findUnique({
     where: { id: parsed.data.creatorId },
-    include: { user: { select: { adultAttestedAt: true } } },
+    include: { user: { select: { adultAttestedAt: true, minorDeclaredAt: true } } },
   });
   if (!creator) return jsonError(404, "NOT_FOUND");
-  if (!creator.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
+  const recipient = giftReceiveDecision(creator.user);
+  if (recipient !== "OK") return jsonError(403, recipient === "MINOR_NO_GIFTS" ? "MINOR_NO_GIFTS" : "CREATOR_AGE_REQUIRED");
   if (user.creatorProfile?.id === creator.id) return jsonError(400, "SELF_GIFT");
 
   const existing = await db.familyMembership.findUnique({

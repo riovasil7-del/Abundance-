@@ -12,6 +12,8 @@ test("every go-live failure has its own message, including a thrown request", ()
   assert.equal(liveStartNotice("UNAUTHENTICATED", false), "creator");
   assert.equal(liveStartNotice("LIVE_NOT_CONFIGURED", false), "config");
   assert.equal(liveStartNotice("NOT_IN_CIRCLE", false), "circle");
+  assert.equal(liveStartNotice("PARENT_REQUIRED", false), "parent");
+  assert.equal(liveStartNotice("MINOR_NO_LIVE", false), "minorLive");
   assert.equal(liveStartNotice(undefined, false), "failed");
   assert.equal(liveStartNotice("SERVER", false), "failed");
 });
