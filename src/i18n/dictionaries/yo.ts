@@ -208,7 +208,7 @@ const yo: Messages = {
     failed: "Àsopọ̀ kò ṣí. Gbìyànjú ohùn nìkan, tàbí tún gbìyànjú.",
     ended: "Ìgbóhùn yìí ti parí.", listTitle: "Ta ni ó wà lọ́wọ́lọ́wọ́",
     reconnecting: "Yàrá ń tun sopọ̀. Ẹ̀bùn tí a ti rán kì í lọ lẹ́ẹ̀mejì.",
-    cameraNeed: "Kámẹ́rà tàbí gbohùngbohùn kò sí. O lè dúró pẹ̀lú ohùn nìkan.",
+    cameraNeed: "Kámẹ́rà tàbí gbohùngbohùn kò sí. O lè dúró pẹ̀lú ohùn nìkan.", quality: "Àwòrán", qualityAuto: "Auto", qualityHigh: "Gíga", qualityLow: "Kékeré",
     excludeMine: "Fi pamọ́ kúrò ní ìjíròrò mi", reportMod: "Jábọ̀ fún alábòójútó", removeEveryone: "Yọ kúrò fún gbogbo ènìyàn", removedAll: "Ènìyàn yìí kò lè kọ mọ́ níbí.", chatMuted: "O kò lè kọ mọ́ níbí.", joined: "{name} ti darapọ̀", giftLine: "{name} · {gift}", translate: "Túmọ̀", chatPause: "Dá ọ̀rọ̀ dúró",
     chatResume: "Fi ọ̀rọ̀ tuntun hàn",
   },

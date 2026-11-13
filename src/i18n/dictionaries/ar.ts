@@ -208,7 +208,7 @@ const ar: Messages = {
     failed: "لم يُفتح الاتصال. جرّب الصوت فقط، أو أعد المحاولة.",
     ended: "انتهى هذا البث.", listTitle: "من هو مباشر الآن",
     reconnecting: "الغرفة تعيد الاتصال. العطية التي أُرسلت لا تُرسل مرة ثانية.",
-    cameraNeed: "الكاميرا أو الميكروفون غير شغّال. يمكنك البقاء مع الصوت.",
+    cameraNeed: "الكاميرا أو الميكروفون غير شغّال. يمكنك البقاء مع الصوت.", quality: "الصورة", qualityAuto: "Auto", qualityHigh: "عالية", qualityLow: "منخفضة",
     excludeMine: "أخفِه من محادثتي", reportMod: "أبلغ المشرف", removeEveryone: "أزلها للجميع", removedAll: "هذا الشخص لم يعد يكتب هنا.", chatMuted: "لم يعد بإمكانك الكتابة هنا.", joined: "انضم {name}", giftLine: "{name} · {gift}", translate: "ترجم", chatPause: "أوقف الحديث",
     chatResume: "أظهر الكلمات الجديدة",
   },

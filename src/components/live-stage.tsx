@@ -1,9 +1,20 @@
 "use client";
 
 import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useConnectionState, useParticipants, useRoomContext, useTracks } from "@livekit/components-react";
-import { ConnectionState, RoomEvent, Track, type RoomOptions } from "livekit-client";
+import { ConnectionState, RoomEvent, Track, VideoPreset, VideoQuality, type RoomOptions } from "livekit-client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import {
+  LIVE_BACKUP_CODEC,
+  LIVE_CAPTURE,
+  LIVE_CODEC,
+  LIVE_HIGH_ENCODING,
+  LIVE_SIMULCAST,
+  lowDataActive,
+  networkSavesData,
+  viewerQualityPlan,
+  type ViewerQuality,
+} from "@/lib/live-video";
 import { remoteVideoSubscribed } from "@/lib/low-data";
 import { formatMoney } from "@/lib/format";
 import { capTail } from "@/lib/gift-guard";
@@ -16,10 +27,27 @@ import { CollabPanel } from "./collab-panel";
 import { LiveChatPanel } from "./live-chat-panel";
 import { Sheet } from "./sheet";
 
+const captureResolution = {
+  width: LIVE_CAPTURE.width,
+  height: LIVE_CAPTURE.height,
+  frameRate: LIVE_CAPTURE.frameRate,
+  aspectRatio: LIVE_CAPTURE.width / LIVE_CAPTURE.height,
+};
+
 const roomOptions: RoomOptions = {
-  adaptiveStream: true,
+  adaptiveStream: { pixelDensity: "screen" },
   dynacast: true,
-  publishDefaults: { simulcast: true },
+  videoCaptureDefaults: { resolution: captureResolution },
+  publishDefaults: {
+    simulcast: true,
+    videoCodec: LIVE_CODEC,
+    backupCodec: { codec: LIVE_BACKUP_CODEC },
+    degradationPreference: "maintain-resolution",
+    videoEncoding: { maxBitrate: LIVE_HIGH_ENCODING.maxBitrate, maxFramerate: LIVE_HIGH_ENCODING.maxFramerate },
+    videoSimulcastLayers: LIVE_SIMULCAST.map(
+      (layer) => new VideoPreset(layer.width, layer.height, layer.maxBitrate, layer.maxFramerate),
+    ),
+  },
 };
 
 type ChatLine = { id: string; author: string; authorId: string; body: string };
@@ -48,6 +76,7 @@ export function LiveStage({
   gifts,
   initialBlessingNetCents,
   initialLightBalance,
+  userLowData = false,
   onEnded,
   onError,
 }: {
@@ -64,6 +93,7 @@ export function LiveStage({
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
   initialLightBalance: number;
+  userLowData?: boolean;
   onEnded: () => void;
   onError: () => void;
 }) {
@@ -90,6 +120,7 @@ export function LiveStage({
         gifts={gifts}
         initialBlessingNetCents={initialBlessingNetCents}
         initialLightBalance={initialLightBalance}
+        userLowData={userLowData}
         onEnded={onEnded}
       />
     </LiveKitRoom>
@@ -108,6 +139,7 @@ function Broadcast({
   gifts,
   initialBlessingNetCents,
   initialLightBalance,
+  userLowData,
   onEnded,
 }: {
   canPublish: boolean;
@@ -121,6 +153,7 @@ function Broadcast({
   gifts: GiftChoice[];
   initialBlessingNetCents: number;
   initialLightBalance: number;
+  userLowData: boolean;
   onEnded: () => void;
 }) {
   const { locale, messages: m } = useI18n();
@@ -128,6 +161,8 @@ function Broadcast({
   const people = useParticipants();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
   const [audioOnly, setAudioOnly] = useState(false);
+  const [quality, setQuality] = useState<ViewerQuality>("auto");
+  const [networkSaver, setNetworkSaver] = useState(false);
   const [cameraOn, setCameraOn] = useState(canPublish);
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [muted, setMuted] = useState(false);
@@ -293,13 +328,33 @@ function Broadcast({
     };
     room.on(RoomEvent.TrackPublished, onPublished);
     if (canPublish) {
-      room.localParticipant.setCameraEnabled(cameraOn && subscribe, { facingMode: facing }).catch(() => setMediaNote(m.live.cameraNeed));
+      room.localParticipant.setCameraEnabled(cameraOn && subscribe, { facingMode: facing, resolution: captureResolution }).catch(() => setMediaNote(m.live.cameraNeed));
       room.localParticipant.setMicrophoneEnabled(!muted).catch(() => setMediaNote(m.live.cameraNeed));
     }
     return () => {
       room.off(RoomEvent.TrackPublished, onPublished);
     };
   }, [audioOnly, cameraOn, canPublish, facing, muted, room, m.live.cameraNeed]);
+
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string; addEventListener?: (type: string, listener: () => void) => void; removeEventListener?: (type: string, listener: () => void) => void } }).connection;
+    const read = () => setNetworkSaver(networkSavesData({ saveData: connection?.saveData, effectiveType: connection?.effectiveType }));
+    read();
+    connection?.addEventListener?.("change", read);
+    return () => connection?.removeEventListener?.("change", read);
+  }, []);
+
+  const qualityPlan = viewerQualityPlan(quality, lowDataActive({ userEnabled: userLowData, saveData: networkSaver }));
+  useEffect(() => {
+    room.remoteParticipants.forEach((participant) => {
+      participant.trackPublications.forEach((publication) => {
+        if (publication.kind !== Track.Kind.Video) return;
+        if (qualityPlan === "low") publication.setVideoQuality(VideoQuality.LOW);
+        else if (qualityPlan === "high") publication.setVideoDimensions({ width: LIVE_CAPTURE.width, height: LIVE_CAPTURE.height });
+        else publication.setVideoQuality(VideoQuality.HIGH);
+      });
+    });
+  }, [qualityPlan, room, tracks]);
 
   async function sendHeart() {
     const now = Date.now();
@@ -520,9 +575,18 @@ function Broadcast({
             </button>
           </>
         ) : (
-          <button type="button" onClick={() => setAudioOnly((value) => !value)}>
-            ♪<span>{audioOnly ? m.live.camera : m.live.audioOnly}</span>
-          </button>
+          <>
+            <div className="live-quality" role="group" aria-label={m.live.quality}>
+              {(["auto", "high", "low"] as const).map((item) => (
+                <button key={item} type="button" className={quality === item ? "on" : ""} aria-pressed={quality === item} onClick={() => setQuality(item)}>
+                  {item === "auto" ? m.live.qualityAuto : item === "high" ? m.live.qualityHigh : m.live.qualityLow}
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setAudioOnly((value) => !value)}>
+              ♪<span>{audioOnly ? m.live.camera : m.live.audioOnly}</span>
+            </button>
+          </>
         )}
         {isHost ? (
           <button

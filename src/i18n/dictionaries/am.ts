@@ -211,7 +211,7 @@ const am: Messages = {
     failed: "ግንኙነቱ አልተከፈተም። ድምፅ ብቻ ሞክር፣ ወይም እንደገና ሞክር።",
     ended: "ይህ ስርጭት አልቋል።", listTitle: "አሁን ማን በቀጥታ ነው",
     reconnecting: "ክፍሉ እንደገና ይገናኛል። የተላከ ስጦታ ዳግም አይላክም።",
-    cameraNeed: "ካሜራ ወይም ማይክ አልበራም። በድምጽ ብቻ መቆየት ትችላለህ።",
+    cameraNeed: "ካሜራ ወይም ማይክ አልበራም። በድምጽ ብቻ መቆየት ትችላለህ።", quality: "ምስል", qualityAuto: "Auto", qualityHigh: "ከፍተኛ", qualityLow: "ዝቅተኛ",
     excludeMine: "ከውይይቴ ደብቅ", reportMod: "ለመቆጣጠሪያ ጥቀስ", removeEveryone: "ከሁሉም አውጣ", removedAll: "ይህ ሰው እዚህ አይጽፍም።", chatMuted: "እዚህ መጻፍ አትችልም።", joined: "{name} ተቀላቅሏል", giftLine: "{name} · {gift}", translate: "ተርጉም", chatPause: "ውይይቱን አቁም",
     chatResume: "አዲስ ቃላት አሳይ",
   },

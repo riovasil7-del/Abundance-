@@ -292,7 +292,7 @@ const cs: Messages = {
     ended: "Toto vysílání skončilo.",
     listTitle: "Kdo je teď živě",
     reconnecting: "Místnost se znovu připojuje. Už poslaný dar se nepošle podruhé.",
-    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.",
+    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.", quality: "Obraz", qualityAuto: "Auto", qualityHigh: "Vysoká", qualityLow: "Nízká",
     excludeMine: "Skrýt z mého chatu", reportMod: "Nahlásit moderátorovi", removeEveryone: "Odebrat z chatu pro všechny", removedAll: "Tato osoba už zde nepíše.", chatMuted: "Zde už nemůžete psát.", joined: "{name} se připojil", giftLine: "{name} · {gift}", translate: "Přeložit", chatPause: "Pozastavit rozhovor",
     chatResume: "Ukazovat nová slova",
   },

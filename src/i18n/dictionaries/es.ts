@@ -208,7 +208,7 @@ const es: Messages = {
     failed: "La conexión no se abrió. Prueba solo el sonido, o inténtalo de nuevo.",
     ended: "Esta emisión terminó.", listTitle: "Quién está en directo",
     reconnecting: "La sala se vuelve a conectar. Un don ya enviado no se envía otra vez.",
-    cameraNeed: "La cámara o el micrófono no están. Puedes quedarte solo con el audio.",
+    cameraNeed: "La cámara o el micrófono no están. Puedes quedarte solo con el audio.", quality: "Imagen", qualityAuto: "Auto", qualityHigh: "Alta", qualityLow: "Baja",
     excludeMine: "Quitar de mi chat", reportMod: "Avisar a un moderador", removeEveryone: "Quitar del chat para todos", removedAll: "Esta persona ya no escribe aquí.", chatMuted: "Ya no puedes escribir aquí.", joined: "{name} se unió", giftLine: "{name} · {gift}", translate: "Traducir", chatPause: "Pausar la conversación",
     chatResume: "Mostrar palabras nuevas",
   },

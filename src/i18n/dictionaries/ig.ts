@@ -208,7 +208,7 @@ const ig: Messages = {
     failed: "Njikọ emeghị. Nwaa ụda naanị, ma ọ bụ nwaa ọzọ.",
     ended: "Mgbasa a agwụla.", listTitle: "Onye nọ ozugbo ugbu a",
     reconnecting: "Ime ụlọ na-ejikọta ọzọ. Onyinye e zigalarị anaghị aga ọzọ.",
-    cameraNeed: "Igwefoto ma ọ bụ igwe okwu adịghị. Ị nwere ike ịnọ na ụda.",
+    cameraNeed: "Igwefoto ma ọ bụ igwe okwu adịghị. Ị nwere ike ịnọ na ụda.", quality: "Onyonyo", qualityAuto: "Auto", qualityHigh: "Elu", qualityLow: "Ala",
     excludeMine: "Zochie na mkparịta ụka m", reportMod: "Kọọrọ onye nlekọta", removeEveryone: "Wepụ maka onye ọ bụla", removedAll: "Onye a anaghịzi ede ebe a.", chatMuted: "Ị nweghịzi ike ide ebe a.", joined: "{name} abanyela", giftLine: "{name} · {gift}", translate: "Tụgharịa", chatPause: "Kwụsị mkparịta ụka",
     chatResume: "Gosi okwu ọhụrụ",
   },

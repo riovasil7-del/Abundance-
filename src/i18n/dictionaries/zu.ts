@@ -208,7 +208,7 @@ const zu: Messages = {
     failed: "Uxhumano aluvulekanga. Zama umsindo kuphela, noma zama futhi.",
     ended: "Loku kusakaza kuphelile.", listTitle: "Ubani okhoma manje",
     reconnecting: "Igumbi liyaxhuma futhi. Isipho esesithunyelwe asiphindi.",
-    cameraNeed: "Ikhamera noma imakrofoni ayivuliwe. Ungahlala nomsindo kuphela.",
+    cameraNeed: "Ikhamera noma imakrofoni ayivuliwe. Ungahlala nomsindo kuphela.", quality: "Isithombe", qualityAuto: "Auto", qualityHigh: "Phezulu", qualityLow: "Phansi",
     excludeMine: "Fihla engxoxweni yami", reportMod: "Bika kumqondisi", removeEveryone: "Susa kuwo wonke umuntu", removedAll: "Lo muntu akasabhali lapha.", chatMuted: "Awusakwazi ukubhala lapha.", joined: "{name} ujoyinile", giftLine: "{name} · {gift}", translate: "Humusha", chatPause: "Misa ingxoxo",
     chatResume: "Bonisa amagama amasha",
   },

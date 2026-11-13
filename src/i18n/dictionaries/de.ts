@@ -208,7 +208,7 @@ const de: Messages = {
     failed: "Die Verbindung kam nicht zustande. Versuch nur Ton, oder versuch es noch einmal.",
     ended: "Diese Sendung ist zu Ende.", listTitle: "Wer gerade live ist",
     reconnecting: "Der Raum verbindet sich neu. Eine schon gesendete Gabe geht nicht noch einmal.",
-    cameraNeed: "Kamera oder Mikrofon sind aus. Du kannst beim Ton bleiben.",
+    cameraNeed: "Kamera oder Mikrofon sind aus. Du kannst beim Ton bleiben.", quality: "Bild", qualityAuto: "Auto", qualityHigh: "Hoch", qualityLow: "Niedrig",
     excludeMine: "Aus meinem Chat ausblenden", reportMod: "Einer Moderation melden", removeEveryone: "Für alle aus dem Raumchat entfernen", removedAll: "Diese Person schreibt hier nicht mehr.", chatMuted: "Sie können hier nicht mehr schreiben.", joined: "{name} ist dazugekommen", giftLine: "{name} · {gift}", translate: "Übersetzen", chatPause: "Gespräch anhalten",
     chatResume: "Neue Worte zeigen",
   },
