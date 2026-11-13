@@ -211,6 +211,12 @@ const zu: Messages = {
     cameraNeed: "Ikhamera noma imakrofoni ayivuliwe. Ungahlala nomsindo kuphela.", ageFirst: "Qala ngokuqinisekisa 18+ ngaphansi kukaMina. Akukho ukuhlolwa kweminyaka.", needCreator: "Lowo wabelanayo kuphela ongakwazi ukusakaza.", allowMedia: "Vumela ikhamera nomakhrofoni kusiphequluli, bese uzama futhi.", startFailed: "Ukusakaza akuqalanga. Zama futhi.", enableMedia: "Vula ikhamera nomakhrofoni", circleOnly: "Amacembu alo mbuthano kuphela angakwazi ukusakaza lapha.", quality: "Isithombe", qualityAuto: "Auto", qualityHigh: "Phezulu", qualityLow: "Phansi",
     excludeMine: "Fihla engxoxweni yami", reportMod: "Bika kumqondisi", removeEveryone: "Susa kuwo wonke umuntu", removedAll: "Lo muntu akasabhali lapha.", chatMuted: "Awusakwazi ukubhala lapha.", joined: "{name} ujoyinile", giftLine: "{name} · {gift}", translate: "Humusha", chatPause: "Misa ingxoxo",
     chatResume: "Bonisa amagama amasha",
+    writeLove: "Bhala ngothando…",
+    sharedWork: "Umsebenzi ohlanganyelwe",
+    sentGift: "{name} uthumele {gift} ✨",
+    welcomeJoin: "{name} ujoyine · Wamukelekile",
+    share: "Yabelana",
+    badge: "LIVE",
   },
   bond: {
     follow: "Landela",
@@ -309,6 +315,9 @@ const zu: Messages = {
   me: {
     title: "I-akhawunti yakho", role: "Indima",
     oneAccount: "Umuntu oyedwa, i-akhawunti eyodwa. Ukuqinisekisa ubuwena kuzofika kamuva.",
+    themeLabel: "Ukubukeka",
+    themePearl: "Ilulu",
+    themeDiamond: "Idayimane elimnyama",
     family: "Imindeni oyinxenye yayo", none: "Awukabi wumndeni wanyanga zonke wanoma ubani.",
     blockedTitle: "Abafihliwe",
     blockedEmpty: "Awukafihli muntu.",

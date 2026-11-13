@@ -211,6 +211,12 @@ const pt: Messages = {
     cameraNeed: "A câmara ou o microfone não estão ligados. Podes ficar só com o som.", ageFirst: "Primeiro confirme 18+ em Eu. Não é uma verificação de idade.", needCreator: "Só quem partilha pode emitir.", allowMedia: "Permita a câmara e o microfone no navegador e tente de novo.", startFailed: "A emissão não começou. Tente de novo.", enableMedia: "Ligar câmara e microfone", circleOnly: "Só os membros deste círculo podem emitir aqui.", quality: "Imagem", qualityAuto: "Auto", qualityHigh: "Alta", qualityLow: "Baixa",
     excludeMine: "Tirar do meu chat", reportMod: "Avisar um moderador", removeEveryone: "Tirar do chat para todos", removedAll: "Esta pessoa já não escreve aqui.", chatMuted: "Já não pode escrever aqui.", joined: "{name} entrou", giftLine: "{name} · {gift}", translate: "Traduzir", chatPause: "Pausar a conversa",
     chatResume: "Mostrar palavras novas",
+    writeLove: "Escreve com amor…",
+    sharedWork: "Obra comum",
+    sentGift: "{name} enviou {gift} ✨",
+    welcomeJoin: "{name} entrou · Bem-vindo",
+    share: "Partilhar",
+    badge: "LIVE",
   },
   bond: {
     follow: "Seguir",
@@ -309,6 +315,9 @@ const pt: Messages = {
   me: {
     title: "A tua conta", role: "Papel",
     oneAccount: "Uma pessoa, uma conta. Mais tarde junta-se uma verificação de identidade.",
+    themeLabel: "Aspeto",
+    themePearl: "Pérola",
+    themeDiamond: "Diamante negro",
     family: "Famílias de que fazes parte", none: "Ainda não és família mensal de ninguém.",
     blockedTitle: "Ocultos do chat",
     blockedEmpty: "Não excluiu ninguém.",

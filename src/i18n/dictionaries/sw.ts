@@ -214,6 +214,12 @@ const sw: Messages = {
     cameraNeed: "Kamera au maikrofoni haipo. Unaweza kubaki na sauti tu.", ageFirst: "Kwanza thibitisha 18+ chini ya Mimi. Si ukaguzi wa umri.", needCreator: "Anayeshiriki pekee ndiye anayeweza kutangaza.", allowMedia: "Ruhusu kamera na kipaza sauti kwenye kivinjari, kisha jaribu tena.", startFailed: "Matangazo hayajaanza. Jaribu tena.", enableMedia: "Washa kamera na kipaza sauti", circleOnly: "Ni wanachama wa duara hili pekee wanaoweza kutangaza hapa.", quality: "Picha", qualityAuto: "Auto", qualityHigh: "Juu", qualityLow: "Chini",
     excludeMine: "Ficha kwenye mazungumzo yangu", reportMod: "Ripoti kwa msimamizi", removeEveryone: "Ondoa kwa wote", removedAll: "Mtu huyu haandiki tena hapa.", chatMuted: "Huwezi kuandika tena hapa.", joined: "{name} amejiunga", giftLine: "{name} · {gift}", translate: "Tafsiri", chatPause: "Simamisha mazungumzo",
     chatResume: "Onyesha maneno mapya",
+    writeLove: "Andika kwa upendo…",
+    sharedWork: "Kazi ya pamoja",
+    sentGift: "{name} ametuma {gift} ✨",
+    welcomeJoin: "{name} amejiunga · Karibu",
+    share: "Shiriki",
+    badge: "LIVE",
   },
   bond: {
     follow: "Fuata",
@@ -312,6 +318,9 @@ const sw: Messages = {
   me: {
     title: "Akaunti yako", role: "Wajibu",
     oneAccount: "Mtu mmoja, akaunti moja. Uthibitisho wa utambulisho utakuja baadaye.",
+    themeLabel: "Muonekano",
+    themePearl: "Lulu",
+    themeDiamond: "Almasi jeusi",
     family: "Familia unazoshiriki", none: "Bado huja kuwa familia ya mwezi ya mtu.",
     blockedTitle: "Waliofichwa",
     blockedEmpty: "Hujamficha mtu.",

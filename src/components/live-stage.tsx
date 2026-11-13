@@ -70,6 +70,8 @@ export function LiveStage({
   sessionId,
   hostName,
   hostAvatar,
+  hostUserId,
+  title,
   isHost,
   canModerate,
   translateEnabled,
@@ -87,6 +89,8 @@ export function LiveStage({
   sessionId: string;
   hostName: string;
   hostAvatar: string;
+  hostUserId: string;
+  title: string;
   isHost: boolean;
   canModerate: boolean;
   translateEnabled: boolean;
@@ -114,6 +118,8 @@ export function LiveStage({
         sessionId={sessionId}
         hostName={hostName}
         hostAvatar={hostAvatar}
+        hostUserId={hostUserId}
+        title={title}
         isHost={isHost}
         canModerate={canModerate}
         translateEnabled={translateEnabled}
@@ -133,6 +139,8 @@ function Broadcast({
   sessionId,
   hostName,
   hostAvatar,
+  hostUserId,
+  title,
   isHost,
   canModerate,
   translateEnabled,
@@ -147,6 +155,8 @@ function Broadcast({
   sessionId: string;
   hostName: string;
   hostAvatar: string;
+  hostUserId: string;
+  title: string;
   isHost: boolean;
   canModerate: boolean;
   translateEnabled: boolean;
@@ -164,6 +174,7 @@ function Broadcast({
   const [audioOnly, setAudioOnly] = useState(false);
   const [quality, setQuality] = useState<ViewerQuality>("auto");
   const [networkSaver, setNetworkSaver] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const [cameraOn, setCameraOn] = useState(canPublish);
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const [muted, setMuted] = useState(false);
@@ -219,11 +230,9 @@ function Broadcast({
     window.setTimeout(() => {
       setBursts((current) => current.filter((item) => item.id !== event.id));
     }, 2800);
-    if (isHost) {
-      const who = event.donorName || m.common.anonymous;
-      setThanks(`${m.live.thanks} ${who}`);
-      window.setTimeout(() => setThanks(null), 3200);
-    }
+    const who = event.donorName || m.common.anonymous;
+    setThanks(m.live.sentGift.replace("{name}", who).replace("{gift}", event.name || event.symbol));
+    window.setTimeout(() => setThanks(null), 3200);
     void fetch(`/api/live/sessions/${sessionId}/messages`)
       .then(async (response) => {
         if (!response.ok) return null;
@@ -283,7 +292,7 @@ function Broadcast({
     return () => {
       room.off(RoomEvent.DataReceived, onData);
     };
-  }, [room, blocked, isHost, m.common.anonymous, m.live.thanks]);
+  }, [room, blocked, m.common.anonymous, m.live.sentGift]);
 
   useEffect(() => {
     let stop = false;
@@ -354,6 +363,15 @@ function Broadcast({
     return () => connection?.removeEventListener?.("change", read);
   }, []);
 
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const read = () => setReduceMotion(media.matches);
+    read();
+    media.addEventListener("change", read);
+    return () => media.removeEventListener("change", read);
+  }, []);
+
+  const effectsOff = userLowData || networkSaver || reduceMotion;
   const qualityPlan = viewerQualityPlan(quality, lowDataActive({ userEnabled: userLowData, saveData: networkSaver }));
   useEffect(() => {
     room.remoteParticipants.forEach((participant) => {
@@ -474,8 +492,17 @@ function Broadcast({
 
   const visibleChat = messages.filter((message) => !blocked.includes(message.authorId)).slice(-6);
 
+  async function shareRoom() {
+    const url = window.location.href;
+    if (navigator.share) {
+      await navigator.share({ title: hostName, url }).catch(() => undefined);
+      return;
+    }
+    await navigator.clipboard?.writeText(url).catch(() => undefined);
+  }
+
   return (
-    <div className="live-fill" data-screen="live-room">
+    <div className="live-fill" data-screen="live-room" data-effects={effectsOff ? "off" : "on"}>
       {audioOnly || tracks.length === 0 ? (
         <div className="live-audio-only">
           <span aria-hidden="true">{audioOnly ? "♪" : "…"}</span>
@@ -499,16 +526,30 @@ function Broadcast({
         <Link className="live-back" href="/live">
           {m.common.back}
         </Link>
-        <img src={hostAvatar} alt="" />
-        <div>
-          <strong>{hostName}</strong>
-          <div>
-            {people.length} {m.live.viewers}
-          </div>
+        <div className="creator-pill">
+          <span className="halo">
+            <img src={hostAvatar} alt="" />
+          </span>
+          <span className="creator-id">
+            <strong>{hostName}</strong>
+            <span className="live-badge">{m.live.badge}</span>
+          </span>
+          <LiveFollow hostUserId={hostUserId} loggedIn={loggedIn} isHost={isHost} />
+          <span className="viewer-stack" aria-label={`${people.length} ${m.live.viewers}`}>
+            {people.slice(0, 3).map((person) => (
+              <span className="viewer-dot" key={person.identity}>
+                {(person.name || person.identity || "?").slice(0, 1)}
+              </span>
+            ))}
+            <span className="viewer-count">{new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(people.length)}</span>
+          </span>
         </div>
-        <div className="live-total">
-          <span>{m.live.blessings}</span>
-          <strong>{formatMoney(blessingNet, locale)}</strong>
+        <div className="goal-capsule">
+          <span className="goal-fill" aria-hidden="true" />
+          <strong>
+            {m.live.sharedWork} · {title}
+          </strong>
+          <span className="goal-amount">{formatMoney(blessingNet, locale)}</span>
         </div>
       </div>
 
@@ -525,33 +566,50 @@ function Broadcast({
       {thanks ? <div className="live-thanks">{thanks}</div> : null}
       {bursts.map((burst) => (
         <div className="gift-burst" key={burst.id}>
+          <i className="bloom" />
+          <i className="spark s1" />
+          <i className="spark s2" />
+          <i className="spark s3" />
           <span>{burst.symbol}</span>
           <strong>{burst.name}</strong>
           <em>{burst.donorName || m.common.anonymous}</em>
         </div>
       ))}
       {hearts.map((heart) => (
-        <span className="heart-float" key={heart.id} style={{ right: heart.x }}>
-          ♥
+        <span className="heart-float" key={heart.id} style={{ right: heart.x, ["--dx" as string]: `${(heart.x % 48) - 24}px` }}>
+          <svg className="heart-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z" />
+          </svg>
+          <i className="gem-heart" />
         </span>
       ))}
 
-      <LiveChatPanel sessionId={sessionId} loggedIn={loggedIn} canModerate={canModerate} translateEnabled={translateEnabled} />
+      <div className="live-dock">
+        <LiveChatPanel sessionId={sessionId} loggedIn={loggedIn} canModerate={canModerate} translateEnabled={translateEnabled} />
+        <div className="live-rounds">
+          <button type="button" className="live-round" aria-label={m.live.heart} onClick={() => void sendHeart()}>
+            ♥
+          </button>
+          <Link className="live-round" href="/ideas" aria-label={m.nav.ideas}>
+            ⌁
+          </Link>
+          {loggedIn ? (
+            <button type="button" className="live-round" aria-label={m.bond.cohosts} onClick={() => setCollabOpen(true)}>
+              ☺
+            </button>
+          ) : null}
+          {loggedIn && !isHost ? (
+            <button type="button" className="live-round" aria-label={m.live.gift} onClick={() => { setReceipt(null); setGiftOpen(true); }}>
+              ✦
+            </button>
+          ) : null}
+          <button type="button" className="live-round" aria-label={m.live.share} onClick={() => void shareRoom()}>
+            ↑
+          </button>
+        </div>
+      </div>
 
-      <div className="live-rail">
-        <button type="button" aria-label={m.live.heart} onClick={() => void sendHeart()}>
-          ♥<span>{m.live.heart}</span>
-        </button>
-        {loggedIn ? (
-          <button type="button" onClick={() => setCollabOpen(true)}>
-            +<span>{m.bond.cohosts}</span>
-          </button>
-        ) : null}
-        {loggedIn && !isHost ? (
-          <button type="button" onClick={() => { setReceipt(null); setGiftOpen(true); }}>
-            ✦<span>{m.live.gift}</span>
-          </button>
-        ) : null}
+      <div className="live-host-tools">
         {canPublish ? (
           <>
             <button
@@ -688,5 +746,44 @@ function Broadcast({
         </Sheet>
       ) : null}
     </div>
+  );
+}
+
+function LiveFollow({ hostUserId, loggedIn, isHost }: { hostUserId: string; loggedIn: boolean; isHost: boolean }) {
+  const { messages: m } = useI18n();
+  const [following, setFollowing] = useState(false);
+
+  useEffect(() => {
+    if (!loggedIn || isHost) return;
+    let stop = false;
+    fetch("/api/follows")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { following?: { userId: string }[] } | null) => {
+        if (stop || !data?.following) return;
+        setFollowing(data.following.some((row) => row.userId === hostUserId));
+      })
+      .catch(() => undefined);
+    return () => {
+      stop = true;
+    };
+  }, [hostUserId, isHost, loggedIn]);
+
+  if (!loggedIn || isHost) return null;
+
+  async function toggle() {
+    const response = following
+      ? await fetch(`/api/follows?creatorUserId=${encodeURIComponent(hostUserId)}`, { method: "DELETE" })
+      : await fetch("/api/follows", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ creatorUserId: hostUserId }),
+        });
+    if (response.ok) setFollowing((value) => !value);
+  }
+
+  return (
+    <button type="button" className="follow-compact" onClick={() => void toggle()}>
+      {following ? m.bond.following : m.bond.follow}
+    </button>
   );
 }

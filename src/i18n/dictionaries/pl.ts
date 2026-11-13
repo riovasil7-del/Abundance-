@@ -211,6 +211,12 @@ const pl: Messages = {
     cameraNeed: "Kamera albo mikrofon są wyłączone. Możesz zostać przy samym dźwięku.", ageFirst: "Najpierw potwierdź 18+ w Ja. To nie jest sprawdzenie wieku.", needCreator: "Nadawać może tylko osoba, która się dzieli.", allowMedia: "Zezwól na kamerę i mikrofon w przeglądarce i spróbuj ponownie.", startFailed: "Transmisja się nie zaczęła. Spróbuj ponownie.", enableMedia: "Włącz kamerę i mikrofon", circleOnly: "W tym kręgu nadawać mogą tylko jego członkowie.", quality: "Obraz", qualityAuto: "Auto", qualityHigh: "Wysoka", qualityLow: "Niska",
     excludeMine: "Ukryj z mojego czatu", reportMod: "Zgłoś moderatorowi", removeEveryone: "Usuń z czatu dla wszystkich", removedAll: "Ta osoba już tu nie pisze.", chatMuted: "Nie możesz już tu pisać.", joined: "{name} dołączył", giftLine: "{name} · {gift}", translate: "Przetłumacz", chatPause: "Wstrzymaj rozmowę",
     chatResume: "Pokazuj nowe słowa",
+    writeLove: "Pisz z miłością…",
+    sharedWork: "Wspólne dzieło",
+    sentGift: "{name} posłał(a) {gift} ✨",
+    welcomeJoin: "{name} dołączył(a) · Witaj",
+    share: "Udostępnij",
+    badge: "LIVE",
   },
   bond: {
     follow: "Obserwuj",
@@ -309,6 +315,9 @@ const pl: Messages = {
   me: {
     title: "Twoje konto", role: "Rola",
     oneAccount: "Jeden człowiek, jedno konto. Później dojdzie sprawdzenie tożsamości.",
+    themeLabel: "Wygląd",
+    themePearl: "Perła",
+    themeDiamond: "Czarny diament",
     family: "Rodziny, do których należysz", none: "Nie jesteś jeszcze niczyją miesięczną rodziną.",
     blockedTitle: "Ukryci na czacie",
     blockedEmpty: "Nikogo nie wykluczyłeś.",

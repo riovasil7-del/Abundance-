@@ -211,6 +211,12 @@ const ar: Messages = {
     cameraNeed: "الكاميرا أو الميكروفون غير شغّال. يمكنك البقاء مع الصوت.", ageFirst: "أكّد أولاً 18+ في أنا. ليس فحص عمر.", needCreator: "فقط من يشارك يستطيع البث.", allowMedia: "اسمح بالكاميرا والميكروفون في المتصفح ثم أعد المحاولة.", startFailed: "لم يبدأ البث. حاول مرة أخرى.", enableMedia: "تشغيل الكاميرا والميكروفون", circleOnly: "فقط أعضاء هذه الحلقة يمكنهم البث هنا.", quality: "الصورة", qualityAuto: "Auto", qualityHigh: "عالية", qualityLow: "منخفضة",
     excludeMine: "أخفِه من محادثتي", reportMod: "أبلغ المشرف", removeEveryone: "أزلها للجميع", removedAll: "هذا الشخص لم يعد يكتب هنا.", chatMuted: "لم يعد بإمكانك الكتابة هنا.", joined: "انضم {name}", giftLine: "{name} · {gift}", translate: "ترجم", chatPause: "أوقف الحديث",
     chatResume: "أظهر الكلمات الجديدة",
+    writeLove: "اكتب بمحبة…",
+    sharedWork: "عمل مشترك",
+    sentGift: "{name} أرسل {gift} ✨",
+    welcomeJoin: "{name} انضم · أهلاً",
+    share: "مشاركة",
+    badge: "LIVE",
   },
   bond: {
     follow: "تابِع",
@@ -309,6 +315,9 @@ const ar: Messages = {
   me: {
     title: "حسابك", role: "الدور",
     oneAccount: "إنسان واحد، حساب واحد. التحقق من الهوية يأتي لاحقًا.",
+    themeLabel: "المظهر",
+    themePearl: "لؤلؤة",
+    themeDiamond: "ماس أسود",
     family: "أُسَر أنت منها", none: "لست بعد أسرة شهرية لأحد.",
     blockedTitle: "المخفيون",
     blockedEmpty: "لم تستبعد أحدًا.",

@@ -211,6 +211,12 @@ const ha: Messages = {
     cameraNeed: "Kyamara ko makirufo ba su kunne. Za ka iya zama da sauti kawai.", ageFirst: "Fara da tabbatar da 18+ a Ni. Ba tantancewar shekaru ba.", needCreator: "Mai rabawa kawai zai iya watsa shiri.", allowMedia: "Ka ba da izinin kyamara da makirufo a burauza, sannan ka sake gwadawa.", startFailed: "Watsa shiri bai fara ba. Sake gwadawa.", enableMedia: "Kunna kyamara da makirufo", circleOnly: "Membobin wannan da'irar kawai za su iya watsa shiri a nan.", quality: "Hoto", qualityAuto: "Auto", qualityHigh: "Babba", qualityLow: "Ƙarami",
     excludeMine: "Ɓoye daga hirana", reportMod: "Kai rahoto ga mai kula", removeEveryone: "Cire ga kowa", removedAll: "Wannan mutum ba ya rubutu a nan.", chatMuted: "Ba za ka iya rubutu a nan ba.", joined: "{name} ya shiga", giftLine: "{name} · {gift}", translate: "Fassara", chatPause: "Dakatar da hira",
     chatResume: "Nuna sababbin kalmomi",
+    writeLove: "Rubuta da ƙauna…",
+    sharedWork: "Aikin gama kai",
+    sentGift: "{name} ya aiko {gift} ✨",
+    welcomeJoin: "{name} ya shiga · Barka da zuwa",
+    share: "Raba",
+    badge: "LIVE",
   },
   bond: {
     follow: "Bi",
@@ -309,6 +315,9 @@ const ha: Messages = {
   me: {
     title: "Asusunka", role: "Matsayi",
     oneAccount: "Mutum ɗaya, asusu ɗaya. Tabbacin shaida zai zo daga baya.",
+    themeLabel: "Bayyanar",
+    themePearl: "Lu'u-lu'u",
+    themeDiamond: "Duya baƙi",
     family: "Iyalin da kake ciki", none: "Har yanzu ba ka zama iyali na wata-wata na kowa ba.",
     blockedTitle: "Boyayyu",
     blockedEmpty: "Baka kori kowa.",
