@@ -208,7 +208,7 @@ const ha: Messages = {
     failed: "Haɗin bai buɗe ba. Gwada sauti kawai, ko sake gwadawa.",
     ended: "Wannan watsa ya ƙare.", listTitle: "Wa yake kai tsaye yanzu",
     reconnecting: "Ɗaki yana sake haɗi. Kyautar da aka tura ba za ta sake tafiya ba.",
-    cameraNeed: "Kyamara ko makirufo ba su kunne. Za ka iya zama da sauti kawai.", ageFirst: "Fara da tabbatar da 18+ a Ni. Ba tantancewar shekaru ba.", needCreator: "Mai rabawa kawai zai iya watsa shiri.", allowMedia: "Ka ba da izinin kyamara da makirufo a burauza, sannan ka sake gwadawa.", startFailed: "Watsa shiri bai fara ba. Sake gwadawa.", enableMedia: "Kunna kyamara da makirufo", circleOnly: "Membobin wannan da'irar kawai za su iya watsa shiri a nan.",
+    cameraNeed: "Kyamara ko makirufo ba su kunne. Za ka iya zama da sauti kawai.", ageFirst: "Fara da tabbatar da 18+ a Ni. Ba tantancewar shekaru ba.", needCreator: "Mai rabawa kawai zai iya watsa shiri.", allowMedia: "Ka ba da izinin kyamara da makirufo a burauza, sannan ka sake gwadawa.", startFailed: "Watsa shiri bai fara ba. Sake gwadawa.", enableMedia: "Kunna kyamara da makirufo", circleOnly: "Membobin wannan da'irar kawai za su iya watsa shiri a nan.", quality: "Hoto", qualityAuto: "Auto", qualityHigh: "Babba", qualityLow: "Ƙarami",
     excludeMine: "Ɓoye daga hirana", reportMod: "Kai rahoto ga mai kula", removeEveryone: "Cire ga kowa", removedAll: "Wannan mutum ba ya rubutu a nan.", chatMuted: "Ba za ka iya rubutu a nan ba.", joined: "{name} ya shiga", giftLine: "{name} · {gift}", translate: "Fassara", chatPause: "Dakatar da hira",
     chatResume: "Nuna sababbin kalmomi",
   },

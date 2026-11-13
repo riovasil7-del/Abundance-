@@ -208,7 +208,7 @@ const fr: Messages = {
     failed: "La connexion n'a pas abouti. Essaie le son seul, ou réessaie.",
     ended: "Ce direct est terminé.", listTitle: "Qui est en direct",
     reconnecting: "La salle se reconnecte. Un don déjà envoyé ne part pas une deuxième fois.",
-    cameraNeed: "La caméra ou le micro est éteint. Vous pouvez rester au son.", ageFirst: "Confirmez d'abord 18+ dans Moi. Ce n'est pas une vérification d'âge.", needCreator: "Seule une personne qui partage peut émettre.", allowMedia: "Autorisez la caméra et le micro dans le navigateur, puis réessayez.", startFailed: "L'émission n'a pas démarré. Réessayez.", enableMedia: "Activer la caméra et le micro", circleOnly: "Seuls les membres de ce cercle peuvent émettre ici.",
+    cameraNeed: "La caméra ou le micro est éteint. Vous pouvez rester au son.", ageFirst: "Confirmez d'abord 18+ dans Moi. Ce n'est pas une vérification d'âge.", needCreator: "Seule une personne qui partage peut émettre.", allowMedia: "Autorisez la caméra et le micro dans le navigateur, puis réessayez.", startFailed: "L'émission n'a pas démarré. Réessayez.", enableMedia: "Activer la caméra et le micro", circleOnly: "Seuls les membres de ce cercle peuvent émettre ici.", quality: "Image", qualityAuto: "Auto", qualityHigh: "Haute", qualityLow: "Basse",
     excludeMine: "Retirer de mon chat", reportMod: "Signaler à un modérateur", removeEveryone: "Retirer du chat pour tout le monde", removedAll: "Cette personne n'écrit plus ici.", chatMuted: "Vous ne pouvez plus écrire ici.", joined: "{name} est arrivé", giftLine: "{name} · {gift}", translate: "Traduire", chatPause: "Pause de la conversation",
     chatResume: "Montrer les mots nouveaux",
   },

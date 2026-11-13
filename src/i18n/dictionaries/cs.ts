@@ -292,7 +292,7 @@ const cs: Messages = {
     ended: "Toto vysílání skončilo.",
     listTitle: "Kdo je teď živě",
     reconnecting: "Místnost se znovu připojuje. Už poslaný dar se nepošle podruhé.",
-    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.", ageFirst: "Nejprve potvrďte 18+ v části Já. Není to ověření věku.", needCreator: "Vysílat může jen tvůrce.", allowMedia: "Povolte kameru a mikrofon v prohlížeči a zkuste to znovu.", startFailed: "Vysílání se nepodařilo spustit, zkuste to znovu.", enableMedia: "Zapnout kameru a mikrofon", circleOnly: "V tomto kruhu mohou vysílat jen jeho členové.",
+    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.", ageFirst: "Nejprve potvrďte 18+ v části Já. Není to ověření věku.", needCreator: "Vysílat může jen tvůrce.", allowMedia: "Povolte kameru a mikrofon v prohlížeči a zkuste to znovu.", startFailed: "Vysílání se nepodařilo spustit, zkuste to znovu.", enableMedia: "Zapnout kameru a mikrofon", circleOnly: "V tomto kruhu mohou vysílat jen jeho členové.", quality: "Obraz", qualityAuto: "Auto", qualityHigh: "Vysoká", qualityLow: "Nízká",
     excludeMine: "Skrýt z mého chatu", reportMod: "Nahlásit moderátorovi", removeEveryone: "Odebrat z chatu pro všechny", removedAll: "Tato osoba už zde nepíše.", chatMuted: "Zde už nemůžete psát.", joined: "{name} se připojil", giftLine: "{name} · {gift}", translate: "Přeložit", chatPause: "Pozastavit rozhovor",
     chatResume: "Ukazovat nová slova",
   },

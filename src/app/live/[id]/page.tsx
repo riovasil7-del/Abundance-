@@ -53,6 +53,7 @@ export default async function LiveRoomPage({ params }: { params: Promise<{ id: s
       gifts={gifts}
       blessingNetCents={blessing._sum.netCents ?? 0}
       lightBalance={user ? await lightBalance(user.id) : 0}
+      userLowData={Boolean(user?.lowData)}
     />
   );
 }

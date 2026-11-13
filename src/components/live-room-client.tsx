@@ -33,6 +33,7 @@ export function LiveRoomClient({
   gifts,
   blessingNetCents,
   lightBalance,
+  userLowData = false,
 }: {
   sessionId: string;
   title: string;
@@ -46,6 +47,7 @@ export function LiveRoomClient({
   gifts: GiftChoice[];
   blessingNetCents: number;
   lightBalance: number;
+  userLowData?: boolean;
 }) {
   const { messages: m } = useI18n();
   const [connection, setConnection] = useState<{ url: string; token: string; canPublish: boolean } | null>(null);
@@ -119,6 +121,7 @@ export function LiveRoomClient({
           gifts={gifts}
           initialBlessingNetCents={blessingNetCents}
           initialLightBalance={lightBalance}
+          userLowData={userLowData}
           onEnded={() => setEnded(true)}
           onError={() => setConnectError(m.live.failed)}
         />

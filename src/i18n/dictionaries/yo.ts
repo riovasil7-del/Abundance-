@@ -208,7 +208,7 @@ const yo: Messages = {
     failed: "Àsopọ̀ kò ṣí. Gbìyànjú ohùn nìkan, tàbí tún gbìyànjú.",
     ended: "Ìgbóhùn yìí ti parí.", listTitle: "Ta ni ó wà lọ́wọ́lọ́wọ́",
     reconnecting: "Yàrá ń tun sopọ̀. Ẹ̀bùn tí a ti rán kì í lọ lẹ́ẹ̀mejì.",
-    cameraNeed: "Kámẹ́rà tàbí gbohùngbohùn kò sí. O lè dúró pẹ̀lú ohùn nìkan.", ageFirst: "Kọ́kọ́ jẹ́rìí 18+ lábẹ́ Èmi. Kì í ṣe àyẹ̀wò ọjọ́-orí.", needCreator: "Ẹni tó ń pín nìkan ló lè gbóhùn sóde.", allowMedia: "Fààyè gba kámẹ́rà àti gbohùngbohùn nínú aṣàwákiri, lẹ́yìn náà tún gbìyànjú.", startFailed: "Ìgbóhùnsáfẹ́fẹ́ kò bẹ̀rẹ̀. Tún gbìyànjú.", enableMedia: "Tan kámẹ́rà àti gbohùngbohùn", circleOnly: "Àwọn ọmọ ẹgbẹ́ yìí nìkan ló lè gbóhùn sóde níbí.",
+    cameraNeed: "Kámẹ́rà tàbí gbohùngbohùn kò sí. O lè dúró pẹ̀lú ohùn nìkan.", ageFirst: "Kọ́kọ́ jẹ́rìí 18+ lábẹ́ Èmi. Kì í ṣe àyẹ̀wò ọjọ́-orí.", needCreator: "Ẹni tó ń pín nìkan ló lè gbóhùn sóde.", allowMedia: "Fààyè gba kámẹ́rà àti gbohùngbohùn nínú aṣàwákiri, lẹ́yìn náà tún gbìyànjú.", startFailed: "Ìgbóhùnsáfẹ́fẹ́ kò bẹ̀rẹ̀. Tún gbìyànjú.", enableMedia: "Tan kámẹ́rà àti gbohùngbohùn", circleOnly: "Àwọn ọmọ ẹgbẹ́ yìí nìkan ló lè gbóhùn sóde níbí.", quality: "Àwòrán", qualityAuto: "Auto", qualityHigh: "Gíga", qualityLow: "Kékeré",
     excludeMine: "Fi pamọ́ kúrò ní ìjíròrò mi", reportMod: "Jábọ̀ fún alábòójútó", removeEveryone: "Yọ kúrò fún gbogbo ènìyàn", removedAll: "Ènìyàn yìí kò lè kọ mọ́ níbí.", chatMuted: "O kò lè kọ mọ́ níbí.", joined: "{name} ti darapọ̀", giftLine: "{name} · {gift}", translate: "Túmọ̀", chatPause: "Dá ọ̀rọ̀ dúró",
     chatResume: "Fi ọ̀rọ̀ tuntun hàn",
   },
