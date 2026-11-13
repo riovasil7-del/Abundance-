@@ -339,7 +339,7 @@ const yo: Messages = {
   terms: {
     title: "Òfin", link: "Òfin", agree: "Mo gba àwọn òfin",
     mustAgree: "Àkọọ́lẹ̀ ń wáyé lẹ́yìn ìfọwọ́sí.", need: "Kí o tó ṣe fídíò àkọ́kọ́ tàbí ìgbóhùnsáfẹ́fẹ́, gba òfin lọ́wọ́lọ́wọ́.", accept: "Mo gba àwọn òfin", saved: "A ti pamọ́ ìfọwọ́sí.",
-    lights: "Ìmọ́lẹ̀ kan jẹ́ kọbọ kan. O ra àpò ní dọ́là, o sì fi ìmọ́lẹ̀ ránṣẹ́. Apèsè ló ń yan iye.", split: "Ọgọ́rin àti márùn-ún nínú ọgọ́rùn-ún ẹ̀bùn kọ̀ọ̀kan lọ sí ẹni, márùn-ún dín lógún lọ sí Hojnosť fún ilé-iṣẹ́ àti àwọn apèsè. Pínpín náà ń ṣẹlẹ̀ lẹ́ẹ̀kan lórí apèsè.", fund: "Kànga àti búrẹ́dì kò lọ sí ẹni. Márùn-ún dín lógún dúró pẹ̀lú Hojnosť, ọgọ́rin àti márùn-ún lọ sí àpò àwùjọ fún omi tàbí oúnjẹ, tí a ń pè ní àpò àwùjọ (a ń palẹ̀mọ́). Kì í ṣe ìfijíṣẹ́.",
+    lights: "Ìmọ́lẹ̀ kan jẹ́ kọbọ kan. O ra àpò ní dọ́là, o sì fi ìmọ́lẹ̀ ránṣẹ́. Apèsè ló ń yan iye.", split: "Ọgọ́rin nínú ọgọ́rùn-ún ẹ̀bùn tuntun kọ̀ọ̀kan lọ sí ẹni, ogún lọ sí Hojnosť fún iṣẹ́, àwọn apèsè, owó ìsanwó àti ìtọ́jú. Ẹ̀bùn tí a ti kọ tẹ́lẹ̀ ń fi pínpín ọjọ́ yẹn pamọ́. Pínpín náà ń ṣẹlẹ̀ lẹ́ẹ̀kan lórí apèsè.", fund: "Kànga àti búrẹ́dì kò lọ sí ẹni. Ogún dúró pẹ̀lú Hojnosť, ọgọ́rin lọ sí àpò àwùjọ fún omi tàbí oúnjẹ, tí a ń pè ní àpò àwùjọ (a ń palẹ̀mọ́). Kì í ṣe ìfijíṣẹ́.",
     holds: "Nígbà tí àríyànjiyàn bá ṣí sílẹ̀ tàbí bàjẹ́, kò sí ẹni tó lè tú ìsanwó yẹn.", age: "Ẹni tó fẹ́ gbé jáde tàbí gba ẹ̀bùn ń sọ fún ara rẹ̀ pé ó ti pé ó kéré tán ọdún 18. Kì í ṣe ìdánimọ̀.", dignity: "Bèèrè àṣẹ ẹni tí o ń ràn lọ́wọ́ kí o tó yà á. Fídíò gẹ́gẹ́ bí ẹ̀rí kò jẹ́ dandan.",
   },
   giftNames: {

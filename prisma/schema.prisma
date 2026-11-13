@@ -222,7 +222,8 @@ model Gift {
 }
 
 /// One donor charge. grossCents is the amount paid.
-/// feeCents is the platform share (15%). netCents is what creators share (85%).
+/// feeCents and netCents are the split written when the gift was recorded.
+/// New gifts use 20% platform and 80% creator or fund. Older rows keep their own split.
 /// feeCents + netCents = grossCents is also enforced in SQL.
 model LedgerTransaction {
   id                    String        @id @default(cuid())
@@ -416,7 +417,7 @@ model UserBlock {
 }
 
 /// Supporter lights (svetielka). amount is positive for a pack and negative for a gift.
-/// The balance is the sum. A gift spend also writes the 15/85 ledger row.
+/// The balance is the sum. A gift spend also writes the ledger row from that moment's split.
 model CreditEntry {
   id                      String   @id @default(cuid())
   userId                  String
@@ -668,7 +669,7 @@ model StoryReceipt {
   @@index([storyId])
 }
 
-/// The 85 percent of a community-fund gift. The platform fee stays on the transaction.
+/// The fund share of a community-fund gift, from the split recorded with it. The platform fee stays on the transaction.
 /// This is a ledger account, not a promise that water or bread has been delivered.
 model FundCredit {
   id            String            @id @default(cuid())

@@ -339,7 +339,7 @@ const ha: Messages = {
   terms: {
     title: "Sharudda", link: "Sharudda", agree: "Na yarda da sharudda",
     mustAgree: "Asusu yana faruwa bayan amincewa.", need: "Kafin bidiyo na farko ko watsa shiri, karɓi sharuddan yanzu.", accept: "Na yarda da sharudda", saved: "An ajiye amincewa.",
-    lights: "Fitila ɗaya senti ɗaya ce. Kana sayen fakiti da dala kuma kana aika kyauta da fitila. Uwar garke ce ke ƙayyade farashi.", split: "Kashi 85 na kowace kyauta yana zuwa ga mutum, kashi 15 yana zuwa Hojnosť don kamfani da uwar garke. Rarraba yana faruwa sau ɗaya a uwar garke.", fund: "Rijiya da burodi ba sa zuwa ga mutum. Kashi 15 yana nan da Hojnosť, kashi 85 yana zuwa asusun al'umma na ruwa ko abinci, wanda ake kira asusun al'umma (ana shirya). Ba isarwa ba ce.",
+    lights: "Fitila ɗaya senti ɗaya ce. Kana sayen fakiti da dala kuma kana aika kyauta da fitila. Uwar garke ce ke ƙayyade farashi.", split: "Kashi 80 na kowace sabuwar kyauta yana zuwa ga mutum, kashi 20 yana zuwa Hojnosť don aiki, uwar garke, kudaden biyan kuɗi da kulawa. Kyauta da aka riga aka rubuta tana riƙe da rabon ranar. Rarraba yana faruwa sau ɗaya a uwar garke.", fund: "Rijiya da burodi ba sa zuwa ga mutum. Kashi 20 yana nan da Hojnosť, kashi 80 yana zuwa asusun al'umma na ruwa ko abinci, wanda ake kira asusun al'umma (ana shirya). Ba isarwa ba ce.",
     holds: "Yayin da jayayya take buɗe ko ta yi hasara, babu wanda zai iya sakin wannan biyan.", age: "Wanda yake son watsa shiri ko karɓar kyauta yana bayyana kansa yana da aƙalla shekara 18. Ba tantancewar shaida ba ce.", dignity: "Ka tambayi izinin wanda kake taimakawa kafin ka dauki shi. Ba a taɓa buƙatar bidiyo a matsayin hujja.",
   },
   giftNames: {

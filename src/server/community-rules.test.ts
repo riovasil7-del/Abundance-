@@ -54,7 +54,7 @@ test("mocked LiveKit grant, no live server: a viewer cannot publish by asking", 
   assert.equal(canPublishToRoom("guest_abc", audience), false);
 });
 
-test("a selected creator receives the whole 85 percent and co-hosts are not split in silently", () => {
+test("a selected creator receives the whole 80 percent and co-hosts are not split in silently", () => {
   const selected = liveGiftShares({
     priceCents: 100,
     selectedCreatorId: "cohost-profile",
@@ -64,10 +64,10 @@ test("a selected creator receives the whole 85 percent and co-hosts are not spli
   });
   assert.ok(!("error" in selected));
   if ("error" in selected) return;
-  assert.equal(selected.feeCents, 15);
-  assert.equal(selected.netCents, 85);
+  assert.equal(selected.feeCents, 20);
+  assert.equal(selected.netCents, 80);
   assert.equal(selected.feeCents + selected.netCents, 100);
-  assert.deepEqual(selected.shares, [{ creatorId: "cohost-profile", netCents: 85 }]);
+  assert.deepEqual(selected.shares, [{ creatorId: "cohost-profile", netCents: 80 }]);
 
   const stranger = liveGiftShares({
     priceCents: 100,
@@ -87,9 +87,9 @@ test("a selected creator receives the whole 85 percent and co-hosts are not spli
   });
   assert.ok(!("error" in circle));
   if ("error" in circle) return;
-  assert.equal(circle.shares.reduce((sum, share) => sum + share.netCents, 0), 85);
+  assert.equal(circle.shares.reduce((sum, share) => sum + share.netCents, 0), 80);
   assert.equal(circle.shares.some((share) => share.creatorId === "cohost-profile"), false);
-  assert.equal(circle.feeCents, 15);
+  assert.equal(circle.feeCents, 20);
 
   const oneCircleMember = liveGiftShares({
     priceCents: 500,
@@ -100,6 +100,6 @@ test("a selected creator receives the whole 85 percent and co-hosts are not spli
   });
   assert.ok(!("error" in oneCircleMember));
   if ("error" in oneCircleMember) return;
-  assert.equal(oneCircleMember.feeCents, 75);
-  assert.deepEqual(oneCircleMember.shares, [{ creatorId: "a", netCents: 425 }]);
+  assert.equal(oneCircleMember.feeCents, 100);
+  assert.deepEqual(oneCircleMember.shares, [{ creatorId: "a", netCents: 400 }]);
 });

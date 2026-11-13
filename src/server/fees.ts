@@ -8,8 +8,10 @@ import {
  * The only money split in the product.
  *
  * Every donor transaction is divided here, in integer minor units (cents):
- *   platform fee = 15% of gross, half-up
+ *   platform fee = 20% of gross, half-up
  *   creator net  = gross - fee
+ *
+ * This runs when a gift is recorded. It does not reopen an older ledger row.
  *
  * Callers must pass a price loaded on the server (gift catalog or family tier).
  * Client-supplied amounts are not a parameter that affects the result.
@@ -32,11 +34,11 @@ export class MoneyError extends Error {
 
 /** Fail fast if the named fee constant and the integer fraction ever drift apart. */
 export function assertFeeConfig(): void {
-  if (PLATFORM_FEE !== 0.15) {
-    throw new MoneyError("PLATFORM_FEE must stay exactly 0.15");
+  if (PLATFORM_FEE !== 0.2) {
+    throw new MoneyError("PLATFORM_FEE must stay exactly 0.2");
   }
-  if (PLATFORM_FEE_NUMERATOR !== 15 || PLATFORM_FEE_DENOMINATOR !== 100) {
-    throw new MoneyError("Platform fee fraction must stay 15/100");
+  if (PLATFORM_FEE_NUMERATOR !== 20 || PLATFORM_FEE_DENOMINATOR !== 100) {
+    throw new MoneyError("Platform fee fraction must stay 20/100");
   }
   if (PLATFORM_FEE_NUMERATOR / PLATFORM_FEE_DENOMINATOR !== PLATFORM_FEE) {
     throw new MoneyError("PLATFORM_FEE and its integer fraction disagree");
@@ -60,8 +62,8 @@ function assertCents(value: number, label: string): void {
 /**
  * Split one donor charge.
  * Rounding is half-up, implemented with integers only:
- *   fee = floor((gross * 15 + 50) / 100)
- * so 1.5 cents of fee becomes 2, and an exact 15.00 stays 15.
+ *   fee = floor((gross * 20 + 50) / 100)
+ * so 0.6 cents of fee becomes 1, and an exact 2.00 stays 2.
  */
 export function splitDonation(grossCents: number): MoneySplit {
   assertCents(grossCents, "grossCents");
@@ -111,7 +113,7 @@ export function allocateEvenly(totalCents: number, parts: number): number[] {
   return shares;
 }
 
-/** Fee is taken once from the gift, then the 85% net is shared evenly. */
+/** Fee is taken once from the gift, then the 80% net is shared evenly. */
 export function splitCircleDonation(grossCents: number, participantCount: number): MoneySplit & { shares: number[] } {
   const split = splitDonation(grossCents);
   const shares = allocateEvenly(split.netCents, participantCount);

@@ -339,7 +339,7 @@ const pl: Messages = {
   terms: {
     title: "Warunki", link: "Warunki", agree: "Zgadzam się na warunki",
     mustAgree: "Konto powstaje dopiero po zgodzie.", need: "Przed pierwszym filmem albo transmisją zaakceptuj aktualne warunki.", accept: "Zgadzam się na warunki", saved: "Zgoda jest zapisana.",
-    lights: "Jedno światełko to jeden cent. Kupujesz paczkę w dolarach i wysyłasz dar w światełkach. Cenę ustala serwer.", split: "85 % każdego daru trafia do osoby, a 15 % do Hojnosti na spółkę i serwery. Podział odbywa się raz na serwerze.", fund: "Studnia i chleb nie idą do osoby. 15 % zostaje w Hojnosti, a 85 % trafia do funduszu wspólnoty na wodę albo jedzenie, nazwanego fundusz wspólnoty (w przygotowaniu). To nie jest dostawa.",
+    lights: "Jedno światełko to jeden cent. Kupujesz paczkę w dolarach i wysyłasz dar w światełkach. Cenę ustala serwer.", split: "80 % każdego nowego daru trafia do osoby, a 20 % do Hojnosti na działanie, serwery, opłaty płatnicze i moderację. Dar już zapisany zostaje przy podziale z tamtego dnia. Podział odbywa się raz na serwerze.", fund: "Studnia i chleb nie idą do osoby. 20 % zostaje w Hojnosti, a 80 % trafia do funduszu wspólnoty na wodę albo jedzenie, nazwanego fundusz wspólnoty (w przygotowaniu). To nie jest dostawa.",
     holds: "Dopóki spór jest otwarty albo przegrany, nikt nie może zwolnić tej wypłaty.", age: "Kto chce nadawać albo przyjmować dary, sam oświadcza, że ma co najmniej 18 lat. To nie jest weryfikacja tożsamości.", dignity: "Zanim kogoś nagrasz, zapytaj o zgodę. Film jako dowód nigdy nie jest wymagany.",
   },
   giftNames: {

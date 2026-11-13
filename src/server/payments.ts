@@ -20,7 +20,7 @@ type StripeLike = {
  * Amounts always come from splitDonation, never from the browser.
  * When the creator has a Connect account, the platform fee is application_fee_amount
  * and the rest is destined for that account. Otherwise the platform holds the charge
- * and the ledger still records the creator's 85% for a later payout.
+ * and the ledger still records the creator's share from that gift for a later payout.
  */
 export async function createCharge(input: {
   priceCents: number;
