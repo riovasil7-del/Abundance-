@@ -50,6 +50,18 @@ export function StartLiveButton({
         setNote(m.terms.need);
         return;
       }
+      if (data.error === "AGE_REQUIRED") {
+        setNote(m.age.need);
+        return;
+      }
+      if (data.error === "PARENT_REQUIRED") {
+        setNote(m.guardian.locked);
+        return;
+      }
+      if (data.error === "MINOR_NO_LIVE") {
+        setNote(m.guardian.noLive);
+        return;
+      }
       if (response.status === 503 || data.error === "LIVE_NOT_CONFIGURED") {
         setNote(m.live.notConfigured);
         return;

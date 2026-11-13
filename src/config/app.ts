@@ -69,7 +69,7 @@ export function lightPack(slug: string | undefined | null) {
 export const GIFT_CONFIRM_CENTS = 500;
 
 /** Bump this when the terms text changes. Sign-up and creator publish check it. */
-export const TERMS_VERSION = 1;
+export const TERMS_VERSION = 2;
 
 export const CONTENT_CATEGORIES = [
   "everyday",

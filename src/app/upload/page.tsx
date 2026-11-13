@@ -6,6 +6,7 @@ import { termsAreCurrent } from "@/server/terms";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { pickLocalized } from "@/lib/format";
+import { publishDecision } from "@/server/age-gate";
 import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 
@@ -48,6 +49,8 @@ export default async function UploadPage({
         <Link href="/rules">{messages.upload.rulesLink}</Link>
       </div>
       <TermsGate needed={!termsAreCurrent(user)} />
+      {publishDecision({ ...user, consent: user.parentalConsent }) === "PARENT_REQUIRED" ? <p className="notice">{messages.guardian.locked}</p> : null}
+      {user.minorDeclaredAt && publishDecision({ ...user, consent: user.parentalConsent }) === "OK" ? <p className="notice">{messages.guardian.canPost}</p> : null}
       <StoryForm
         ownerId={user.id}
         initialTitle={query.title ?? ""}

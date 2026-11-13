@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
 import { createPhotoStory, createTextStory, parseContentCategory, parseDeed, parseVisibility } from "@/server/stories";
+import { publishDecision } from "@/server/age-gate";
 import { termsDecision } from "@/server/terms";
 
 export const runtime = "nodejs";
@@ -22,6 +23,8 @@ async function circleFor(userId: string, creatorId: string, circleIdRaw: string)
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
+  const allowed = publishDecision({ ...user, consent: user.parentalConsent });
+  if (allowed !== "OK") return jsonError(403, allowed);
   if (termsDecision(user) === "TERMS_REQUIRED") return jsonError(403, "TERMS_REQUIRED");
   const limit = memoryRateLimiter.consume(clientKey(request, "story", user.id), 12, 60 * 60 * 1000);
   if (!limit.ok) return jsonError(429, "RATE_LIMITED");

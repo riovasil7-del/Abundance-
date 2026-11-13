@@ -2,12 +2,14 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Noto_Sans_Arabic, Noto_Sans_Ethiopic, Outfit } from "next/font/google";
 import Link from "next/link";
 import { APP_NAME } from "@/config/app";
+import { AgeGate } from "@/components/age-gate";
 import { BottomNav } from "@/components/bottom-nav";
 import { IntroTour } from "@/components/intro-tour";
 import { LangSwitch } from "@/components/lang-switch";
 import { LocaleSync } from "@/components/locale-sync";
 import { I18nProvider } from "@/components/providers";
 import { RegisterSw } from "@/components/register-sw";
+import { consentActive } from "@/server/age-gate";
 import { getCurrentUser } from "@/server/auth";
 import { LANGUAGE_META, messagesFor } from "@/i18n";
 import { followsDeviceLanguage, getLocale } from "@/i18n/get-locale";
@@ -57,6 +59,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const followDevice = await followsDeviceLanguage(user);
   const messages = messagesFor(locale);
   const dir = LANGUAGE_META[locale].dir;
+  const ageMode = !user?.creatorProfile || user.adultAttestedAt
+    ? null
+    : user.minorDeclaredAt
+      ? consentActive(user.parentalConsent) ? null : "parent"
+      : "ask";
 
   return (
     <html lang={locale} dir={dir} className={`${display.variable} ${sans.variable} ${arabic.variable} ${ethiopic.variable}`}>
@@ -64,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <I18nProvider locale={locale} messages={messages}>
           <LocaleSync locale={locale} followDevice={followDevice} />
           <IntroTour />
+          <AgeGate mode={ageMode} />
           <div className="sky">
             <div className="frame">
               <header className="site-header">

@@ -67,6 +67,10 @@ model User {
   localeChosen Boolean @default(false)
   /// Self-declared "I am 18 or older". This is not an identity or age-provider check.
   adultAttestedAt DateTime?
+  /// Self-declared "I am under 18". Not an identity check. Cleared if they later declare 18+.
+  minorDeclaredAt DateTime?
+  /// Optional birth date used only to choose the self-declaration. Not a document and not a verified age.
+  birthDate       DateTime? @db.Date
   /// When true, the feed does not preload the next video.
   lowData         Boolean  @default(false)
   /// When the person accepted the terms. Not an identity check.
@@ -104,6 +108,23 @@ model User {
   ideasProposed     Idea[]
   ideaSaves         IdeaSave[]
   chatMutes         LiveChatMute[] @relation("ChatMuted")
+  parentalConsent   ParentalConsent?
+}
+
+/// A parent's self-declared approval for a minor creator to post.
+/// The raw link token is never stored. This is not an identity check.
+model ParentalConsent {
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentEmail        String
+  parentName         String?
+  tokenHash          String    @unique
+  createdAt          DateTime  @default(now())
+  approvedAt         DateTime?
+  revokedAt          DateTime?
+  /// The parent confirmed they are the guardian. Still not an identity document.
+  guardianConfirmed  Boolean   @default(false)
 }
 
 model CreatorProfile {

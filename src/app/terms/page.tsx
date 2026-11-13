@@ -13,6 +13,7 @@ export default async function TermsPage() {
       <p>{terms.fund}</p>
       <p>{terms.holds}</p>
       <p>{terms.age}</p>
+      <p>{terms.minors}</p>
       <p>{terms.dignity}</p>
     </article>
   );

@@ -7,6 +7,7 @@ import { holdDaysFor } from "@/server/catalog";
 import { planGift } from "@/server/gift-plan";
 import { randomUUID } from "node:crypto";
 import { CreditError, spendLights } from "@/server/credits";
+import { giftReceiveDecision } from "@/server/age-gate";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -27,10 +28,11 @@ export async function POST(request: Request) {
 
   const video = await db.video.findUnique({
     where: { id: body.videoId },
-    include: { creator: { include: { user: { select: { adultAttestedAt: true } } } } },
+    include: { creator: { include: { user: { select: { adultAttestedAt: true, minorDeclaredAt: true } } } } },
   });
   if (!video || video.moderationStatus !== "VISIBLE") return jsonError(404, "NOT_FOUND");
-  if (!video.creator.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
+  const recipient = giftReceiveDecision(video.creator.user);
+  if (recipient !== "OK") return jsonError(403, recipient === "MINOR_NO_GIFTS" ? "MINOR_NO_GIFTS" : "CREATOR_AGE_REQUIRED");
   const planned = planGift(gift.priceCents, gift.destination, [video.creatorId]);
   if (!planned.fund && user.creatorProfile?.id === video.creatorId) return jsonError(400, "SELF_GIFT");
 
