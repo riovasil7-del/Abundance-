@@ -437,7 +437,7 @@ const cs: Messages = {
   terms: {
     title: "Podmínky", link: "Podmínky", agree: "Souhlasím s podmínkami",
     mustAgree: "Účet vznikne až po souhlasu.", need: "Před prvním videem nebo vysíláním potvrďte aktuální podmínky.", accept: "Souhlasím s podmínkami", saved: "Souhlas je uložen.",
-    lights: "Jedno světélko je jeden cent. Balíček koupíte v dolarech a dar pošlete ve světélkách. Cenu určuje server.", split: "Z každého daru jde 85 % tvůrci a 15 % Hojnosti na společnost a servery. Rozdělení se na serveru udělá jednou.", fund: "Studánka a bochník nejdou tvůrci. 15 % zůstává Hojnosti a 85 % se zapíše do komunitního fondu vody nebo jídla, označeného komunitní fond (připravujeme). Není to slib doručení.",
+    lights: "Jedno světélko je jeden cent. Balíček koupíte v dolarech a dar pošlete ve světélkách. Cenu určuje server.", split: "Z každého nového daru jde 80 % tvůrci a 20 % Hojnosti na provoz, servery, poplatky za platbu a moderování. Dar, který už byl zapsán, si nechává rozdělení z toho dne. Rozdělení se na serveru udělá jednou.", fund: "Studánka a bochník nejdou tvůrci. 20 % zůstává Hojnosti a 80 % se zapíše do komunitního fondu vody nebo jídla, označeného komunitní fond (připravujeme). Není to slib doručení.",
     holds: "Dokud je spor otevřený nebo prohraný, výplatu z té držby nikdo neuvolní.", age: "Tvůrce, který chce vysílat nebo přijímat dary, sám uvede, že má alespoň 18 let. Není to ověření totožnosti.", dignity: "Než někoho natočíte, zeptejte se na souhlas. Video jako důkaz se nikdy nevyžaduje.",
   },
   giftNames: {

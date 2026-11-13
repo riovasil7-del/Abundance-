@@ -339,7 +339,7 @@ const zu: Messages = {
   terms: {
     title: "Imigomo", link: "Imigomo", agree: "Ngiyavuma imigomo",
     mustAgree: "I-akhawunti ivela ngemva kwemvume.", need: "Ngaphambi kwevidiyo yokuqala noma ukusakaza, vuma imigomo yamanje.", accept: "Ngiyavuma imigomo", saved: "Imvume igciniwe.",
-    lights: "Ukukhanya okukodwa kungusenti owodwa. Uthenga iphakethe ngamadola uphinde uthumele isipho ngezibani. Iseva ibeka intengo.", split: "Amaphesenti angama-85 esipho ngasinye aya kumuntu, angu-15 aya ku-Hojnosť ngenkampani namaseva. Ukwehlukanisa kwenzeka kanye kuseva.", fund: "Umthombo nesinkwa akuyi kumuntu. Angu-15 ahlala ku-Hojnosť, angama-85 abhalwa esikhwameni somphakathi samanzi noma ukudla, esibizwa ngokuthi isikhwama somphakathi (siyalungiselela). Akukho ukulethwa.",
+    lights: "Ukukhanya okukodwa kungusenti owodwa. Uthenga iphakethe ngamadola uphinde uthumele isipho ngezibani. Iseva ibeka intengo.", split: "Amaphesenti angama-80 esipho esisha ngasinye aya kumuntu, angu-20 aya ku-Hojnosť ngomsebenzi, amaseva, izimali zokukhokha nokulawula. Isipho esivele sibhaliwe sigcina ukuhlukaniswa kwalolo suku. Ukwehlukanisa kwenzeka kanye kuseva.", fund: "Umthombo nesinkwa akuyi kumuntu. Angu-20 ahlala ku-Hojnosť, angama-80 abhalwa esikhwameni somphakathi samanzi noma ukudla, esibizwa ngokuthi isikhwama somphakathi (siyalungiselela). Akukho ukulethwa.",
     holds: "Ngenkathi ingxabano ivuliwe noma ilahlekile, akekho ongakhulula lelo khokho.", age: "Ofuna ukusakaza noma ukwamukela izipho uzimemezela ukuthi uneminyaka okungenani eyi-18. Akukho ukuqinisekiswa kobunikazi.", dignity: "Cela imvume kumuntu omsizayo ngaphambi kokumqopha. Ividiyo njengobufakazi ayifuneki.",
   },
   giftNames: {

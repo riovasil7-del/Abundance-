@@ -339,7 +339,7 @@ const es: Messages = {
   terms: {
     title: "Condiciones", link: "Condiciones", agree: "Acepto las condiciones",
     mustAgree: "La cuenta nace solo después del acuerdo.", need: "Antes del primer video o del directo, acepta las condiciones actuales.", accept: "Acepto las condiciones", saved: "El acuerdo quedó guardado.",
-    lights: "Una luz es un centavo. Compras un paquete en dólares y envías el don en luces. El servidor fija el precio.", split: "El 85 % de cada don va a la persona y el 15 % a Hojnosť para la sociedad y los servidores. El reparto se hace una sola vez en el servidor.", fund: "El pozo y el pan no van a la persona. El 15 % queda en Hojnosť y el 85 % se anota en el fondo comunitario de agua o comida, llamado fondo comunitario (en preparación). No es una entrega.",
+    lights: "Una luz es un centavo. Compras un paquete en dólares y envías el don en luces. El servidor fija el precio.", split: "El 80 % de cada don nuevo va a la persona y el 20 % a Hojnosť para el funcionamiento, los servidores, las comisiones de pago y la moderación. Un don ya anotado conserva el reparto de ese día. El reparto se hace una sola vez en el servidor.", fund: "El pozo y el pan no van a la persona. El 20 % queda en Hojnosť y el 80 % se anota en el fondo comunitario de agua o comida, llamado fondo comunitario (en preparación). No es una entrega.",
     holds: "Mientras una disputa está abierta o perdida, nadie puede liberar ese pago.", age: "Quien quiere emitir o recibir dones declara tener al menos 18 años. No es una verificación de identidad.", dignity: "Pide consentimiento a la persona a la que ayudas antes de filmarla. Nunca se exige un video como prueba.",
   },
   giftNames: {

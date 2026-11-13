@@ -339,7 +339,7 @@ const ig: Messages = {
   terms: {
     title: "Usoro", link: "Usoro", agree: "Ekwenyere m n'usoro",
     mustAgree: "Akaụntụ na-amalite mgbe nkwenye gasịrị.", need: "Tupu vidiyo mbụ ma ọ bụ mgbasa ozi, nabata usoro ugbu a.", accept: "Ekwenyere m n'usoro", saved: "Echekwara nkwenye.",
-    lights: "Otu ọkụ bụ otu senti. Ị na-azụta ngwugwu na dollar ma zipu onyinye na ọkụ. Sava na-ekpebi ọnụahịa.", split: "Pasent 85 nke onyinye ọ bụla na-aga onye ahụ, pasent 15 na-aga Hojnosť maka ụlọ ọrụ na sava. Nkewa na-eme otu ugboro na sava.", fund: "Olulu mmiri na achịcha anaghị aga onye ahụ. Pasent 15 na-anọ na Hojnosť, pasent 85 na-ede na ego obodo maka mmiri ma ọ bụ nri, nke a na-akpọ ego obodo (anyị na-akwado). Ọ bụghị nnyefe.",
+    lights: "Otu ọkụ bụ otu senti. Ị na-azụta ngwugwu na dollar ma zipu onyinye na ọkụ. Sava na-ekpebi ọnụahịa.", split: "Pasent 80 nke onyinye ọhụrụ ọ bụla na-aga onye ahụ, pasent 20 na-aga Hojnosť maka ọrụ, sava, ụgwọ ịkwụ ụgwọ na nlekọta. Onyinye edereworị na-ejide nkewa nke ụbọchị ahụ. Nkewa na-eme otu ugboro na sava.", fund: "Olulu mmiri na achịcha anaghị aga onye ahụ. Pasent 20 na-anọ na Hojnosť, pasent 80 na-ede na ego obodo maka mmiri ma ọ bụ nri, nke a na-akpọ ego obodo (anyị na-akwado). Ọ bụghị nnyefe.",
     holds: "Mgbe esemokwu ka meghere ma ọ bụ furu, ọ nweghị onye nwere ike ịhapụ ụgwọ ahụ.", age: "Onye chọrọ igbasa ozi ma ọ bụ nata onyinye na-ekwupụta onwe ya na ọ dịkarịa ala afọ 18. Ọ bụghị nkwenye njirimara.", dignity: "Jụọ onye i na-enyere aka maka nkwenye tupu i see ya. A naghị achọ vidiyo dị ka ihe àmà.",
   },
   giftNames: {
