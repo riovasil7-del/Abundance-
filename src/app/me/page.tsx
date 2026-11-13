@@ -3,7 +3,10 @@ import { ReportNoteButton } from "@/components/report-note";
 import { AgeAttest } from "@/components/age-attest";
 import { ReopenIntroButton } from "@/components/intro-tour";
 import { LangSwitch } from "@/components/lang-switch";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { UnblockButton } from "@/components/unblock-button";
+import { cookies } from "next/headers";
+import { THEME_COOKIE, parseTheme } from "@/lib/theme";
 import { messagesFor } from "@/i18n";
 import { getLocale } from "@/i18n/get-locale";
 import { formatMoney } from "@/lib/format";
@@ -20,6 +23,7 @@ export default async function MePage() {
       <div className="page">
         <h1>{messages.me.title}</h1>
         <LangSwitch locale={locale} />
+        <ThemeToggle initial={parseTheme((await cookies()).get(THEME_COOKIE)?.value)} loggedIn={false} />
         <Link className="btn-primary" href="/login">
           {messages.auth.login}
         </Link>
@@ -72,6 +76,7 @@ export default async function MePage() {
         </Link>
       ) : null}
       <LangSwitch locale={locale} />
+      <ThemeToggle initial={parseTheme(user.themeChoice) ?? parseTheme((await cookies()).get(THEME_COOKIE)?.value)} loggedIn />
       <section className="stack" data-screen="chat-blocks">
         <h2>{messages.me.blockedTitle}</h2>
         {blocks.length === 0 ? <p className="empty">{messages.me.blockedEmpty}</p> : null}

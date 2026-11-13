@@ -132,7 +132,7 @@ export function LiveChatPanel({
   }
 
   function label(line: RoomLine) {
-    if (line.kind === "join") return m.live.joined.replace("{name}", line.author);
+    if (line.kind === "join") return m.live.welcomeJoin.replace("{name}", line.author);
     if (line.kind === "gift") return m.live.giftLine.replace("{name}", line.author || m.common.anonymous).replace("{gift}", line.body);
     return "";
   }
@@ -143,21 +143,34 @@ export function LiveChatPanel({
         <button type="button" className="chat-pause" onClick={() => setPaused((value) => !value)}>
           {paused ? m.live.chatResume : m.live.chatPause}
         </button>
-        {lines.map((line) => (
-          <div className={line.kind === "chat" ? "live-chat-line" : "live-chat-line live-chat-quiet"} key={line.id}>
-            {line.kind === "chat" ? (
-              <button type="button" className="live-chat-author" onClick={() => setMenu({ authorId: line.authorId, author: line.author, messageId: line.id, body: line.body })}>
-                {line.author}
-              </button>
-            ) : (
-              <span>{label(line)}</span>
-            )}
-            {line.kind === "chat" ? <span> {line.body}</span> : null}
-            {translateEnabled && line.kind === "chat" ? (
-              <button type="button" className="live-chat-author">{m.live.translate}</button>
-            ) : null}
-          </div>
-        ))}
+        {lines.map((line) =>
+          line.kind === "join" ? (
+            <div className="live-join" key={line.id}>
+              {label(line)}
+            </div>
+          ) : (
+            <div className={line.kind === "chat" ? "live-chat-line" : "live-chat-line live-chat-quiet"} key={line.id}>
+              {line.kind === "chat" ? (
+                <span className="chat-avatar" aria-hidden="true">
+                  {(line.author || "?").slice(0, 1)}
+                </span>
+              ) : null}
+              <span>
+                {line.kind === "chat" ? (
+                  <button type="button" className="live-chat-author" onClick={() => setMenu({ authorId: line.authorId, author: line.author, messageId: line.id, body: line.body })}>
+                    {line.author}
+                  </button>
+                ) : (
+                  <span>{label(line)}</span>
+                )}
+                {line.kind === "chat" ? <span> {line.body}</span> : null}
+                {translateEnabled && line.kind === "chat" ? (
+                  <button type="button" className="live-chat-author">{m.live.translate}</button>
+                ) : null}
+              </span>
+            </div>
+          ),
+        )}
       </div>
       <form
         className="live-compose"
@@ -169,7 +182,7 @@ export function LiveChatPanel({
         <input
           value={draft}
           maxLength={280}
-          placeholder={loggedIn ? m.live.chatPlaceholder : m.feed.login}
+          placeholder={loggedIn ? m.live.writeLove : m.feed.login}
           disabled={!loggedIn}
           onChange={(event) => setDraft(event.target.value)}
           aria-label={m.live.chat}

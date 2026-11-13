@@ -211,6 +211,12 @@ const yo: Messages = {
     cameraNeed: "Kámẹ́rà tàbí gbohùngbohùn kò sí. O lè dúró pẹ̀lú ohùn nìkan.", ageFirst: "Kọ́kọ́ jẹ́rìí 18+ lábẹ́ Èmi. Kì í ṣe àyẹ̀wò ọjọ́-orí.", needCreator: "Ẹni tó ń pín nìkan ló lè gbóhùn sóde.", allowMedia: "Fààyè gba kámẹ́rà àti gbohùngbohùn nínú aṣàwákiri, lẹ́yìn náà tún gbìyànjú.", startFailed: "Ìgbóhùnsáfẹ́fẹ́ kò bẹ̀rẹ̀. Tún gbìyànjú.", enableMedia: "Tan kámẹ́rà àti gbohùngbohùn", circleOnly: "Àwọn ọmọ ẹgbẹ́ yìí nìkan ló lè gbóhùn sóde níbí.", quality: "Àwòrán", qualityAuto: "Auto", qualityHigh: "Gíga", qualityLow: "Kékeré",
     excludeMine: "Fi pamọ́ kúrò ní ìjíròrò mi", reportMod: "Jábọ̀ fún alábòójútó", removeEveryone: "Yọ kúrò fún gbogbo ènìyàn", removedAll: "Ènìyàn yìí kò lè kọ mọ́ níbí.", chatMuted: "O kò lè kọ mọ́ níbí.", joined: "{name} ti darapọ̀", giftLine: "{name} · {gift}", translate: "Túmọ̀", chatPause: "Dá ọ̀rọ̀ dúró",
     chatResume: "Fi ọ̀rọ̀ tuntun hàn",
+    writeLove: "Kọ pẹ̀lú ìfẹ́…",
+    sharedWork: "Iṣẹ́ àjọ",
+    sentGift: "{name} fi {gift} ránṣẹ́ ✨",
+    welcomeJoin: "{name} darapọ̀ · Káàbọ̀",
+    share: "Pín",
+    badge: "LIVE",
   },
   bond: {
     follow: "Tẹle",
@@ -309,6 +315,9 @@ const yo: Messages = {
   me: {
     title: "Àkọọ́lẹ̀ rẹ", role: "Ipa",
     oneAccount: "Ènìyàn kan, àkọọ́lẹ̀ kan. Ìjẹ́rìísí ìdánimọ̀ yóò dé nígbà mìíràn.",
+    themeLabel: "Ìrísí",
+    themePearl: "Lulu",
+    themeDiamond: "Dáímọ́ndì dúdú",
     family: "Àwọn ẹbí tí o jẹ́ ọmọ", none: "O kò tíì jẹ́ ẹbí oṣooṣù ẹnikẹ́ni.",
     blockedTitle: "Àwọn tó farapamọ́",
     blockedEmpty: "O kò tíì fi ẹnikẹ́ni pamọ́.",

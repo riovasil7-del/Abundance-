@@ -211,6 +211,12 @@ const es: Messages = {
     cameraNeed: "La cámara o el micrófono no están. Puedes quedarte solo con el audio.", ageFirst: "Primero confirma 18+ en Yo. No es una verificación de edad.", needCreator: "Solo quien comparte puede emitir.", allowMedia: "Permite la cámara y el micrófono en el navegador y vuelve a intentarlo.", startFailed: "La emisión no empezó. Inténtalo de nuevo.", enableMedia: "Encender cámara y micrófono", circleOnly: "Solo los miembros de este círculo pueden emitir aquí.", quality: "Imagen", qualityAuto: "Auto", qualityHigh: "Alta", qualityLow: "Baja",
     excludeMine: "Quitar de mi chat", reportMod: "Avisar a un moderador", removeEveryone: "Quitar del chat para todos", removedAll: "Esta persona ya no escribe aquí.", chatMuted: "Ya no puedes escribir aquí.", joined: "{name} se unió", giftLine: "{name} · {gift}", translate: "Traducir", chatPause: "Pausar la conversación",
     chatResume: "Mostrar palabras nuevas",
+    writeLove: "Escribe con amor…",
+    sharedWork: "Obra común",
+    sentGift: "{name} envió {gift} ✨",
+    welcomeJoin: "{name} se unió · Bienvenida",
+    share: "Compartir",
+    badge: "LIVE",
   },
   bond: {
     follow: "Seguir",
@@ -309,6 +315,9 @@ const es: Messages = {
   me: {
     title: "Tu cuenta", role: "Papel",
     oneAccount: "Una persona, una cuenta. Más adelante se sumará una verificación de identidad.",
+    themeLabel: "Apariencia",
+    themePearl: "Perla",
+    themeDiamond: "Diamante negro",
     family: "Familias de las que formas parte", none: "Todavía no eres familia mensual de nadie.",
     blockedTitle: "Ocultos del chat",
     blockedEmpty: "No has excluido a nadie.",

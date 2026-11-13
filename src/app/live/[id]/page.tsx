@@ -45,6 +45,7 @@ export default async function LiveRoomPage({ params }: { params: Promise<{ id: s
       title={title}
       hostName={session.host.displayName}
       hostAvatar={session.host.avatarUrl}
+      hostUserId={session.host.userId}
       configured={Boolean(readLiveKitCredentials())}
       loggedIn={Boolean(user)}
       isHost={user?.creatorProfile?.id === session.hostId}

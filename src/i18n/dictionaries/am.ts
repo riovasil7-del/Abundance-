@@ -214,6 +214,12 @@ const am: Messages = {
     cameraNeed: "ካሜራ ወይም ማይክ አልበራም። በድምጽ ብቻ መቆየት ትችላለህ።", ageFirst: "መጀመሪያ 18+ በእኔ ያረጋግጡ። የዕድሜ ማረጋገጫ አይደለም።", needCreator: "የሚያካፍል ሰው ብቻ ሊልቅ ይችላል።", allowMedia: "በአሳሽ ካሜራ እና ማይክራፎን ይፍቀዱ እና እንደገና ይሞክሩ።", startFailed: "ስርጭቱ አልተጀመረም። እንደገና ይሞክሩ።", enableMedia: "ካሜራ እና ማይክራፎን አብራ", circleOnly: "በዚህ ክበብ ውስጥ አባላት ብቻ ሊያሰራጩ ይችላሉ።", quality: "ምስል", qualityAuto: "Auto", qualityHigh: "ከፍተኛ", qualityLow: "ዝቅተኛ",
     excludeMine: "ከውይይቴ ደብቅ", reportMod: "ለመቆጣጠሪያ ጥቀስ", removeEveryone: "ከሁሉም አውጣ", removedAll: "ይህ ሰው እዚህ አይጽፍም።", chatMuted: "እዚህ መጻፍ አትችልም።", joined: "{name} ተቀላቅሏል", giftLine: "{name} · {gift}", translate: "ተርጉም", chatPause: "ውይይቱን አቁም",
     chatResume: "አዲስ ቃላት አሳይ",
+    writeLove: "በፍቅር ጻፍ…",
+    sharedWork: "የጋራ ሥራ",
+    sentGift: "{name} {gift} ላከ ✨",
+    welcomeJoin: "{name} ተቀላቀለ · እንኳን ደህና መጣህ",
+    share: "አጋራ",
+    badge: "LIVE",
   },
   bond: {
     follow: "ተከተል",
@@ -312,6 +318,9 @@ const am: Messages = {
   me: {
     title: "መለያህ", role: "ሚና",
     oneAccount: "አንድ ሰው፣ አንድ መለያ። የማንነት ማረጋገጫ በኋላ ይጨመራል።",
+    themeLabel: "ገጽታ",
+    themePearl: "ንቁ",
+    themeDiamond: "ጥቁር አልማዝ",
     family: "አባል የሆንክባቸው ቤተሰቦች", none: "ገና የማንም ወርሃዊ ቤተሰብ አይደለህም።",
     blockedTitle: "የተደበቁ",
     blockedEmpty: "ማንንም አልደበቅህም።",

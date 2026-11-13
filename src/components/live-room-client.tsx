@@ -27,6 +27,7 @@ export function LiveRoomClient({
   title,
   hostName,
   hostAvatar,
+  hostUserId,
   configured,
   loggedIn,
   isHost,
@@ -41,6 +42,7 @@ export function LiveRoomClient({
   title: string;
   hostName: string;
   hostAvatar: string;
+  hostUserId: string;
   configured: boolean;
   loggedIn: boolean;
   isHost: boolean;
@@ -116,6 +118,8 @@ export function LiveRoomClient({
           sessionId={sessionId}
           hostName={hostName}
           hostAvatar={hostAvatar}
+          hostUserId={hostUserId}
+          title={title}
           isHost={isHost}
           canModerate={canModerate}
           translateEnabled={translateEnabled}

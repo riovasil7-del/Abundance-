@@ -211,6 +211,12 @@ const ig: Messages = {
     cameraNeed: "Igwefoto ma ọ bụ igwe okwu adịghị. Ị nwere ike ịnọ na ụda.", ageFirst: "Buru ụzọ kwado 18+ n'okpuru Mụ. Ọ bụghị nyocha afọ.", needCreator: "Naanị onye na-ekesa nwere ike igbasa ozi.", allowMedia: "Kwe ka igwefoto na igweokwu dị na ihe nchọgharị, wee nwaa ọzọ.", startFailed: "Mgbasa ozi amaliteghị. Nwaa ọzọ.", enableMedia: "Gbanye igwefoto na igweokwu", circleOnly: "Naanị ndị otu okirikiri a nwere ike igbasa ozi ebe a.", quality: "Onyonyo", qualityAuto: "Auto", qualityHigh: "Elu", qualityLow: "Ala",
     excludeMine: "Zochie na mkparịta ụka m", reportMod: "Kọọrọ onye nlekọta", removeEveryone: "Wepụ maka onye ọ bụla", removedAll: "Onye a anaghịzi ede ebe a.", chatMuted: "Ị nweghịzi ike ide ebe a.", joined: "{name} abanyela", giftLine: "{name} · {gift}", translate: "Tụgharịa", chatPause: "Kwụsị mkparịta ụka",
     chatResume: "Gosi okwu ọhụrụ",
+    writeLove: "Dee site n'ịhụnanya…",
+    sharedWork: "Ọrụ ọnụ",
+    sentGift: "{name} zipụrụ {gift} ✨",
+    welcomeJoin: "{name} sonyeere · Nnọọ",
+    share: "Kesaa",
+    badge: "LIVE",
   },
   bond: {
     follow: "Soro",
@@ -309,6 +315,9 @@ const ig: Messages = {
   me: {
     title: "Akaụntụ gị", role: "Ọrụ",
     oneAccount: "Otu onye, otu akaụntụ. Nkwenye onye ga-abịa ma emechaa.",
+    themeLabel: "Ọdịdị",
+    themePearl: "Lulu",
+    themeDiamond: "Diamond ojii",
     family: "Ezinụlọ ị so", none: "Ị bụbeghị ezinụlọ kwa ọnwa nke onye ọ bụla.",
     blockedTitle: "Ndị ezoro",
     blockedEmpty: "Ị zochieghị onye ọ bụla.",
