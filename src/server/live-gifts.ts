@@ -2,8 +2,8 @@ import { splitCircleDonation, splitDonation, type MoneySplit } from "./fees";
 
 /**
  * A live gift uses the same split as every other donation.
- * One verified recipient keeps the whole 85%. A live blessing circle
- * shares that 85% evenly. The client amount is accepted only so tests
+ * One verified recipient keeps the whole 80%. A live blessing circle
+ * shares that 80% evenly. The client amount is accepted only so tests
  * can prove it does not change the result.
  */
 export function settleLiveGift(input: {

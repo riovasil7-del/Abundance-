@@ -1,13 +1,13 @@
 import { compare, hash } from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import type { CreatorProfile, Role, User } from "@prisma/client";
+import type { CreatorProfile, ParentalConsent, Role, User } from "@prisma/client";
 import { db } from "./db";
 import { sessionSecretProblem } from "./session-secret";
 
 export const SESSION_COOKIE = "hojnost_session";
 
-export type SessionUser = User & { creatorProfile: CreatorProfile | null };
+export type SessionUser = User & { creatorProfile: CreatorProfile | null; parentalConsent: ParentalConsent | null };
 
 function secretKey(): Uint8Array {
   if (sessionSecretProblem(process.env.AUTH_SECRET)) {
@@ -49,7 +49,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   if (!userId) return null;
   return db.user.findUnique({
     where: { id: userId },
-    include: { creatorProfile: true },
+    include: { creatorProfile: true, parentalConsent: true },
   });
 }
 

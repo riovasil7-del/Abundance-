@@ -4,7 +4,7 @@ import { GIFT_CATALOG } from "../config/app";
 import { splitDonation } from "./fees";
 import { liveGiftBurst, settleLiveGift } from "./live-gifts";
 
-test("a live gift uses the same 15/85 split as every other donation", () => {
+test("a live gift uses the same 20/80 split as every other donation", () => {
   const candle = GIFT_CATALOG.find((gift) => gift.slug === "candle");
   assert.ok(candle);
   const settled = settleLiveGift({
@@ -18,15 +18,15 @@ test("a live gift uses the same 15/85 split as every other donation", () => {
   assert.equal(settled.feeCents + settled.netCents, settled.grossCents);
 });
 
-test("a live blessing circle shares the 85 percent evenly after one fee", () => {
+test("a live blessing circle shares the 80 percent evenly after one fee", () => {
   const settled = settleLiveGift({
     catalogPriceCents: 100,
     untrustedClientAmount: 7,
     verifiedRecipientCount: 3,
   });
-  assert.equal(settled.feeCents, 15);
-  assert.equal(settled.netCents, 85);
-  assert.deepEqual(settled.shares, [29, 28, 28]);
+  assert.equal(settled.feeCents, 20);
+  assert.equal(settled.netCents, 80);
+  assert.deepEqual(settled.shares, [27, 27, 26]);
   assert.equal(
     settled.shares.reduce((sum, share) => sum + share, 0),
     settled.netCents,
@@ -45,8 +45,8 @@ test("the gift burst everyone sees uses the server split, not a client amount", 
   });
   assert.equal(burst.type, "gift");
   assert.equal(burst.grossCents, 1000);
-  assert.equal(burst.feeCents, 150);
-  assert.equal(burst.netCents, 850);
+  assert.equal(burst.feeCents, 200);
+  assert.equal(burst.netCents, 800);
   assert.equal(burst.donorName, "Elena");
   assert.notEqual(burst.grossCents, 1);
   assert.notEqual(burst.grossCents, 5);

@@ -38,13 +38,17 @@ test("refund plan never spends below zero and does not take a second fee", () =>
     reviewCents: 0,
   });
 
-  const partial = planRefund({ packLights: 500, spendable: 400, pendingNetsOldestFirst: [85, 200] });
+  const partial = planRefund({ packLights: 500, spendable: 400, pendingNetsOldestFirst: [80, 200] });
   assert.equal(partial.reverseLights, 400);
   assert.equal(partial.spentLights, 100);
   assert.equal(partial.exposureCents, splitDonation(100).netCents);
-  assert.equal(partial.exposureCents, 85);
+  assert.equal(partial.exposureCents, 80);
   assert.deepEqual(partial.freezeIndexes, [0]);
   assert.equal(partial.reviewCents, 0);
+  const historical = planRefund({ packLights: 500, spendable: 400, pendingNetsOldestFirst: [85, 200] });
+  assert.equal(historical.exposureCents, 80);
+  assert.deepEqual(historical.freezeIndexes, []);
+  assert.equal(historical.reviewCents, 80);
   assert.equal(partial.reverseLights + partial.spentLights, 500);
 
   const tooBigToFreeze = planRefund({ packLights: 100, spendable: 0, pendingNetsOldestFirst: [850] });
@@ -55,9 +59,9 @@ test("refund plan never spends below zero and does not take a second fee", () =>
 
 test("card processing stays inside the platform share", () => {
   const kept = platformBearsProcessing(100, 30);
-  assert.equal(kept.creatorNetCents, 85);
-  assert.equal(kept.platformFeeCents, 15);
-  assert.equal(kept.platformAfterProcessorCents, 15 - 30);
+  assert.equal(kept.creatorNetCents, 80);
+  assert.equal(kept.platformFeeCents, 20);
+  assert.equal(kept.platformAfterProcessorCents, 20 - 30);
   const exact = platformBearsProcessing(100, 0);
   assert.equal(exact.creatorNetCents, splitDonation(100).netCents);
 });
@@ -107,6 +111,8 @@ test("provider events do not restore twice, and a large gift is only partly rese
 
   assert.equal(attributeRecordedNet(850, 1000, 1000), 850);
   assert.equal(attributeRecordedNet(850, 100, 1000), 85);
+  assert.equal(attributeRecordedNet(85, 100, 100), 85);
+  assert.equal(splitDonation(100).netCents, 80);
   assert.deepEqual(distributeExact(85, [850]), [85]);
   assert.equal(payableCents({ realAvailable: 850, reserved: 85 }), 765);
   assert.equal(payableCents({ realAvailable: 50, reserved: 85 }), 0);
@@ -241,8 +247,8 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
       anonymous: false,
       holdDays: 7,
     });
-    assert.equal(spent.transaction.feeCents, 15);
-    assert.equal(spent.transaction.netCents, 85);
+    assert.equal(spent.transaction.feeCents, 20);
+    assert.equal(spent.transaction.netCents, 80);
     assert.equal(await db.moneyEvent.count({ where: { transactionId: spent.transaction.id, kind: "DONATION_RECORDED" } }), 1);
 
     const refund = await applyStripeFact({
@@ -275,15 +281,15 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
     const giftRow = await db.ledgerTransaction.findUnique({ where: { id: spent.transaction.id } });
     assert.equal(giftRow?.status, "HELD");
     assert.equal(giftRow?.grossCents, 100);
-    assert.equal(giftRow?.feeCents, 15);
-    assert.equal(giftRow?.netCents, 85);
+    assert.equal(giftRow?.feeCents, 20);
+    assert.equal(giftRow?.netCents, 80);
     const reserved = await db.payoutReservation.aggregate({
       where: { transactionId: spent.transaction.id, status: "ACTIVE" },
       _sum: { amountCents: true },
     });
-    assert.equal(reserved._sum.amountCents, 85);
+    assert.equal(reserved._sum.amountCents, 80);
     const review = await db.accountReview.findUnique({ where: { stripeEventId: `evt_refund_${stamp}` } });
-    assert.equal(review?.frozenCents, 85);
+    assert.equal(review?.frozenCents, 80);
     assert.equal(review?.reversedCents, 400);
 
     const dispute = await applyStripeFact({
@@ -335,7 +341,7 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
       type: "payment_intent.succeeded",
       paymentIntentId: `pi_direct_${stamp}`,
       amountCents: 100,
-      feeCents: "15",
+      feeCents: "20",
     });
     assert.equal(early.outcome, "deferred");
     const direct = await recordDonation(
@@ -344,20 +350,20 @@ test("duplicate webhook, out-of-order refund, and concurrent spend", { skip: !pr
         priceCents: 100,
         charge: { ...lightsCharge(100), mode: "stripe", stripePaymentIntentId: `pi_direct_${stamp}` },
         kind: "GIFT",
-        shares: [{ creatorId: creator.id, netCents: 85 }],
+        shares: [{ creatorId: creator.id, netCents: 80 }],
         anonymous: false,
         holdDays: 7,
       },
     );
     assert.equal(direct.status, "HELD");
-    assert.equal(direct.feeCents, 15);
-    assert.equal(direct.netCents, 85);
+    assert.equal(direct.feeCents, 20);
+    assert.equal(direct.netCents, 80);
     const settledAgain = await applyStripeFact({
       eventId: `evt_settle_${stamp}`,
       type: "payment_intent.succeeded",
       paymentIntentId: `pi_direct_${stamp}`,
       amountCents: 100,
-      feeCents: "15",
+      feeCents: "20",
     });
     assert.equal(settledAgain.replayed, true);
     assert.equal((await db.ledgerTransaction.findUnique({ where: { id: direct.id } }))?.grossCents, 100);
@@ -449,15 +455,15 @@ test("partial hold on a large gift, shared packs, and staff review", { skip: !pr
     const moved = await db.$transaction((tx) => clawbackPack(tx, firstPack!.id, 1));
     assert.equal(moved.reverseLights, 0);
     assert.equal(moved.reservedCents, attributeRecordedNet(big.netCents, 500, 1000));
-    assert.equal(moved.reservedCents, 425);
+    assert.equal(moved.reservedCents, 400);
     assert.notEqual(moved.reservedCents, big.netCents);
     const still = await db.ledgerTransaction.findUnique({ where: { id: spent.transaction.id } });
     assert.equal(still?.feeCents, big.feeCents);
     assert.equal(still?.netCents, big.netCents);
     const money = await creatorMoney(creator.id);
     assert.equal(money.realAvailable, big.netCents);
-    assert.equal(money.payable, big.netCents - 425);
-    assert.equal(money.payable, 425);
+    assert.equal(money.payable, big.netCents - 400);
+    assert.equal(money.payable, 400);
 
     const denied = await resolveAccountReview({ actor: { id: donor.id, role: "SUPPORTER" }, reviewId: "missing", action: "release" });
     assert.equal(denied.ok, false);

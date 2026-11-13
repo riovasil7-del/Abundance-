@@ -10,6 +10,7 @@ import { liveGiftShares } from "@/server/community-rules";
 import { planGift } from "@/server/gift-plan";
 import { liveGiftBurst, settleLiveGift } from "@/server/live-gifts";
 import { publishRoomEvent } from "@/server/live-events";
+import { giftReceiveDecision } from "@/server/age-gate";
 import { adultDecision } from "@/server/money";
 import { consumeDurableLimit } from "@/server/ratelimit";
 import { giftBody } from "@/server/validators";
@@ -29,12 +30,13 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const session = await db.liveSession.findUnique({
     where: { id },
     include: {
-      host: { include: { user: { select: { adultAttestedAt: true } } } },
+      host: { include: { user: { select: { adultAttestedAt: true, minorDeclaredAt: true } } } },
       circle: { include: { participants: { include: { creator: true }, orderBy: { joinedAt: "asc" } } } },
     },
   });
   if (!session || session.status !== "LIVE") return jsonError(404, "NOT_FOUND");
-  if (!session.host.user.adultAttestedAt) return jsonError(403, "CREATOR_AGE_REQUIRED");
+  const hostAge = giftReceiveDecision(session.host.user);
+  if (hostAge !== "OK") return jsonError(403, hostAge === "MINOR_NO_GIFTS" ? "MINOR_NO_GIFTS" : "CREATOR_AGE_REQUIRED");
 
   const gift = await db.gift.findUnique({ where: { slug: parsed.data.giftSlug } });
   if (!gift || !gift.active || gift.priceCents <= 0) return jsonError(404, "UNKNOWN_GIFT");

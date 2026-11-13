@@ -3,11 +3,24 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { liveStartNotice, type LiveStartNotice } from "@/lib/live-start";
 import type { GiftChoice } from "@/lib/types";
 import { LiveChatPanel } from "./live-chat-panel";
 import { useI18n } from "./providers";
 
 const LiveStage = dynamic(() => import("./live-stage").then((mod) => mod.LiveStage), { ssr: false });
+
+function roomNotice(notice: LiveStartNotice | null, m: { live: { ageFirst: string; needCreator: string; notConfigured: string; circleOnly: string; startFailed: string; failed: string }; terms: { need: string }; guardian: { locked: string; noLive: string } }) {
+  if (notice === "age") return m.live.ageFirst;
+  if (notice === "terms") return m.terms.need;
+  if (notice === "creator") return m.live.needCreator;
+  if (notice === "config") return m.live.notConfigured;
+  if (notice === "circle") return m.live.circleOnly;
+  if (notice === "parent") return m.guardian.locked;
+  if (notice === "minorLive") return m.guardian.noLive;
+  if (notice === "failed") return m.live.startFailed;
+  return m.live.failed;
+}
 
 export function LiveRoomClient({
   sessionId,
@@ -22,6 +35,7 @@ export function LiveRoomClient({
   gifts,
   blessingNetCents,
   lightBalance,
+  userLowData = false,
 }: {
   sessionId: string;
   title: string;
@@ -35,6 +49,7 @@ export function LiveRoomClient({
   gifts: GiftChoice[];
   blessingNetCents: number;
   lightBalance: number;
+  userLowData?: boolean;
 }) {
   const { messages: m } = useI18n();
   const [connection, setConnection] = useState<{ url: string; token: string; canPublish: boolean } | null>(null);
@@ -49,13 +64,14 @@ export function LiveRoomClient({
         const data = await response.json().catch(() => ({}));
         if (cancelled) return;
         if (!response.ok) {
-          setConnectError(data.error === "LIVE_NOT_CONFIGURED" ? m.live.notConfigured : m.live.failed);
+          const notice = liveStartNotice(typeof data.error === "string" ? data.error : undefined, false);
+          setConnectError(roomNotice(notice, m));
           return;
         }
         setConnection({ url: data.url, token: data.token, canPublish: Boolean(data.canPublish) });
       })
       .catch(() => {
-        if (!cancelled) setConnectError(m.live.failed);
+        if (!cancelled) setConnectError(m.live.startFailed);
       });
     return () => {
       cancelled = true;
@@ -89,7 +105,8 @@ export function LiveRoomClient({
 
   return (
     <div className="live-shell">
-      {connectError ? <p className="live-note">{connectError}</p> : null}
+      {connectError ? <p className="live-note" role="alert">{connectError}</p> : null}
+      {connection && isHost && !connection.canPublish ? <p className="live-note" role="alert">{m.live.ageFirst}</p> : null}
       {!connection && !connectError ? <p className="live-note">{m.live.connecting}</p> : null}
       {connection ? (
         <LiveStage
@@ -106,6 +123,7 @@ export function LiveRoomClient({
           gifts={gifts}
           initialBlessingNetCents={blessingNetCents}
           initialLightBalance={lightBalance}
+          userLowData={userLowData}
           onEnded={() => setEnded(true)}
           onError={() => setConnectError(m.live.failed)}
         />

@@ -208,7 +208,7 @@ const zu: Messages = {
     failed: "Uxhumano aluvulekanga. Zama umsindo kuphela, noma zama futhi.",
     ended: "Loku kusakaza kuphelile.", listTitle: "Ubani okhoma manje",
     reconnecting: "Igumbi liyaxhuma futhi. Isipho esesithunyelwe asiphindi.",
-    cameraNeed: "Ikhamera noma imakrofoni ayivuliwe. Ungahlala nomsindo kuphela.",
+    cameraNeed: "Ikhamera noma imakrofoni ayivuliwe. Ungahlala nomsindo kuphela.", ageFirst: "Qala ngokuqinisekisa 18+ ngaphansi kukaMina. Akukho ukuhlolwa kweminyaka.", needCreator: "Lowo wabelanayo kuphela ongakwazi ukusakaza.", allowMedia: "Vumela ikhamera nomakhrofoni kusiphequluli, bese uzama futhi.", startFailed: "Ukusakaza akuqalanga. Zama futhi.", enableMedia: "Vula ikhamera nomakhrofoni", circleOnly: "Amacembu alo mbuthano kuphela angakwazi ukusakaza lapha.", quality: "Isithombe", qualityAuto: "Auto", qualityHigh: "Phezulu", qualityLow: "Phansi",
     excludeMine: "Fihla engxoxweni yami", reportMod: "Bika kumqondisi", removeEveryone: "Susa kuwo wonke umuntu", removedAll: "Lo muntu akasabhali lapha.", chatMuted: "Awusakwazi ukubhala lapha.", joined: "{name} ujoyinile", giftLine: "{name} · {gift}", translate: "Humusha", chatPause: "Misa ingxoxo",
     chatResume: "Bonisa amagama amasha",
   },
@@ -339,8 +339,9 @@ const zu: Messages = {
   terms: {
     title: "Imigomo", link: "Imigomo", agree: "Ngiyavuma imigomo",
     mustAgree: "I-akhawunti ivela ngemva kwemvume.", need: "Ngaphambi kwevidiyo yokuqala noma ukusakaza, vuma imigomo yamanje.", accept: "Ngiyavuma imigomo", saved: "Imvume igciniwe.",
-    lights: "Ukukhanya okukodwa kungusenti owodwa. Uthenga iphakethe ngamadola uphinde uthumele isipho ngezibani. Iseva ibeka intengo.", split: "Amaphesenti angama-85 esipho ngasinye aya kumuntu, angu-15 aya ku-Hojnosť ngenkampani namaseva. Ukwehlukanisa kwenzeka kanye kuseva.", fund: "Umthombo nesinkwa akuyi kumuntu. Angu-15 ahlala ku-Hojnosť, angama-85 abhalwa esikhwameni somphakathi samanzi noma ukudla, esibizwa ngokuthi isikhwama somphakathi (siyalungiselela). Akukho ukulethwa.",
+    lights: "Ukukhanya okukodwa kungusenti owodwa. Uthenga iphakethe ngamadola uphinde uthumele isipho ngezibani. Iseva ibeka intengo.", split: "Amaphesenti angama-80 esipho esisha ngasinye aya kumuntu, angu-20 aya ku-Hojnosť ngomsebenzi, amaseva, izimali zokukhokha nokulawula. Isipho esivele sibhaliwe sigcina ukuhlukaniswa kwalolo suku. Ukwehlukanisa kwenzeka kanye kuseva.", fund: "Umthombo nesinkwa akuyi kumuntu. Angu-20 ahlala ku-Hojnosť, angama-80 abhalwa esikhwameni somphakathi samanzi noma ukudla, esibizwa ngokuthi isikhwama somphakathi (siyalungiselela). Akukho ukulethwa.",
     holds: "Ngenkathi ingxabano ivuliwe noma ilahlekile, akekho ongakhulula lelo khokho.", age: "Ofuna ukusakaza noma ukwamukela izipho uzimemezela ukuthi uneminyaka okungenani eyi-18. Akukho ukuqinisekiswa kobunikazi.", dignity: "Cela imvume kumuntu omsizayo ngaphambi kokumqopha. Ividiyo njengobufakazi ayifuneki.",
+    minors: "Ongaphansi kweminyaka engu-18 angangeza amagama nezithombe uma umzali evumile. Noma kunjalo angeke amukele izipho noma asakaze esidlangalaleni aze aziveze ngo-18+. Isivumelwano asihlolwa kobunikazi, umzali angasichitha ngalesi sixhumanisi.",
   },
   giftNames: {
     heart: "Inhliziyo encane", smile: "Ukumamatheka", flower: "Imbali", candle: "Ikhandlela", cloud: "Ifu elincane",
@@ -363,6 +364,7 @@ const zu: Messages = {
     dignityTitle: "Isithunzi",
     dignityBody: "Asiceli, futhi asihlazi muntu. Othwetshulwayo kufanele avume. Enganeni, umzali uyavuma. Uma into ibuhlungu, ingabikwa.",
   },
+  guardian: { ask: "Uneminyaka emingaki?", birth: "Usuku lokuzalwa", adult: "Ngineminyaka engu-18+", minor: "Ngiphansi kuka-18", notCheck: "Akukho ukuhlolwa kweminyaka noma kobunikazi.", locked: "I-akhawunti ivuliwe. Kuze kube umzali avuma, awukwazi ukwengeza, ukusakaza, noma ukwamukela izipho.", parentEmail: "I-imeyili yomzali", send: "Thumela isivumelwano", linkReady: "Asikwazi ukuthumela incwadi manje. Nikeza umzali lesi sixhumanisi.", sent: "Sithumele isixhumanisi ku-imeyili yomzali.", canPost: "Umzali uvumile. Ungangeza amagama nezithombe. Izipho nokusakaza okusesidlangalaleni kuvalwe kuze kube 18+.", noLive: "Ukusakaza okusesidlangalaleni kuqala ku-18+.", noGifts: "Izipho zingamukelwa yilowo oziveze ngo-18+ kuphela.", mailSubject: "Isivumelwano somzali se-Hojnosť", mailBody: "Ingane yakho ifuna ukwengeza ku-Hojnosť. Vula isixhumanisi uqinisekise ukuthi ungumzali. Akukho ukuhlolwa kobunikazi.", title: "Isivumelwano somzali", intro: "I-Hojnosť iyindawo ethule yemisebenzi emihle. Azikho izimpi noma izinhla.", rules: "Ingane ingangeza amagama nezithombe uma uvumile. Izipho nokusakaza okusesidlangalaleni kuvalwe kuze kube 18+.", name: "Igama lakho", confirm: "Ngingumzali noma umgcini wale ngane.", approve: "Ngiyavuma njengomzali", revoke: "Khansela isivumelwano", approved: "Isivumelwano sigciniwe. Ingane ingangeza. Izipho nokusakaza okusesidlangalaleni kuvalwe kuze kube 18+.", revoked: "Isivumelwano sikhanseliwe. Ingane ayikwazi ukwengeza okwamanje.", missing: "Lesi sixhumanisi asisebenzi.", child: "Ingane" },
   age: {
     need: "Ukuze usakaze noma wamukele, qinisekisa ukuthi uneminyaka okungenani engu-18. Lokhu akusiwo ukuhlolwa kobunikazi noma kobudala.",
     declared: "Uzisho wena ukuthi uneminyaka okungenani engu-18. Lokhu akubona ubudala noma ubunikazi obuqinisekisiwe.",

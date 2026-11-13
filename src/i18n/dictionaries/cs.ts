@@ -292,7 +292,7 @@ const cs: Messages = {
     ended: "Toto vysílání skončilo.",
     listTitle: "Kdo je teď živě",
     reconnecting: "Místnost se znovu připojuje. Už poslaný dar se nepošle podruhé.",
-    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.",
+    cameraNeed: "Kamera nebo mikrofon nejsou zapnuté. Můžete zůstat jen u zvuku.", ageFirst: "Nejprve potvrďte 18+ v části Já. Není to ověření věku.", needCreator: "Vysílat může jen tvůrce.", allowMedia: "Povolte kameru a mikrofon v prohlížeči a zkuste to znovu.", startFailed: "Vysílání se nepodařilo spustit, zkuste to znovu.", enableMedia: "Zapnout kameru a mikrofon", circleOnly: "V tomto kruhu mohou vysílat jen jeho členové.", quality: "Obraz", qualityAuto: "Auto", qualityHigh: "Vysoká", qualityLow: "Nízká",
     excludeMine: "Skrýt z mého chatu", reportMod: "Nahlásit moderátorovi", removeEveryone: "Odebrat z chatu pro všechny", removedAll: "Tato osoba už zde nepíše.", chatMuted: "Zde už nemůžete psát.", joined: "{name} se připojil", giftLine: "{name} · {gift}", translate: "Přeložit", chatPause: "Pozastavit rozhovor",
     chatResume: "Ukazovat nová slova",
   },
@@ -437,8 +437,9 @@ const cs: Messages = {
   terms: {
     title: "Podmínky", link: "Podmínky", agree: "Souhlasím s podmínkami",
     mustAgree: "Účet vznikne až po souhlasu.", need: "Před prvním videem nebo vysíláním potvrďte aktuální podmínky.", accept: "Souhlasím s podmínkami", saved: "Souhlas je uložen.",
-    lights: "Jedno světélko je jeden cent. Balíček koupíte v dolarech a dar pošlete ve světélkách. Cenu určuje server.", split: "Z každého daru jde 85 % tvůrci a 15 % Hojnosti na společnost a servery. Rozdělení se na serveru udělá jednou.", fund: "Studánka a bochník nejdou tvůrci. 15 % zůstává Hojnosti a 85 % se zapíše do komunitního fondu vody nebo jídla, označeného komunitní fond (připravujeme). Není to slib doručení.",
+    lights: "Jedno světélko je jeden cent. Balíček koupíte v dolarech a dar pošlete ve světélkách. Cenu určuje server.", split: "Z každého nového daru jde 80 % tvůrci a 20 % Hojnosti na provoz, servery, poplatky za platbu a moderování. Dar, který už byl zapsán, si nechává rozdělení z toho dne. Rozdělení se na serveru udělá jednou.", fund: "Studánka a bochník nejdou tvůrci. 20 % zůstává Hojnosti a 80 % se zapíše do komunitního fondu vody nebo jídla, označeného komunitní fond (připravujeme). Není to slib doručení.",
     holds: "Dokud je spor otevřený nebo prohraný, výplatu z té držby nikdo neuvolní.", age: "Tvůrce, který chce vysílat nebo přijímat dary, sám uvede, že má alespoň 18 let. Není to ověření totožnosti.", dignity: "Než někoho natočíte, zeptejte se na souhlas. Video jako důkaz se nikdy nevyžaduje.",
+    minors: "Tvůrce mladší než 18 let může přidat slova a fotky až po souhlasu rodiče. Ani potom nemůže přijímat dary ani vysílat veřejně, dokud sám neuvede 18+. Souhlas rodiče není ověření totožnosti a rodič ho může stejným odkazem zrušit.",
   },
   giftNames: {
     heart: "Srdíčko", smile: "Úsměv", flower: "Kvítek", candle: "Svíčka", cloud: "Mráček",
@@ -465,6 +466,7 @@ const cs: Messages = {
     dignityTitle: "Důstojnost",
     dignityBody: "Nežebráme a nikoho neponižujeme. Koho natáčíme, musí souhlasit. U dětí souhlasí rodič. Když něco bolí, dá se to nahlásit.",
   },
+  guardian: { ask: "Kolik vám je let?", birth: "Datum narození", adult: "Je mi 18+", minor: "Je mi méně než 18", notCheck: "Není to ověření věku ani totožnosti.", locked: "Účet je vytvořen. Dokud rodič nesouhlasí, nemůžete přidávat, vysílat ani přijímat dary.", parentEmail: "E-mail rodiče", send: "Poslat souhlas", linkReady: "Poštu teď neumíme odeslat. Dejte tento odkaz rodiči.", sent: "Odkaz jsme poslali na e-mail rodiče.", canPost: "Rodič souhlasil. Můžete přidávat slova a fotky. Dary a veřejné vysílání zůstanou zavřené, dokud sami neuvedete 18+.", noLive: "Veřejné vysílání je až od 18+.", noGifts: "Dary může přijímat jen ten, kdo sám uvedl 18+.", mailSubject: "Souhlas rodiče pro Hojnost", mailBody: "Vaše dítě chce přidávat na Hojnost. Otevřete odkaz a potvrďte, že jste rodič. Není to ověření totožnosti.", title: "Souhlas rodiče", intro: "Hojnosť je tiché místo pro dobré skutky. Nejsou tu souboje ani žebříčky.", rules: "Dítě může přidávat slova a fotky až po vašem souhlasu. Dary a veřejné vysílání zůstanou zavřené do 18+.", name: "Vaše jméno", confirm: "Jsem rodič nebo opatrovník tohoto dítěte.", approve: "Souhlasím jako rodič", revoke: "Zrušit souhlas", approved: "Souhlas je uložen. Dítě může přidávat. Dary a veřejné vysílání zůstávají zavřené do 18+.", revoked: "Souhlas je zrušen. Dítě zatím nemůže přidávat.", missing: "Tento odkaz už neplatí.", child: "Dítě" },
   age: {
     need: "Chcete-li vysílat nebo přijímat dary, potvrďte, že je vám aspoň 18. Není to ověření totožnosti ani věku.",
     declared: "Sami jste uvedli, že je vám aspoň 18. Toto není ověřený věk ani totožnost.",

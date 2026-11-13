@@ -208,7 +208,7 @@ const pl: Messages = {
     failed: "Połączenie nie powstało. Spróbuj tylko dźwięku albo jeszcze raz.",
     ended: "Ta transmisja się skończyła.", listTitle: "Kto jest teraz na żywo",
     reconnecting: "Pokój łączy się ponownie. Już wysłany dar nie pójdzie drugi raz.",
-    cameraNeed: "Kamera albo mikrofon są wyłączone. Możesz zostać przy samym dźwięku.",
+    cameraNeed: "Kamera albo mikrofon są wyłączone. Możesz zostać przy samym dźwięku.", ageFirst: "Najpierw potwierdź 18+ w Ja. To nie jest sprawdzenie wieku.", needCreator: "Nadawać może tylko osoba, która się dzieli.", allowMedia: "Zezwól na kamerę i mikrofon w przeglądarce i spróbuj ponownie.", startFailed: "Transmisja się nie zaczęła. Spróbuj ponownie.", enableMedia: "Włącz kamerę i mikrofon", circleOnly: "W tym kręgu nadawać mogą tylko jego członkowie.", quality: "Obraz", qualityAuto: "Auto", qualityHigh: "Wysoka", qualityLow: "Niska",
     excludeMine: "Ukryj z mojego czatu", reportMod: "Zgłoś moderatorowi", removeEveryone: "Usuń z czatu dla wszystkich", removedAll: "Ta osoba już tu nie pisze.", chatMuted: "Nie możesz już tu pisać.", joined: "{name} dołączył", giftLine: "{name} · {gift}", translate: "Przetłumacz", chatPause: "Wstrzymaj rozmowę",
     chatResume: "Pokazuj nowe słowa",
   },
@@ -339,8 +339,9 @@ const pl: Messages = {
   terms: {
     title: "Warunki", link: "Warunki", agree: "Zgadzam się na warunki",
     mustAgree: "Konto powstaje dopiero po zgodzie.", need: "Przed pierwszym filmem albo transmisją zaakceptuj aktualne warunki.", accept: "Zgadzam się na warunki", saved: "Zgoda jest zapisana.",
-    lights: "Jedno światełko to jeden cent. Kupujesz paczkę w dolarach i wysyłasz dar w światełkach. Cenę ustala serwer.", split: "85 % każdego daru trafia do osoby, a 15 % do Hojnosti na spółkę i serwery. Podział odbywa się raz na serwerze.", fund: "Studnia i chleb nie idą do osoby. 15 % zostaje w Hojnosti, a 85 % trafia do funduszu wspólnoty na wodę albo jedzenie, nazwanego fundusz wspólnoty (w przygotowaniu). To nie jest dostawa.",
+    lights: "Jedno światełko to jeden cent. Kupujesz paczkę w dolarach i wysyłasz dar w światełkach. Cenę ustala serwer.", split: "80 % każdego nowego daru trafia do osoby, a 20 % do Hojnosti na działanie, serwery, opłaty płatnicze i moderację. Dar już zapisany zostaje przy podziale z tamtego dnia. Podział odbywa się raz na serwerze.", fund: "Studnia i chleb nie idą do osoby. 20 % zostaje w Hojnosti, a 80 % trafia do funduszu wspólnoty na wodę albo jedzenie, nazwanego fundusz wspólnoty (w przygotowaniu). To nie jest dostawa.",
     holds: "Dopóki spór jest otwarty albo przegrany, nikt nie może zwolnić tej wypłaty.", age: "Kto chce nadawać albo przyjmować dary, sam oświadcza, że ma co najmniej 18 lat. To nie jest weryfikacja tożsamości.", dignity: "Zanim kogoś nagrasz, zapytaj o zgodę. Film jako dowód nigdy nie jest wymagany.",
+    minors: "Osoba poniżej 18 lat może dodawać słowa i zdjęcia dopiero po zgodzie rodzica. Nawet wtedy nie przyjmuje darów i nie nadaje publicznie, aż sama poda 18+. Zgoda nie jest sprawdzeniem tożsamości i rodzic może ją cofnąć tym samym linkiem.",
   },
   giftNames: {
     heart: "Serduszko", smile: "Uśmiech", flower: "Kwiatek", candle: "Świeca", cloud: "Obłoczek",
@@ -363,6 +364,7 @@ const pl: Messages = {
     dignityTitle: "Godność",
     dignityBody: "Nie żebrzemy i nikogo nie upokarzamy. Kogo filmujemy, musi się zgodzić. Przy dziecku zgodę daje rodzic. Jeśli coś boli, można to zgłosić.",
   },
+  guardian: { ask: "Ile masz lat?", birth: "Data urodzenia", adult: "Mam 18+", minor: "Mam mniej niż 18", notCheck: "To nie jest sprawdzenie wieku ani tożsamości.", locked: "Konto jest utworzone. Dopóki rodzic nie zgodzi się, nie możesz dodawać, nadawać ani przyjmować darów.", parentEmail: "E-mail rodzica", send: "Wyślij zgodę", linkReady: "Teraz nie wyślemy poczty. Daj ten link rodzicowi.", sent: "Wysłaliśmy link na e-mail rodzica.", canPost: "Rodzic się zgodził. Możesz dodawać słowa i zdjęcia. Dary i publiczne nadawanie zostają zamknięte do 18+.", noLive: "Publiczne nadawanie jest dopiero od 18+.", noGifts: "Dary może przyjmować tylko kto sam podał 18+.", mailSubject: "Zgoda rodzica dla Hojnosti", mailBody: "Twoje dziecko chce coś dodać w Hojnosti. Otwórz link i potwierdź, że jesteś rodzicem. To nie jest sprawdzenie tożsamości.", title: "Zgoda rodzica", intro: "Hojnosť to ciche miejsce dobrych uczynków. Nie ma tu walk ani rankingów.", rules: "Dziecko może dodawać słowa i zdjęcia dopiero po twojej zgodzie. Dary i publiczne nadawanie zostają zamknięte do 18+.", name: "Twoje imię", confirm: "Jestem rodzicem lub opiekunem tego dziecka.", approve: "Zgadzam się jako rodzic", revoke: "Cofnij zgodę", approved: "Zgoda jest zapisana. Dziecko może dodawać. Dary i publiczne nadawanie zostają zamknięte do 18+.", revoked: "Zgoda jest cofnięta. Dziecko na razie nie może dodawać.", missing: "Ten link już nie działa.", child: "Dziecko" },
   age: {
     need: "Aby nadawać albo przyjmować dary, potwierdź, że masz co najmniej 18 lat. To nie jest sprawdzenie tożsamości ani wieku.",
     declared: "Samodzielnie podałeś, że masz co najmniej 18 lat. To nie jest zweryfikowany wiek ani tożsamość.",

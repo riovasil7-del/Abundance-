@@ -78,7 +78,7 @@ export type GiftShareResult =
   | { shares: RecipientShare[]; feeCents: number; netCents: number; grossCents: number; attributedTo: string };
 
 /**
- * A selected creator receives the whole 85 percent.
+ * A selected creator receives the whole 80 percent.
  * Omitting a selection keeps the host, or the existing even circle split.
  * Accepted co-hosts are not given a silent share.
  */

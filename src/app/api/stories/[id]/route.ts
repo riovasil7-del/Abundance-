@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { publishDecision } from "@/server/age-gate";
 import { getCurrentUser } from "@/server/auth";
 import { jsonError } from "@/server/http";
 import { deleteStory, parseVisibility, readStory, updateStory } from "@/server/stories";
@@ -22,6 +23,8 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return jsonError(401, "UNAUTHENTICATED");
+  const allowed = publishDecision({ ...user, consent: user.parentalConsent });
+  if (allowed !== "OK") return jsonError(403, allowed);
   const { id } = await context.params;
   const body = await request.json().catch(() => null);
   const visibility = body?.visibility == null ? undefined : parseVisibility(String(body.visibility));

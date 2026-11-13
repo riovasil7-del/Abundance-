@@ -2,12 +2,26 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { audit } from "@/server/audit";
 import { getCurrentUser } from "@/server/auth";
-import { adultDecision } from "@/server/money";
+import { broadcastDecision } from "@/server/age-gate";
 import { jsonError } from "@/server/http";
 import { readLiveKitCredentials } from "@/server/live-access";
 import { openLiveSession } from "@/server/live-sessions";
 import { isContentCategory } from "@/config/app";
 import { termsDecision } from "@/server/terms";
+import { db } from "@/server/db";
+import { toPublicLiveCard, visibleLiveSessions } from "@/lib/live-list";
+
+export async function GET(request: Request) {
+  const categoryParam = new URL(request.url).searchParams.get("category");
+  const category = isContentCategory(categoryParam) ? categoryParam : null;
+  const rows = await db.liveSession.findMany({
+    where: { status: "LIVE" },
+    include: { host: true },
+    orderBy: { startedAt: "desc" },
+  });
+  const sessions = visibleLiveSessions(rows, category).map(toPublicLiveCard);
+  return NextResponse.json({ sessions }, { headers: { "cache-control": "no-store" } });
+}
 
 const bodySchema = z.object({
   title: z.string().trim().max(120).optional(),
@@ -19,7 +33,8 @@ const bodySchema = z.object({
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user?.creatorProfile) return jsonError(403, "CREATOR_ONLY");
-  if (adultDecision(user) === "AGE_REQUIRED") return jsonError(403, "AGE_REQUIRED");
+  const liveGate = broadcastDecision({ ...user, consent: user.parentalConsent });
+  if (liveGate !== "OK") return jsonError(403, liveGate);
   if (termsDecision(user) === "TERMS_REQUIRED") return jsonError(403, "TERMS_REQUIRED");
   if (!readLiveKitCredentials()) return jsonError(503, "LIVE_NOT_CONFIGURED");
 

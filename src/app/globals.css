@@ -262,6 +262,7 @@ textarea { min-height: 96px; resize: vertical; }
 .action-btn strong { font-size: 0.95rem; }
 .action-btn.on { background: #f3d48a; }
 
+.age-gate { position: fixed; inset: 0; z-index: 45; background: rgba(42, 36, 28, 0.45); display: flex; align-items: flex-end; justify-content: center; }
 .sheet-back { position: fixed; inset: 0; background: rgba(42, 36, 28, 0.35); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
 .sheet {
   width: min(480px, 100%);
@@ -394,7 +395,19 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .live-compose input { flex: 1; min-height: 44px; border-radius: 999px; border: 0; padding: 0 14px; background: rgba(255,250,243,0.94); }
 .live-compose button { border: 0; border-radius: 999px; background: #7d5a22; color: #fffaf3; padding: 0 14px; min-height: 44px; }
-.live-note { position: absolute; left: 16px; right: 16px; top: 72px; z-index: 3; color: #fffaf3; }
+.live-note { position: absolute; left: 16px; right: 16px; top: 72px; z-index: 6; color: #fffaf3; }
+.live-note[role="alert"] {
+  background: rgba(62, 42, 18, 0.94); color: #fffaf3; border-radius: 16px; padding: 10px 12px;
+}
+.live-quality {
+  position: absolute; top: calc(64px + env(safe-area-inset-top)); right: 10px; z-index: 7;
+  display: flex; gap: 4px;
+}
+.live-quality button {
+  border: 0; border-radius: 999px; min-height: 32px; padding: 0 10px;
+  background: rgba(20, 14, 10, 0.55); color: #fffaf3; font-size: 0.75rem;
+}
+.live-quality button.on { background: #7d5a22; }
 .live-thanks {
   position: absolute; left: 16px; right: 84px; top: 78px; z-index: 3;
   background: rgba(255, 248, 230, 0.94); color: #3e2a12; border-radius: 16px; padding: 10px 12px;

@@ -4,8 +4,9 @@
  * Rename the product by changing APP_NAME only.
  * Chrome, the PWA manifest, and page titles read it from here.
  *
- * PLATFORM_FEE is the business rule for every donor transaction:
- * 15% stays with the platform, 85% is credited to creators.
+ * PLATFORM_FEE is the business rule for every new donor transaction:
+ * 20% stays with the platform, 80% is credited to creators.
+ * A gift already stored keeps the split written on that row.
  * Money math must not multiply by the float — see src/server/fees.ts.
  */
 
@@ -14,11 +15,11 @@ export const APP_NAME = "Hojnosť";
 /** Working subtitle kept next to the name so a future rename stays obvious. */
 export const APP_NAME_NOTE = "working name";
 
-/** Exactly 15%. Do not compute cents with this float. */
-export const PLATFORM_FEE = 0.15;
+/** Exactly 20%. Do not compute cents with this float. */
+export const PLATFORM_FEE = 0.2;
 
-/** Integer fraction equal to PLATFORM_FEE. 15 / 100 = 0.15 */
-export const PLATFORM_FEE_NUMERATOR = 15;
+/** Integer fraction equal to PLATFORM_FEE. 20 / 100 = 0.2 */
+export const PLATFORM_FEE_NUMERATOR = 20;
 export const PLATFORM_FEE_DENOMINATOR = 100;
 
 export const LEDGER_CURRENCY = "usd";
@@ -46,7 +47,7 @@ export type FamilyTierCents = (typeof FAMILY_TIERS_CENTS)[number];
 /**
  * Svetielka / lights. One light is one cent of gift value.
  * A pack's dollar price is the number of lights, said in the open.
- * The 15/85 split happens when a light is given, not when a pack is bought.
+ * The 20/80 split happens when a light is given, not when a pack is bought.
  */
 export const LIGHT_PACKS = [
   { slug: "small", priceCents: 500, lights: 500 },
@@ -69,7 +70,7 @@ export function lightPack(slug: string | undefined | null) {
 export const GIFT_CONFIRM_CENTS = 500;
 
 /** Bump this when the terms text changes. Sign-up and creator publish check it. */
-export const TERMS_VERSION = 1;
+export const TERMS_VERSION = 2;
 
 export const CONTENT_CATEGORIES = [
   "everyday",

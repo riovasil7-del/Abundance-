@@ -62,18 +62,18 @@ Heslo pre všetky: `DobrySkutok-1`
 
 Na prihlásení sú tlačidlá, ktoré tieto účty vyplnia. Sú to semienka na vyskúšanie, nie zadné vrátka.
 
-## Pravidlo 15 / 85
+## Pravidlo 20 / 80
 
-Každá darcovská transakcia sa delí na serveri, v celých centoch:
+Každý nový dar sa delí na serveri, v celých centoch. Podiel je napísaný len v podmienkach, nie na obrazovkách aplikácie.
 
-- **15 %** ostáva platforme (spoločnosť a servery),
-- **85 %** je zapísaných tvorcovi.
+- **20 %** ostáva platforme (prevádzka, servery, poplatky za platbu a moderovanie),
+- **80 %** je zapísaných tvorcovi.
 
-Konštanty sú `PLATFORM_FEE = 0.15` a zlomok `15 / 100` v `src/config/app.ts`. Jediný výpočet je `splitDonation()` v `src/server/fees.ts`. Násobenie plávajúcou desatinnou čiarkou sa na peniaze nepoužíva. Zaokrúhlenie je half-up: poplatok z 10 centov (1,5 centu) je 2 centy. Súčet poplatku a čistej sumy sa vždy rovná hrubej sume. V databáze to isté drží kontrola `ledger_conserves_cents`.
+Konštanty sú `PLATFORM_FEE = 0.2` a zlomok `20 / 100` v `src/config/app.ts`. Jediný výpočet je `splitDonation()` v `src/server/fees.ts`. Násobenie plávajúcou desatinnou čiarkou sa na peniaze nepoužíva. Zaokrúhlenie je half-up: poplatok z 3 centov (0,6 centu) je 1 cent. Súčet poplatku a čistej sumy sa vždy rovná hrubej sume. V databáze to isté drží kontrola `ledger_conserves_cents`. Starší riadok v knihe sa neprepisuje.
 
 Cenu daru server načíta z katalógu. Telo požiadavky sumu neobsahuje. Ak ju klient pošle, schéma ju zahodí.
 
-Pri kruhu sa 15 % vezme raz z celého daru a 85 % sa rozdelí rovným dielom medzi **overených** účastníkov. Zvyšné centy dostanú tí, ktorí sa pridali skôr. Neoverený účastník je v kruhu vidieť, ale podiel zatiaľ nemá.
+Pri kruhu sa 20 % vezme raz z celého daru a 80 % sa rozdelí rovným dielom medzi **overených** účastníkov. Zvyšné centy dostanú tí, ktorí sa pridali skôr. Neoverený účastník je v kruhu vidieť, ale podiel zatiaľ nemá.
 
 Peňaženka drží hrubú sumu, poplatok aj čistú sumu pri každom pohybe. Čistá suma je v držbe `PAYOUT_HOLD_DAYS` (predvolene 7 dní), kým sa nedá vyplatiť.
 
@@ -83,7 +83,7 @@ Testy:
 npm test
 ```
 
-Pokryté sú presný podiel 15/85, hraničné zaokrúhlenie, invariant pre 0 až 20 000 centov, odmietnutie záporných a necelých súm, ignorovanie klientskej sumy a rovnomerné delenie kruhu.
+Pokryté sú presný podiel 20/80, hraničné zaokrúhlenie, invariant pre 0 až 20 000 centov, odmietnutie záporných a necelých súm, ignorovanie klientskej sumy a rovnomerné delenie kruhu.
 
 ## Čo prvá verzia vie
 
@@ -104,7 +104,7 @@ Pokryté sú presný podiel 15/85, hraničné zaokrúhlenie, invariant pre 0 až
 
 ## Čo je zatiaľ len rozhranie
 
-**Platby.** Bez `STRIPE_SECRET_KEY` beží označený testovací režim: dar sa zapíše do účtovnej knihy, peniaze reálne nejdú. S kľúčom server vytvorí Stripe PaymentIntent na hrubú sumu. Ak má tvorca `stripeAccountId`, použije sa `application_fee_amount` (15 %) a `transfer_data` (Stripe Connect). Kruh má viac príjemcov, preto ostáva na účte platformy a delenie je v knihe — Connect vypláca jednému účtu. Webhook je `POST /api/stripe/webhook`. Suma z udalosti sa porovná s riadkom v knihe. Kým webhook platbu nepotvrdí, stav je `PENDING` a do peňaženky sa nepočíta.
+**Platby.** Bez `STRIPE_SECRET_KEY` beží označený testovací režim: dar sa zapíše do účtovnej knihy, peniaze reálne nejdú. S kľúčom server vytvorí Stripe PaymentIntent na hrubú sumu. Ak má tvorca `stripeAccountId`, použije sa `application_fee_amount` (20 %) a `transfer_data` (Stripe Connect). Kruh má viac príjemcov, preto ostáva na účte platformy a delenie je v knihe — Connect vypláca jednému účtu. Webhook je `POST /api/stripe/webhook`. Suma z udalosti sa porovná s riadkom v knihe. Kým webhook platbu nepotvrdí, stav je `PENDING` a do peňaženky sa nepočíta.
 
 **Výplaty.** `src/server/payouts.ts` má rozhranie pre M-Pesa, Flutterwave, Paystack a Stripe Connect. Predvolená implementácia žiadosť len uloží ako `STUBBED` a zostatok nestrhne, lebo peniaze neodišli.
 
@@ -120,7 +120,7 @@ Pokryté sú presný podiel 15/85, hraničné zaokrúhlenie, invariant pre 0 až
 
 ## Ďalšie kroky
 
-1. **Právny subjekt** a jasné podmienky: kto je platforma, ako sa účtuje 15 %, dane, ochrana darcov aj tvorcov, pravidlá pre obsah s deťmi.
+1. **Právny subjekt** a jasné podmienky: kto je platforma, ako sa účtuje 20 %, dane, ochrana darcov aj tvorcov, pravidlá pre obsah s deťmi.
 2. **Stripe v ostrej prevádzke:** live kľúče, webhook, Stripe Connect účty tvorcov, prípadne samostatný účet pre kruhy.
 3. **Výplaty** do Kene: M-Pesa, Flutterwave alebo Paystack. Až potom sa zostatok po držbe smie odpísať.
 4. **KYC** (napríklad Smile ID), aby jeden človek naozaj znamenal jeden účet a výplata šla overenému tvorcovi.

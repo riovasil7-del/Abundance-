@@ -208,7 +208,7 @@ const es: Messages = {
     failed: "La conexión no se abrió. Prueba solo el sonido, o inténtalo de nuevo.",
     ended: "Esta emisión terminó.", listTitle: "Quién está en directo",
     reconnecting: "La sala se vuelve a conectar. Un don ya enviado no se envía otra vez.",
-    cameraNeed: "La cámara o el micrófono no están. Puedes quedarte solo con el audio.",
+    cameraNeed: "La cámara o el micrófono no están. Puedes quedarte solo con el audio.", ageFirst: "Primero confirma 18+ en Yo. No es una verificación de edad.", needCreator: "Solo quien comparte puede emitir.", allowMedia: "Permite la cámara y el micrófono en el navegador y vuelve a intentarlo.", startFailed: "La emisión no empezó. Inténtalo de nuevo.", enableMedia: "Encender cámara y micrófono", circleOnly: "Solo los miembros de este círculo pueden emitir aquí.", quality: "Imagen", qualityAuto: "Auto", qualityHigh: "Alta", qualityLow: "Baja",
     excludeMine: "Quitar de mi chat", reportMod: "Avisar a un moderador", removeEveryone: "Quitar del chat para todos", removedAll: "Esta persona ya no escribe aquí.", chatMuted: "Ya no puedes escribir aquí.", joined: "{name} se unió", giftLine: "{name} · {gift}", translate: "Traducir", chatPause: "Pausar la conversación",
     chatResume: "Mostrar palabras nuevas",
   },
@@ -339,8 +339,9 @@ const es: Messages = {
   terms: {
     title: "Condiciones", link: "Condiciones", agree: "Acepto las condiciones",
     mustAgree: "La cuenta nace solo después del acuerdo.", need: "Antes del primer video o del directo, acepta las condiciones actuales.", accept: "Acepto las condiciones", saved: "El acuerdo quedó guardado.",
-    lights: "Una luz es un centavo. Compras un paquete en dólares y envías el don en luces. El servidor fija el precio.", split: "El 85 % de cada don va a la persona y el 15 % a Hojnosť para la sociedad y los servidores. El reparto se hace una sola vez en el servidor.", fund: "El pozo y el pan no van a la persona. El 15 % queda en Hojnosť y el 85 % se anota en el fondo comunitario de agua o comida, llamado fondo comunitario (en preparación). No es una entrega.",
+    lights: "Una luz es un centavo. Compras un paquete en dólares y envías el don en luces. El servidor fija el precio.", split: "El 80 % de cada don nuevo va a la persona y el 20 % a Hojnosť para el funcionamiento, los servidores, las comisiones de pago y la moderación. Un don ya anotado conserva el reparto de ese día. El reparto se hace una sola vez en el servidor.", fund: "El pozo y el pan no van a la persona. El 20 % queda en Hojnosť y el 80 % se anota en el fondo comunitario de agua o comida, llamado fondo comunitario (en preparación). No es una entrega.",
     holds: "Mientras una disputa está abierta o perdida, nadie puede liberar ese pago.", age: "Quien quiere emitir o recibir dones declara tener al menos 18 años. No es una verificación de identidad.", dignity: "Pide consentimiento a la persona a la que ayudas antes de filmarla. Nunca se exige un video como prueba.",
+    minors: "Quien tiene menos de 18 años puede añadir palabras y fotos solo después del acuerdo de un padre. Aun así no puede recibir dones ni emitir en público hasta declarar 18+. Ese acuerdo no es una verificación de identidad y el padre puede cancelarlo con el mismo enlace.",
   },
   giftNames: {
     heart: "Corazoncito", smile: "Sonrisa", flower: "Flor", candle: "Vela", cloud: "Nubecita",
@@ -363,6 +364,7 @@ const es: Messages = {
     dignityTitle: "Dignidad",
     dignityBody: "No mendigamos y no humillamos a nadie. Quien es filmado debe aceptar. Con una niña o un niño, acepta su madre o padre. Si algo duele, se puede avisar.",
   },
+  guardian: { ask: "¿Cuántos años tienes?", birth: "Fecha de nacimiento", adult: "Tengo 18+", minor: "Tengo menos de 18", notCheck: "No es una verificación de edad ni de identidad.", locked: "La cuenta está creada. Hasta que un padre acepte, no puedes añadir, emitir ni recibir dones.", parentEmail: "Correo de un padre", send: "Enviar el acuerdo", linkReady: "Ahora no podemos enviar correo. Dale este enlace a un padre.", sent: "Enviamos el enlace al correo del padre.", canPost: "Un padre aceptó. Puedes añadir palabras y fotos. Los dones y el directo público siguen cerrados hasta 18+.", noLive: "El directo público es solo desde 18+.", noGifts: "Solo puede recibir dones quien declaró 18+.", mailSubject: "Acuerdo de un padre para Hojnosť", mailBody: "Tu hijo quiere añadir algo en Hojnosť. Abre el enlace y confirma que eres el padre. No es una verificación de identidad.", title: "Acuerdo de un padre", intro: "Hojnosť es un lugar tranquilo para las buenas acciones. No hay combates ni rankings.", rules: "Un niño puede añadir palabras y fotos solo después de tu acuerdo. Los dones y el directo público siguen cerrados hasta 18+.", name: "Tu nombre", confirm: "Soy el padre o tutor de este niño.", approve: "Acepto como padre", revoke: "Cancelar el acuerdo", approved: "El acuerdo está guardado. El niño puede añadir. Los dones y el directo público siguen cerrados hasta 18+.", revoked: "El acuerdo está cancelado. El niño no puede añadir por ahora.", missing: "Este enlace ya no vale.", child: "Niño" },
   age: {
     need: "Para emitir o recibir, confirma que tienes al menos 18 años. No es una verificación de identidad ni de edad.",
     declared: "Declaraste tener al menos 18 años. No es una edad ni una identidad verificadas.",

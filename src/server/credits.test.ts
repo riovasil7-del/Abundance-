@@ -19,7 +19,7 @@ test("a gift price never comes from the client", () => {
   assert.throws(() => catalogPriceCents(1.5), /BAD_PRICE/);
 });
 
-test("buying a pack is idempotent, and a gift spends lights at 15/85", { skip: !process.env.DATABASE_URL }, async () => {
+test("buying a pack is idempotent, and a gift spends lights at 20/80", { skip: !process.env.DATABASE_URL }, async () => {
   const stamp = Date.now().toString(36);
   const donor = await db.user.create({
     data: { email: `lights-${stamp}@test.local`, passwordHash: "x", name: "Tester" },
@@ -73,8 +73,8 @@ test("buying a pack is idempotent, and a gift spends lights at 15/85", { skip: !
     assert.equal(spent.transaction.feeCents + spent.transaction.netCents, price);
     assert.equal(spent.transaction.paymentMode, "CREDITS");
     assert.equal(gift.priceCents, 20);
-    assert.equal(split.feeCents, 3);
-    assert.equal(split.netCents, 17);
+    assert.equal(split.feeCents, 4);
+    assert.equal(split.netCents, 16);
 
     const replay = await spendLights({
       donorId: donor.id,

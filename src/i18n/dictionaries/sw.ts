@@ -211,7 +211,7 @@ const sw: Messages = {
     failed: "Muunganiko haujafunguka. Jaribu sauti tu, au jaribu tena.",
     ended: "Matangazo haya yameisha.", listTitle: "Nani yuko moja kwa moja",
     reconnecting: "Chumba kinaunganisha tena. Sadaka iliyotumwa haitumwi tena.",
-    cameraNeed: "Kamera au maikrofoni haipo. Unaweza kubaki na sauti tu.",
+    cameraNeed: "Kamera au maikrofoni haipo. Unaweza kubaki na sauti tu.", ageFirst: "Kwanza thibitisha 18+ chini ya Mimi. Si ukaguzi wa umri.", needCreator: "Anayeshiriki pekee ndiye anayeweza kutangaza.", allowMedia: "Ruhusu kamera na kipaza sauti kwenye kivinjari, kisha jaribu tena.", startFailed: "Matangazo hayajaanza. Jaribu tena.", enableMedia: "Washa kamera na kipaza sauti", circleOnly: "Ni wanachama wa duara hili pekee wanaoweza kutangaza hapa.", quality: "Picha", qualityAuto: "Auto", qualityHigh: "Juu", qualityLow: "Chini",
     excludeMine: "Ficha kwenye mazungumzo yangu", reportMod: "Ripoti kwa msimamizi", removeEveryone: "Ondoa kwa wote", removedAll: "Mtu huyu haandiki tena hapa.", chatMuted: "Huwezi kuandika tena hapa.", joined: "{name} amejiunga", giftLine: "{name} · {gift}", translate: "Tafsiri", chatPause: "Simamisha mazungumzo",
     chatResume: "Onyesha maneno mapya",
   },
@@ -342,8 +342,9 @@ const sw: Messages = {
   terms: {
     title: "Masharti", link: "Masharti", agree: "Nakubali masharti",
     mustAgree: "Akaunti inazaliwa baada ya kukubali.", need: "Kabla ya video ya kwanza au matangazo, kubali masharti ya sasa.", accept: "Nakubali masharti", saved: "Makubaliano yamehifadhiwa.",
-    lights: "Taa moja ni senti moja. Unanunua kifurushi kwa dola na kutuma sadaka kwa taa. Seva inaweka bei.", split: "Asilimia 85 ya kila sadaka huenda kwa mtu na 15 % kwa Hojnosť kwa kampuni na seva. Mgawanyo hufanywa mara moja kwenye seva.", fund: "Kisima na mkate haviendi kwa mtu. 15 % hubaki Hojnosť na 85 % huandikwa kwenye mfuko wa jamii wa maji au chakula, uitwao mfuko wa jamii (tunaandaa). Si utoaji.",
+    lights: "Taa moja ni senti moja. Unanunua kifurushi kwa dola na kutuma sadaka kwa taa. Seva inaweka bei.", split: "Asilimia 80 ya kila sadaka mpya huenda kwa mtu na 20 % kwa Hojnosť kwa uendeshaji, seva, ada za malipo na usimamizi. Sadaka iliyoandikwa tayari hubaki na mgawanyo wa siku hiyo. Mgawanyo hufanywa mara moja kwenye seva.", fund: "Kisima na mkate haviendi kwa mtu. 20 % hubaki Hojnosť na 80 % huandikwa kwenye mfuko wa jamii wa maji au chakula, uitwao mfuko wa jamii (tunaandaa). Si utoaji.",
     holds: "Wakati mgogoro uko wazi au umepotea, hakuna anayeweza kuachilia malipo hayo.", age: "Anayetaka kutangaza au kupokea sadaka anajitangaza kuwa na angalau miaka 18. Si uthibitisho wa utambulisho.", dignity: "Muombe ridhaa mtu unayemsaidia kabla ya kumpiga picha. Video kama uthibitisho haihitajiki.",
+    minors: "Mwenye chini ya miaka 18 anaweza kuongeza maneno na picha baada ya mzazi kukubali. Hata hivyo hawezi kupokea sadaka wala kutangaza hadharani mpaka ajitangaze 18+. Makubaliano si ukaguzi wa utambulisho, na mzazi anaweza kuyafuta kwa kiungo hicho.",
   },
   giftNames: {
     heart: "Moyo mdogo", smile: "Tabasamu", flower: "Ua", candle: "Mshumaa", cloud: "Wingu dogo",
@@ -366,6 +367,7 @@ const sw: Messages = {
     dignityTitle: "Heshima",
     dignityBody: "Hatuombi omba wala hatumdhalilishi mtu. Anayepigwa picha lazima akubali. Kwa mtoto, mzazi anakubali. Ikiwa kitu kinaumiza, kinaweza kuripotiwa.",
   },
+  guardian: { ask: "Una umri gani?", birth: "Tarehe ya kuzaliwa", adult: "Nina 18+", minor: "Nina chini ya 18", notCheck: "Si ukaguzi wa umri wala utambulisho.", locked: "Akaunti ipo. Mpaka mzazi akubali, huwezi kuongeza, kutangaza, wala kupokea sadaka.", parentEmail: "Barua pepe ya mzazi", send: "Tuma makubaliano", linkReady: "Hatuwezi kutuma barua sasa. Mpe mzazi kiungo hiki.", sent: "Tumetuma kiungo kwenye barua ya mzazi.", canPost: "Mzazi amekubali. Unaweza kuongeza maneno na picha. Sadaka na matangazo ya hadhara yamefungwa mpaka 18+.", noLive: "Matangazo ya hadhara ni tangu 18+.", noGifts: "Sadaka hupokelewa na aliyejitangaza 18+ tu.", mailSubject: "Makubaliano ya mzazi kwa Hojnosť", mailBody: "Mtoto wako anataka kuongeza kitu kwenye Hojnosť. Fungua kiungo na uthibitishe kuwa wewe ni mzazi. Si ukaguzi wa utambulisho.", title: "Makubaliano ya mzazi", intro: "Hojnosť ni mahali tulivu pa matendo mema. Hakuna mapigano wala orodha.", rules: "Mtoto anaweza kuongeza maneno na picha baada ya wewe kukubali. Sadaka na matangazo ya hadhara yamefungwa mpaka 18+.", name: "Jina lako", confirm: "Mimi ni mzazi au mlezi wa mtoto huyu.", approve: "Nakubali kama mzazi", revoke: "Futa makubaliano", approved: "Makubaliano yamehifadhiwa. Mtoto anaweza kuongeza. Sadaka na matangazo ya hadhara yamefungwa mpaka 18+.", revoked: "Makubaliano yamefutwa. Mtoto hawezi kuongeza kwa sasa.", missing: "Kiungo hiki hakifanyi kazi tena.", child: "Mtoto" },
   age: {
     need: "Ili kutangaza au kupokea, thibitisha una angalau miaka 18. Hii si ukaguzi wa utambulisho wala umri.",
     declared: "Ulijitangaza kuwa na angalau miaka 18. Huu si umri wala utambulisho uliothibitishwa.",

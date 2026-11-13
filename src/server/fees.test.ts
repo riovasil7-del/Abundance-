@@ -8,35 +8,42 @@ import {
   splitDonation,
 } from "./fees";
 
-test("PLATFORM_FEE is exactly 15 percent", () => {
-  assert.equal(PLATFORM_FEE, 0.15);
+test("PLATFORM_FEE is exactly 20 percent", () => {
+  assert.equal(PLATFORM_FEE, 0.2);
+  assert.equal(PLATFORM_FEE, 20 / 100);
 });
 
-test("one dollar splits into 15 cents fee and 85 cents net", () => {
-  assert.deepEqual(splitDonation(100), { grossCents: 100, feeCents: 15, netCents: 85 });
+test("one dollar splits into 20 cents fee and 80 cents net", () => {
+  assert.deepEqual(splitDonation(100), { grossCents: 100, feeCents: 20, netCents: 80 });
 });
 
-test("catalog prices that divide cleanly keep an exact 15/85 split", () => {
+test("a gift recorded at the old split is not recomputed", () => {
+  const recorded = { grossCents: 100, feeCents: 15, netCents: 85 };
+  assert.equal(recorded.feeCents + recorded.netCents, recorded.grossCents);
+  assert.notDeepEqual(splitDonation(recorded.grossCents), recorded);
+});
+
+test("catalog prices that divide cleanly keep an exact 20/80 split", () => {
   for (const gift of GIFT_CATALOG) {
     const split = splitDonation(gift.priceCents);
     assert.equal(split.feeCents + split.netCents, gift.priceCents);
     if (gift.priceCents % 100 === 0) {
-      assert.equal(split.feeCents, (gift.priceCents * 15) / 100);
+      assert.equal(split.feeCents, (gift.priceCents * 20) / 100);
     }
   }
 });
 
 test("half-up rounding edges stay inside a single cent", () => {
-  // 1 cent * 15% = 0.15 -> 0
+  // 1 cent * 20% = 0.2 -> 0
   assert.deepEqual(splitDonation(1), { grossCents: 1, feeCents: 0, netCents: 1 });
-  // 3 * 0.15 = 0.45 -> 0
-  assert.equal(splitDonation(3).feeCents, 0);
-  // 4 * 0.15 = 0.60 -> 1
-  assert.equal(splitDonation(4).feeCents, 1);
-  // 10 * 0.15 = 1.5 -> 2 (half up), creator keeps 8
+  // 2 * 0.2 = 0.4 -> 0
+  assert.equal(splitDonation(2).feeCents, 0);
+  // 3 * 0.2 = 0.6 -> 1
+  assert.equal(splitDonation(3).feeCents, 1);
+  // 10 * 0.2 = 2 exactly, creator keeps 8
   assert.deepEqual(splitDonation(10), { grossCents: 10, feeCents: 2, netCents: 8 });
-  // 7 * 0.15 = 1.05 -> 1
-  assert.equal(splitDonation(7).feeCents, 1);
+  // 8 * 0.2 = 1.6 -> 2
+  assert.equal(splitDonation(8).feeCents, 2);
   assert.equal(splitDonation(0).feeCents, 0);
 });
 
@@ -46,7 +53,7 @@ test("fee plus net always equals gross, and the fee is within half a cent", () =
     assert.equal(split.feeCents + split.netCents, gross);
     assert.ok(split.feeCents >= 0);
     assert.ok(split.netCents >= 0);
-    const exactFee = gross * 0.15;
+    const exactFee = gross * 0.2;
     assert.ok(
       Math.abs(split.feeCents - exactFee) <= 0.5 + 1e-9,
       `gross ${gross} fee ${split.feeCents} drifted from ${exactFee}`,
@@ -57,8 +64,8 @@ test("fee plus net always equals gross, and the fee is within half a cent", () =
 test("a large exact amount does not drift", () => {
   const gross = 9_999_900;
   const split = splitDonation(gross);
-  assert.equal(split.feeCents, 1_499_985);
-  assert.equal(split.netCents, 8_499_915);
+  assert.equal(split.feeCents, 1_999_980);
+  assert.equal(split.netCents, 7_999_920);
   assert.equal(split.feeCents + split.netCents, gross);
 });
 
@@ -80,20 +87,20 @@ test("client-supplied amounts are ignored; the catalog price is split", () => {
   assert.throws(() => priceDonationFromCatalog(GIFT_CATALOG, "nope", { amount: 100 }), /UNKNOWN_GIFT/);
 });
 
-test("circle net is shared evenly after the single 15 percent fee", () => {
+test("circle net is shared evenly after the single 20 percent fee", () => {
   const result = splitCircleDonation(100, 3);
-  assert.equal(result.feeCents, 15);
-  assert.equal(result.netCents, 85);
-  assert.deepEqual(result.shares, [29, 28, 28]);
+  assert.equal(result.feeCents, 20);
+  assert.equal(result.netCents, 80);
+  assert.deepEqual(result.shares, [27, 27, 26]);
   assert.equal(
     result.shares.reduce((sum, share) => sum + share, 0),
     result.netCents,
   );
 
   const dove = splitCircleDonation(500, 3);
-  assert.equal(dove.feeCents, 75);
-  assert.equal(dove.netCents, 425);
-  assert.deepEqual(dove.shares, [142, 142, 141]);
+  assert.equal(dove.feeCents, 100);
+  assert.equal(dove.netCents, 400);
+  assert.deepEqual(dove.shares, [134, 133, 133]);
 });
 
 test("even allocation conserves cents and never differs by more than one", () => {

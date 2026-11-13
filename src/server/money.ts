@@ -4,7 +4,7 @@ import { splitDonation } from "./fees";
  * A refund or dispute of a light pack.
  * Unused lights are reversed. Lights already given are not pulled out of the
  * creator's available or paid balance. Pending gifts can be frozen whole,
- * oldest first, and only when the whole gift fits inside the original 85%.
+ * oldest first, and only when the whole gift fits inside the current 80% exposure.
  * Anything left is an explicit review balance, never a negative wallet.
  */
 export function planRefund(input: {
@@ -45,7 +45,7 @@ export function planRefund(input: {
   };
 }
 
-/** Card fees stay inside the platform 15%. They never shrink the creator's 85%. */
+/** Card fees stay inside the platform 20%. They never shrink the creator's 80%. */
 export function platformBearsProcessing(grossCents: number, processorCents: number) {
   if (!Number.isSafeInteger(processorCents) || processorCents < 0) {
     throw new Error("BAD_PROCESSOR_FEE");
@@ -97,7 +97,7 @@ export function reducePaymentCase(
   return { state: next, effect: "none" };
 }
 
-/** Share an already-recorded creator net. Does not take another 15% fee. */
+/** Share an already-recorded creator net. Does not take another fee. */
 export function attributeRecordedNet(netCents: number, lights: number, grossCents: number): number {
   if (grossCents <= 0 || lights <= 0 || netCents < 0) return 0;
   if (lights >= grossCents) return netCents;

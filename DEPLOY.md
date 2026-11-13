@@ -2,7 +2,7 @@
 
 Tento návod je pre Ria. Netreba vedieť programovať. Každý krok je kliknutie alebo skopírovanie textu. Účty nižšie majú bezplatnú verziu, ktorá na prvé spustenie stačí.
 
-Kód je v GitHube. Aplikácia sa volá Hojnosť. Dary fungujú aj bez Stripe: je to ukážkový režim, ale rozdelenie 15 % platforma / 85 % tvorca sa počíta na serveri rovnako ako pri ostrej platbe.
+Kód je v GitHube. Aplikácia sa volá Hojnosť. Dary fungujú aj bez Stripe: je to ukážkový režim, ale rozdelenie 20 % platforma / 80 % tvorca sa počíta na serveri rovnako ako pri ostrej platbe. Podiel je len v podmienkach.
 
 Keď niečo z živého vysielania ešte nemáte, stránka povie „Živé vysielanie ešte nie je zapnuté“ a ostatné časti bežia ďalej.
 
@@ -58,7 +58,7 @@ Vložte presne tieto mená. Hodnotu prilepte bez úvodzoviek.
 | `LIVEKIT_API_KEY` | z kroku 5 |
 | `LIVEKIT_API_SECRET` | z kroku 5 |
 
-Prázdny Stripe je v poriadku. Peňaženka potom predá svetielka jedným ťuknutím (ukážkový režim) a dar sa strhne z nich. Na obrazovke ostáva 15 % a 85 %.
+Prázdny Stripe je v poriadku. Peňaženka potom predá svetielka jedným ťuknutím (ukážkový režim) a dar sa strhne z nich. Podiel 20/80 sa na obrazovkách neukazuje. Je v podmienkach.
 
 Keď Stripe kľúče vyplníte, nákup balíčka ide cez Stripe Checkout. Svetielka sa pripíšu až po zaplatení, na existujúcej adrese webhooku `https://vaša-doména/api/stripe/webhook`. V Stripe dashboarde pri tejto adrese zapnite udalosti `checkout.session.completed`, `payment_intent.succeeded`, `charge.refunded` a `charge.dispute.created`. Opakovaná udalosť svetielka nepripíše druhý raz. Vrátenie a spor nestrhnú tvorcovi dostupný zostatok pod nulu. Novú premennú prostredia netreba. `STRIPE_WEBHOOK_SECRET` je ten istý podpis, ktorý už tabuľka vyššie spomína.
 
@@ -102,7 +102,7 @@ Toto môžete urobiť až keď stránka inak beží.
 4. Vložte ich do Vercelu ako `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
 5. Redeploy.
 
-Tvorca potom v telefóne otvorí svoj profil a stlačí „Ísť naživo“. Prehliadač si vypýta kameru a mikrofón. Divák otvorí odkaz „Naživo“. V izbe je rozhovor (drzé slová sa zadržia) a dar, ktorý ide cez to isté pravidlo 15/85.
+Tvorca potom v telefóne otvorí svoj profil a stlačí „Ísť naživo“. Prehliadač si vypýta kameru a mikrofón. Divák otvorí odkaz „Naživo“. V izbe je rozhovor (drzé slová sa zadržia) a dar, ktorý ide cez to isté pravidlo 20/80.
 
 Kruh požehnania má tlačidlo „Živé požehnanie kruhu“. Viacerí tvorcovia sú v jednej izbe. Nie je tam súboj ani poradie. Dar sa po poplatku delí medzi overených.
 
@@ -136,8 +136,8 @@ Keď je ukážka vnútri, `SEED_SECRET` vo Verceli zmažte a dajte Redeploy. Str
 ## 8. Rýchla skúška na telefóne
 
 1. Otvorte adresu. Má ísť kanál videí.
-2. Prihláste Elenu a pošlite sviečku. Má sa ukázať 1,00 USD, poplatok 0,15 USD a tvorca 0,85 USD.
-3. Odhláste sa, prihláste Aminu, otvorte Peňaženku. Má vidieť čistých 85 %.
+2. Prihláste Elenu a pošlite sviečku. Potvrdenie ukáže sumu daru, nie percentá. Nový dar sa v knihe delí 20/80.
+3. Odhláste sa, prihláste Aminu, otvorte Peňaženku. Má vidieť čistú sumu z darov, bez textu o percentách.
 4. Ak je LiveKit doplnený: Amina stlačí „Ísť naživo“, povolí kameru. Elena v druhom telefóne alebo okne otvorí „Naživo“ a pošle dar naživo.
 
 ## 9. Čo zatiaľ nerobiť
