@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/server/auth";
 import { db } from "@/server/db";
 import { jsonError } from "@/server/http";
 
-const bodySchema = z.object({ theme: z.enum(["pearl", "diamond"]) });
+const bodySchema = z.object({ theme: z.enum(["pearl", "diamond", "garden"]) });
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();

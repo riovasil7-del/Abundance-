@@ -430,6 +430,7 @@ export const sk = {
     themeLabel: "Vzhľad",
     themePearl: "Perla",
     themeDiamond: "Čierny diamant",
+    themeGarden: "Nebeská záhrada",
     family: "Rodiny, ktorých ste súčasťou",
     blockedTitle: "Skrytí v chate",
     blockedEmpty: "Nikoho ste z chatu nevylúčili.",

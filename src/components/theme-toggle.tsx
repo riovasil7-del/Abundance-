@@ -43,6 +43,9 @@ export function ThemeToggle({ initial, loggedIn }: { initial: ThemeChoice | null
         <button type="button" className={current === "diamond" ? "on" : ""} aria-pressed={current === "diamond"} onClick={() => void choose("diamond")}>
           {m.me.themeDiamond}
         </button>
+        <button type="button" className={current === "garden" ? "on" : ""} aria-pressed={current === "garden"} onClick={() => void choose("garden")}>
+          {m.me.themeGarden}
+        </button>
       </div>
     </section>
   );

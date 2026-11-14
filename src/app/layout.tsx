@@ -55,7 +55,7 @@ export async function generateViewport(): Promise<Viewport> {
   const cookieTheme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
   const theme = parseTheme(user?.themeChoice) ?? cookieTheme;
   return {
-    themeColor: theme === "diamond" ? "#07060f" : "#f6efe6",
+    themeColor: theme === "diamond" ? "#07060f" : theme === "garden" ? "#f4e2cc" : "#f6efe6",
     width: "device-width",
     initialScale: 1,
   };

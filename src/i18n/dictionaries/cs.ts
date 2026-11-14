@@ -415,6 +415,7 @@ const cs: Messages = {
     themeLabel: "Vzhled",
     themePearl: "Perla",
     themeDiamond: "Černý diamant",
+    themeGarden: "Nebeská zahrada",
     family: "Rodiny, kterých jste součástí",
     none: "Zatím nejste ničí měsíční rodina.",
     blockedTitle: "Skrytí v chatu",

@@ -318,6 +318,7 @@ const pt: Messages = {
     themeLabel: "Aspeto",
     themePearl: "Pérola",
     themeDiamond: "Diamante negro",
+    themeGarden: "Jardim celestial",
     family: "Famílias de que fazes parte", none: "Ainda não és família mensal de ninguém.",
     blockedTitle: "Ocultos do chat",
     blockedEmpty: "Não excluiu ninguém.",

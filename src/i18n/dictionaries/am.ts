@@ -321,6 +321,7 @@ const am: Messages = {
     themeLabel: "ገጽታ",
     themePearl: "ንቁ",
     themeDiamond: "ጥቁር አልማዝ",
+    themeGarden: "የሰማይ አትክልት",
     family: "አባል የሆንክባቸው ቤተሰቦች", none: "ገና የማንም ወርሃዊ ቤተሰብ አይደለህም።",
     blockedTitle: "የተደበቁ",
     blockedEmpty: "ማንንም አልደበቅህም።",

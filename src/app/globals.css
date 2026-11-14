@@ -52,6 +52,30 @@
   --ink-soft: #efe6ff;
   color-scheme: dark;
 }
+[data-theme="garden"] {
+  --paper: #f7efe4;
+  --paper-2: rgba(255, 250, 242, 0.76);
+  --sky: #f6dcc0;
+  --sky-deep: #e7c9a0;
+  --gold: #b8893d;
+  --gold-deep: #8d1d32;
+  --clay: #c23b4a;
+  --leaf: #5d7a62;
+  --ink: #3a241c;
+  --muted: #6a4a3e;
+  --line: rgba(255, 248, 236, 0.72);
+  --shadow: 0 18px 40px rgba(140, 50, 40, 0.16);
+  --glass: rgba(255, 248, 236, 0.64);
+  --glass-strong: rgba(255, 250, 242, 0.88);
+  --field: rgba(255, 252, 246, 0.82);
+  --btn: linear-gradient(180deg, #e24b5c, #9d1c34);
+  --btn-ink: #fffaf6;
+  --accent: linear-gradient(100deg, #c4163a, #e8b15a);
+  --glow: 0 0 22px rgba(196, 40, 60, 0.4);
+  --on-accent: #fffaf6;
+  --ink-soft: #5c3a32;
+  color-scheme: light;
+}
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --paper: #07060f;
@@ -113,6 +137,13 @@ body {
     radial-gradient(900px 420px at 80% -40px, rgba(255, 220, 236, 0.9), transparent 50%),
     radial-gradient(700px 380px at 10% 10%, rgba(210, 245, 230, 0.8), transparent 46%),
     linear-gradient(180deg, #f8e7d8 0%, #f4efe6 46%, #efe4f4 100%);
+}
+[data-theme="garden"] body {
+  background:
+    radial-gradient(820px 460px at 78% -8%, rgba(255, 214, 150, 0.9), transparent 56%),
+    radial-gradient(520px 360px at 8% 18%, rgba(196, 40, 60, 0.16), transparent 52%),
+    radial-gradient(480px 280px at 80% 88%, rgba(150, 184, 150, 0.28), transparent 50%),
+    linear-gradient(180deg, #f8d7ae 0%, #f6e7d2 46%, #f8f1e6 100%);
 }
 button, input, textarea, select { font: inherit; color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
@@ -537,15 +568,17 @@ textarea { min-height: 96px; resize: vertical; }
 .brand { flex-direction: row; align-items: center; gap: 8px; }
 .brand > span { display: flex; flex-direction: column; min-width: 0; }
 .mark { display: block; flex: none; width: 22px; height: 22px; }
-.mark-diamond { display: none; }
-[data-theme="diamond"] .mark-pearl { display: none; }
+.mark-diamond, .mark-garden { display: none; }
+[data-theme="diamond"] .mark-pearl,
+[data-theme="garden"] .mark-pearl { display: none; }
 [data-theme="diamond"] .mark-diamond { display: block; }
+[data-theme="garden"] .mark-garden { display: block; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) .mark-pearl { display: none; }
   :root:not([data-theme]) .mark-diamond { display: block; }
 }
 
-.theme-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.theme-toggle { display: flex; flex-direction: column; gap: 8px; }
 .theme-toggle button {
   min-height: 44px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--glass); color: var(--ink);
@@ -623,7 +656,7 @@ textarea { min-height: 96px; resize: vertical; }
 }
 
 .live-thanks {
-  position: absolute; left: 12px; right: 12px; top: calc(8px + env(safe-area-inset-top)); z-index: 5;
+  position: relative; left: auto; right: auto; top: auto; z-index: 5;
   border-radius: 999px; padding: 8px 14px; text-align: center; font-weight: 650;
   animation: ticker-in 0.45s ease-out;
 }
@@ -745,8 +778,99 @@ html[data-low="1"] .live-thanks,
   backdrop-filter: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .halo::before, .goal-fill, .heart-float, .gift-burst, .gift-burst i, .live-thanks { animation: none; }
+  .halo::before, .goal-fill, .heart-float, .gift-burst, .gift-burst i, .live-thanks, .petal, .feather, .heart-glint { animation: none; }
+  .garden-sky { display: none; }
   .creator-pill, .goal-capsule, .live-chat-line, .live-compose, .live-round, .live-thanks, .site-header, .bottom-nav, .card {
     backdrop-filter: none;
+  }
+}
+
+/* Nebeská záhrada: ruby, ivory glass, a few drifting petals and feathers. */
+[data-theme="garden"] .card,
+[data-theme="garden"] .notice,
+[data-theme="garden"] .auth-card {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='88' height='88' fill='none' stroke='%23b8893d' stroke-width='0.8'><path d='M74 18c6 2 8 8 4 12-6-1-8-6-4-12zM70 28c-8 2-10 10-6 14 8-2 12-8 6-14z'/><path d='M18 70c8-10 16-8 18 2-10 2-16 0-18-2z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px top 8px;
+  background-size: 72px 72px;
+}
+[data-theme="garden"] .halo::before {
+  background: conic-gradient(#fff6e4, #e8b15a, #fff, #c4163a, #f6d7a8, #fff6e4);
+}
+.halo-heart, .goal-heart { display: none; position: relative; z-index: 2; color: #9d1c34; }
+[data-theme="garden"] .halo-heart {
+  display: block; position: absolute; top: -7px; right: -1px; font-size: 0.72rem; line-height: 1;
+}
+[data-theme="garden"] .goal-heart { display: inline; margin-inline-end: 4px; }
+[data-theme="garden"] .goal-fill {
+  background: linear-gradient(90deg, #9d1c34, #e24b5c 46%, #e8b15a);
+  opacity: 0.9;
+}
+[data-theme="garden"] .live-badge { background: #fff6ee; color: #8d1d32; }
+[data-theme="garden"] .viewer-dot,
+[data-theme="garden"] .chat-avatar { background: #8d1d32; color: #fffaf6; }
+[data-theme="garden"] .live-round.heart-btn,
+[data-theme="garden"] .live-round.gift-btn {
+  background: linear-gradient(180deg, #e24b5c, #9d1c34);
+  color: #fffaf6;
+  border-color: transparent;
+}
+[data-theme="garden"] .heart-float { color: #c4163a; }
+.heart-glint {
+  display: none; position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: #fff4d2; right: 6px; top: 6px;
+}
+[data-theme="garden"] .heart-glint { display: block; animation: glint 1.6s ease-in-out infinite; }
+[data-theme="garden"] .gift-burst .bloom {
+  background: radial-gradient(circle, rgba(255, 214, 150, 0.8), rgba(196, 22, 58, 0.4) 46%, transparent 70%);
+}
+[data-theme="garden"] .gift-burst .spark { background: #e8b15a; }
+.angel-figure { display: none; width: 72px; height: 92px; }
+[data-theme="garden"] .gift-angel .angel-figure { display: block; }
+[data-theme="garden"] .gift-angel > span:first-of-type { position: absolute; width: 1px; height: 1px; overflow: hidden; }
+[data-theme="garden"] .live-audio-only {
+  background: radial-gradient(circle at 50% 30%, #f8e2c4, #e7c9a0 70%);
+  color: var(--ink);
+}
+.garden-sky { display: none; position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+[data-theme="garden"] .live-fill[data-effects="on"] .garden-sky { display: block; }
+.petal, .feather {
+  position: absolute; top: -8%; opacity: 0;
+  animation: drift 10s linear infinite;
+  will-change: transform, opacity;
+}
+.petal { width: 11px; height: 16px; border-radius: 80% 0 80% 0; background: linear-gradient(180deg, #e24b5c, #9d1c34); }
+.feather { width: 8px; height: 22px; border-radius: 40% 40% 40% 10%; background: linear-gradient(180deg, #fff, #f4efe4); }
+.petal:nth-child(1) { left: 14%; animation-duration: 11s; }
+.petal:nth-child(2) { left: 62%; animation-duration: 13s; animation-delay: -4s; }
+.petal:nth-child(3) { left: 38%; animation-duration: 12s; animation-delay: -7s; }
+.petal:nth-child(4) { left: 82%; animation-duration: 14s; animation-delay: -2s; }
+.feather:nth-child(5) { left: 24%; animation-duration: 15s; animation-delay: -6s; }
+.feather:nth-child(6) { left: 74%; animation-duration: 16s; animation-delay: -9s; }
+@keyframes drift {
+  0% { transform: translate3d(0, -6vh, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.85; }
+  100% { transform: translate3d(18px, 96vh, 0) rotate(28deg); opacity: 0; }
+}
+@keyframes glint {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1); }
+}
+html[data-low="1"] .garden-sky,
+.live-fill[data-effects="off"] .garden-sky,
+html[data-low="1"] .heart-glint,
+.live-fill[data-effects="off"] .heart-glint,
+html[data-low="1"] .petal,
+html[data-low="1"] .feather,
+.live-fill[data-effects="off"] .petal,
+.live-fill[data-effects="off"] .feather {
+  display: none;
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="garden"] .live-fill .garden-sky,
+  [data-theme="garden"] .heart-glint {
+    display: none;
+    animation: none;
   }
 }

@@ -318,6 +318,7 @@ const zu: Messages = {
     themeLabel: "Ukubukeka",
     themePearl: "Ilulu",
     themeDiamond: "Idayimane elimnyama",
+    themeGarden: "Ingadi yasezulwini",
     family: "Imindeni oyinxenye yayo", none: "Awukabi wumndeni wanyanga zonke wanoma ubani.",
     blockedTitle: "Abafihliwe",
     blockedEmpty: "Awukafihli muntu.",
