@@ -24,7 +24,9 @@
   --header-h: 58px;
   --nav-h: 68px;
   --radius: 22px;
-  --font-sans: var(--font-body), var(--font-arabic), var(--font-ethiopic), sans-serif;
+  --font-sans: var(--font-inter-latin), var(--font-inter-ext), var(--font-inter-vi), var(--font-arabic), var(--font-ethiopic), sans-serif;
+  --font-body: var(--font-sans);
+  --font-display: var(--font-cormorant-latin), var(--font-cormorant-ext), var(--font-cormorant-vi), var(--font-ethiopic-serif), var(--font-body), Georgia, serif;
   color-scheme: light;
 }
 [data-theme="diamond"] {
