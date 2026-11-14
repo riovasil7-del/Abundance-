@@ -318,6 +318,7 @@ const yo: Messages = {
     themeLabel: "Ìrísí",
     themePearl: "Lulu",
     themeDiamond: "Dáímọ́ndì dúdú",
+    themeGarden: "Ọgbà ọ̀run",
     family: "Àwọn ẹbí tí o jẹ́ ọmọ", none: "O kò tíì jẹ́ ẹbí oṣooṣù ẹnikẹ́ni.",
     blockedTitle: "Àwọn tó farapamọ́",
     blockedEmpty: "O kò tíì fi ẹnikẹ́ni pamọ́.",

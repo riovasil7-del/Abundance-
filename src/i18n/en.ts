@@ -447,6 +447,7 @@ export const en: Messages = {
     themeLabel: "Appearance",
     themePearl: "Pearl",
     themeDiamond: "Black diamond",
+    themeGarden: "Heavenly garden",
     family: "Families you belong to",
     blockedTitle: "Hidden in chat",
     blockedEmpty: "You have not hidden anyone from chat.",

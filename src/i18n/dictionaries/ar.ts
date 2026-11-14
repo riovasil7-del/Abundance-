@@ -318,6 +318,7 @@ const ar: Messages = {
     themeLabel: "المظهر",
     themePearl: "لؤلؤة",
     themeDiamond: "ماس أسود",
+    themeGarden: "حديقة سماوية",
     family: "أُسَر أنت منها", none: "لست بعد أسرة شهرية لأحد.",
     blockedTitle: "المخفيون",
     blockedEmpty: "لم تستبعد أحدًا.",

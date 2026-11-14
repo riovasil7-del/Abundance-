@@ -318,6 +318,7 @@ const de: Messages = {
     themeLabel: "Erscheinung",
     themePearl: "Perle",
     themeDiamond: "Schwarzer Diamant",
+    themeGarden: "Himmlischer Garten",
     family: "Familien, zu denen du gehörst", none: "Du bist noch keine monatliche Familie.",
     blockedTitle: "Im Chat verborgen",
     blockedEmpty: "Sie haben niemanden ausgeschlossen.",

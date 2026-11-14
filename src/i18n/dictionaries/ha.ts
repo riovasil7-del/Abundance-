@@ -318,6 +318,7 @@ const ha: Messages = {
     themeLabel: "Bayyanar",
     themePearl: "Lu'u-lu'u",
     themeDiamond: "Duya baƙi",
+    themeGarden: "Lambun sama",
     family: "Iyalin da kake ciki", none: "Har yanzu ba ka zama iyali na wata-wata na kowa ba.",
     blockedTitle: "Boyayyu",
     blockedEmpty: "Baka kori kowa.",

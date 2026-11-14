@@ -321,6 +321,7 @@ const sw: Messages = {
     themeLabel: "Muonekano",
     themePearl: "Lulu",
     themeDiamond: "Almasi jeusi",
+    themeGarden: "Bustani ya mbinguni",
     family: "Familia unazoshiriki", none: "Bado huja kuwa familia ya mwezi ya mtu.",
     blockedTitle: "Waliofichwa",
     blockedEmpty: "Hujamficha mtu.",

@@ -503,6 +503,14 @@ function Broadcast({
 
   return (
     <div className="live-fill" data-screen="live-room" data-effects={effectsOff ? "off" : "on"}>
+      <div className="garden-sky" aria-hidden="true">
+        <i className="petal" />
+        <i className="petal" />
+        <i className="petal" />
+        <i className="petal" />
+        <i className="feather" />
+        <i className="feather" />
+      </div>
       {audioOnly || tracks.length === 0 ? (
         <div className="live-audio-only">
           <span aria-hidden="true">{audioOnly ? "♪" : "…"}</span>
@@ -523,12 +531,14 @@ function Broadcast({
       )}
 
       <div className="live-top">
+        {thanks ? <div className="live-thanks">{thanks}</div> : null}
         <Link className="live-back" href="/live">
           {m.common.back}
         </Link>
         <div className="creator-pill">
           <span className="halo">
             <img src={hostAvatar} alt="" />
+            <span className="halo-heart" aria-hidden="true">♥</span>
           </span>
           <span className="creator-id">
             <strong>{hostName}</strong>
@@ -547,6 +557,7 @@ function Broadcast({
         <div className="goal-capsule">
           <span className="goal-fill" aria-hidden="true" />
           <strong>
+            <span className="goal-heart" aria-hidden="true">♥</span>
             {m.live.sharedWork} · {title}
           </strong>
           <span className="goal-amount">{formatMoney(blessingNet, locale)}</span>
@@ -563,31 +574,42 @@ function Broadcast({
           {mediaNote}
         </p>
       ) : null}
-      {thanks ? <div className="live-thanks">{thanks}</div> : null}
-      {bursts.map((burst) => (
-        <div className="gift-burst" key={burst.id}>
+      {bursts.map((burst) => {
+        const angel = burst.symbol === "🪽" || burst.symbol === "👼";
+        return (
+        <div className={angel ? "gift-burst gift-angel" : "gift-burst"} key={burst.id}>
           <i className="bloom" />
           <i className="spark s1" />
           <i className="spark s2" />
           <i className="spark s3" />
+          {angel ? (
+            <svg className="angel-figure" viewBox="0 0 80 100" aria-hidden="true">
+              <path d="M40 28c14-16 34-8 28 8-8 2-16-2-20 4 8-2 18 4 12 12-10-6-16-4-20 2-4-6-10-8-20-2-6-8 4-14 12-12-4-6-12-2-20-4-6-16 14-24 28-8z" fill="#fff8ee" />
+              <path d="M40 46c8 0 12 10 10 22-8 16-12 22-10 22s-2-6-10-22c-2-12 2-22 10-22z" fill="#fffaf3" />
+              <circle cx="40" cy="40" r="7" fill="#f3d2b0" />
+              <path d="M40 78s-6-3.4-6-7a3.4 3.4 0 0 1 6-1.6 3.4 3.4 0 0 1 6 1.6c0 3.6-6 7-6 7z" fill="#c4163a" />
+            </svg>
+          ) : null}
           <span>{burst.symbol}</span>
           <strong>{burst.name}</strong>
           <em>{burst.donorName || m.common.anonymous}</em>
         </div>
-      ))}
+        );
+      })}
       {hearts.map((heart) => (
         <span className="heart-float" key={heart.id} style={{ right: heart.x, ["--dx" as string]: `${(heart.x % 48) - 24}px` }}>
           <svg className="heart-glyph" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z" />
           </svg>
           <i className="gem-heart" />
+          <i className="heart-glint" />
         </span>
       ))}
 
       <div className="live-dock">
         <LiveChatPanel sessionId={sessionId} loggedIn={loggedIn} canModerate={canModerate} translateEnabled={translateEnabled} />
         <div className="live-rounds">
-          <button type="button" className="live-round" aria-label={m.live.heart} onClick={() => void sendHeart()}>
+          <button type="button" className="live-round heart-btn" aria-label={m.live.heart} onClick={() => void sendHeart()}>
             ♥
           </button>
           <Link className="live-round" href="/ideas" aria-label={m.nav.ideas}>
@@ -599,7 +621,7 @@ function Broadcast({
             </button>
           ) : null}
           {loggedIn && !isHost ? (
-            <button type="button" className="live-round" aria-label={m.live.gift} onClick={() => { setReceipt(null); setGiftOpen(true); }}>
+            <button type="button" className="live-round gift-btn" aria-label={m.live.gift} onClick={() => { setReceipt(null); setGiftOpen(true); }}>
               ✦
             </button>
           ) : null}

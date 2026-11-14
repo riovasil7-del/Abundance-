@@ -318,6 +318,7 @@ const ig: Messages = {
     themeLabel: "Ọdịdị",
     themePearl: "Lulu",
     themeDiamond: "Diamond ojii",
+    themeGarden: "Ogige eluigwe",
     family: "Ezinụlọ ị so", none: "Ị bụbeghị ezinụlọ kwa ọnwa nke onye ọ bụla.",
     blockedTitle: "Ndị ezoro",
     blockedEmpty: "Ị zochieghị onye ọ bụla.",

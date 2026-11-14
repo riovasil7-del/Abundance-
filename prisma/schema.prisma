@@ -73,7 +73,7 @@ model User {
   birthDate       DateTime? @db.Date
   /// When true, the feed does not preload the next video.
   lowData         Boolean  @default(false)
-  /// Visual theme: "pearl" or "diamond". Null follows the device.
+  /// Visual theme: "pearl", "diamond", or "garden". Null follows the device.
   themeChoice     String?
   /// When the person accepted the terms. Not an identity check.
   termsAcceptedAt DateTime?
