@@ -476,16 +476,20 @@ textarea { min-height: 96px; resize: vertical; }
 .live-total strong { font-size: 0.95rem; }
 .live-chat-stream {
   position: absolute; left: 8px; bottom: 68px; z-index: 2;
-  width: min(68%, 240px); max-height: 30dvh;
-  display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
-  overflow: hidden; pointer-events: auto;
+  width: min(65%, 240px); max-height: 7.6rem;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 32%);
+  mask-image: linear-gradient(180deg, transparent, #000 32%);
 }
 .chat-pause {
   align-self: flex-start; border: 0; border-radius: 999px; min-height: 32px; padding: 0 10px;
   background: rgba(255, 250, 243, 0.9); color: #3e2a12; font-size: 0.75rem;
 }
 .live-chat-line {
-  background: rgba(20, 14, 10, 0.42); color: #fffaf3; border-radius: 14px; padding: 6px 10px; font-size: 0.86rem;
+  background: transparent; color: #fffaf3; border-radius: 0; padding: 1px 0; font-size: 13px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+  pointer-events: auto;
 }
 .live-chat-quiet { font-size: 0.75rem; opacity: 0.9; }
 .live-chat-author { border: 0; background: transparent; color: inherit; font-weight: 700; padding: 0; min-height: 0; }
@@ -517,9 +521,10 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .live-compose input { flex: 1; min-height: 44px; border-radius: 999px; border: 0; padding: 0 14px; background: rgba(255,250,243,0.94); }
 .live-compose button { border: 0; border-radius: 999px; background: #7d5a22; color: #fffaf3; padding: 0 14px; min-height: 44px; }
-.live-note { position: absolute; left: 16px; right: 16px; top: 72px; z-index: 6; color: #fffaf3; }
+.live-note { position: absolute; left: 12px; right: auto; max-width: 70%; top: 72px; z-index: 6; color: #fffaf3; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.7); background: transparent; }
 .live-note[role="alert"] {
-  background: rgba(62, 42, 18, 0.94); color: #fffaf3; border-radius: 16px; padding: 10px 12px;
+  background: transparent; color: #fffaf3; border-radius: 0; padding: 0;
+  pointer-events: none;
 }
 .live-quality {
   position: absolute; top: calc(64px + env(safe-area-inset-top)); right: 10px; z-index: 7;
@@ -594,7 +599,7 @@ textarea { min-height: 96px; resize: vertical; }
   align-self: flex-start; color: var(--ink); background: var(--glass-strong);
   border-radius: 999px; padding: 4px 10px; backdrop-filter: blur(12px);
 }
-.creator-pill, .goal-capsule, .live-thanks, .live-join, .live-chat-line, .live-compose, .live-round, .viewer-stack {
+.creator-pill, .goal-capsule, .live-compose, .live-round, .viewer-stack {
   background: var(--glass-strong);
   color: var(--ink);
   border: 1px solid var(--line);
@@ -657,20 +662,30 @@ textarea { min-height: 96px; resize: vertical; }
 
 .live-thanks {
   position: relative; left: auto; right: auto; top: auto; z-index: 5;
-  border-radius: 999px; padding: 8px 14px; text-align: center; font-weight: 650;
+  border-radius: 999px; padding: 4px 10px; text-align: center; font-weight: 650;
+  background: transparent; backdrop-filter: none; border: 0;
+  color: #fffaf3; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
   animation: ticker-in 0.45s ease-out;
+  pointer-events: none;
 }
-.live-chat-stream { bottom: 76px; width: min(78%, 280px); }
+.live-chat-stream { bottom: 76px; width: min(65%, 240px); max-width: 65%; pointer-events: none; }
 .live-chat-line {
-  display: flex; align-items: flex-start; gap: 6px;
-  background: var(--glass-strong); color: var(--ink); border-radius: 16px;
+  display: flex; align-items: flex-start; gap: 4px;
+  background: transparent; color: #fffaf3; border: 0; border-radius: 0;
+  box-shadow: none; backdrop-filter: none;
+  font-size: 13px; line-height: 1.25; padding: 1px 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+  pointer-events: auto;
 }
 .chat-avatar {
-  width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center;
-  background: var(--accent); color: #2c241c; font-size: 0.7rem; font-weight: 700;
+  width: 16px; height: 16px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--accent); color: #2c241c; font-size: 0.62rem; font-weight: 700;
 }
 .live-join {
-  align-self: flex-start; border-radius: 999px; padding: 6px 12px; font-size: 0.78rem;
+  align-self: flex-start; border-radius: 999px; padding: 2px 0; font-size: 12px;
+  background: transparent; border: 0; backdrop-filter: none; box-shadow: none;
+  color: #fffaf3; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
 }
 .live-dock {
   position: absolute; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); z-index: 3;
@@ -705,7 +720,7 @@ textarea { min-height: 96px; resize: vertical; }
 .chat-pause { background: var(--glass-strong); color: var(--ink); }
 .live-quality button { background: var(--glass-strong); color: var(--ink); }
 .live-quality button.on { background: var(--btn); color: var(--btn-ink); }
-.live-note[role="alert"] { background: var(--glass-strong); color: var(--ink); }
+.live-note[role="alert"] { background: transparent; color: #fffaf3; pointer-events: none; }
 
 .heart-float {
   color: #e7b0c4; bottom: 110px;
@@ -873,4 +888,33 @@ html[data-low="1"] .feather,
     display: none;
     animation: none;
   }
+}
+
+/* Messages stay in the lower-left and never sit on buttons or the picture controls. */
+.live-chat-stream {
+  pointer-events: none;
+  max-width: 65%;
+  max-height: 7.6rem;
+  backdrop-filter: none;
+}
+.live-chat-line, .chat-pause {
+  pointer-events: auto;
+}
+.live-join, .live-thanks, .live-note {
+  pointer-events: none;
+}
+.chat-pause { font-size: 12px; min-height: 28px; padding: 0 8px; }
+@media (max-width: 900px) {
+  .site-header, .bottom-nav, .card, .notice, .creator-pill, .goal-capsule, .live-compose, .live-round, .viewer-stack {
+    backdrop-filter: blur(6px);
+  }
+}
+html.tab-hidden .petal,
+html.tab-hidden .feather,
+html.tab-hidden .heart-float,
+html.tab-hidden .gift-burst,
+html.tab-hidden .halo::before,
+html.tab-hidden .goal-fill,
+html.tab-hidden .heart-glint {
+  animation-play-state: paused;
 }

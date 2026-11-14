@@ -30,14 +30,13 @@ export function mayIssuePublishGrant(
   return canPublishToRoom(user.id, audience);
 }
 
-export function videoGrant(room: string, canPublish: boolean): VideoGrant {
+export function videoGrant(room: string, canPublish: boolean, canPublishData = true): VideoGrant {
   return {
     room,
     roomJoin: true,
     canPublish,
     canSubscribe: true,
-    // Hearts travel as data. Video publish stays limited to the room's creators.
-    canPublishData: true,
+    canPublishData,
   };
 }
 
@@ -65,13 +64,14 @@ export async function createParticipantToken(input: {
   name: string;
   room: string;
   canPublish: boolean;
+  canPublishData?: boolean;
 }): Promise<string> {
   const token = new AccessToken(input.apiKey, input.apiSecret, {
     identity: input.identity,
     name: input.name,
     ttl: "2h",
   });
-  token.addGrant(videoGrant(input.room, input.canPublish));
+  token.addGrant(videoGrant(input.room, input.canPublish, input.canPublishData ?? true));
   return token.toJwt();
 }
 
@@ -83,7 +83,8 @@ export async function tokenForParticipant(input: {
   room: string;
   audience: LiveAudience;
 }): Promise<{ token: string; canPublish: boolean }> {
-  const canPublish = canPublishToRoom(input.userId, input.audience);
+  const guest = input.userId.startsWith("guest_");
+  const canPublish = guest ? false : canPublishToRoom(input.userId, input.audience);
   const token = await createParticipantToken({
     apiKey: input.credentials.apiKey,
     apiSecret: input.credentials.apiSecret,
@@ -91,6 +92,7 @@ export async function tokenForParticipant(input: {
     name: input.name,
     room: input.room,
     canPublish,
+    canPublishData: !guest,
   });
   return { token, canPublish };
 }

@@ -5,6 +5,8 @@ import { jsonError } from "@/server/http";
 import { canPublishToRoom, mayIssuePublishGrant, readLiveKitCredentials, tokenForParticipant } from "@/server/live-access";
 import { serverPublishGrant } from "@/server/community-rules";
 import { loadLiveAudience } from "@/server/live-sessions";
+import { clientKey, memoryRateLimiter } from "@/server/ratelimit";
+import { GUEST_LIVE_TOKEN_LIMIT, GUEST_LIVE_TOKEN_WINDOW_MS, isGuestIdentity } from "@/lib/guest-view";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const credentials = readLiveKitCredentials();
@@ -16,6 +18,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (loaded.session.status !== "LIVE") return jsonError(410, "LIVE_ENDED");
 
   const user = await getCurrentUser();
+  if (isGuestIdentity(user?.id)) {
+    const limit = memoryRateLimiter.consume(clientKey(request, "guest-live", null), GUEST_LIVE_TOKEN_LIMIT, GUEST_LIVE_TOKEN_WINDOW_MS);
+    if (!limit.ok) return jsonError(429, "RATE_LIMITED");
+  }
   const raw = await request.json().catch(() => ({}));
   const clientRequestedPublish = Boolean(raw && typeof raw === "object" && "canPublish" in raw && raw.canPublish);
   const identity = user?.id ?? `guest_${randomUUID()}`;

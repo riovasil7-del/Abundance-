@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SupportSignInButton } from "@/components/sign-in-sheet";
 import { StoryDesk } from "@/components/story-desk";
 import { CreatorBond } from "@/components/creator-bond";
 import { FamilyJoin } from "@/components/creator-actions";
@@ -110,11 +111,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ slug: 
       />
       {self ? <StartLiveButton configured={Boolean(readLiveKitCredentials())} /> : null}
       {user && !self ? <FamilyJoin creatorId={creator.id} tiers={tiers} already={membership?.status === "ACTIVE"} /> : null}
-      {!user ? (
-        <Link className="btn-primary" href="/login">
-          {messages.auth.login}
-        </Link>
-      ) : null}
+      {!user && !self ? <SupportSignInButton label={messages.gifts.title} /> : null}
     </div>
   );
 }

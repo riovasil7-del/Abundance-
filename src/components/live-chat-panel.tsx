@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CHAT_REPORT_REASONS, deliverRoomLines, type RoomLine } from "@/lib/live-chat";
+import { SignInSheet } from "./sign-in-sheet";
 import { useI18n } from "./providers";
 
 type Menu = { authorId: string; author: string; messageId: string; body: string } | null;
@@ -26,6 +27,7 @@ export function LiveChatPanel({
   const [reason, setReason] = useState<(typeof CHAT_REPORT_REASONS)[number]>("harassment");
   const [reportNote, setReportNote] = useState("");
   const [reporting, setReporting] = useState(false);
+  const [signIn, setSignIn] = useState(false);
 
   useEffect(() => {
     let stop = false;
@@ -143,7 +145,7 @@ export function LiveChatPanel({
         <button type="button" className="chat-pause" onClick={() => setPaused((value) => !value)}>
           {paused ? m.live.chatResume : m.live.chatPause}
         </button>
-        {lines.map((line) =>
+        {lines.slice(-5).map((line) =>
           line.kind === "join" ? (
             <div className="live-join" key={line.id}>
               {label(line)}
@@ -176,14 +178,21 @@ export function LiveChatPanel({
         className="live-compose"
         onSubmit={(event) => {
           event.preventDefault();
+          if (!loggedIn) {
+            setSignIn(true);
+            return;
+          }
           if (draft.trim()) void send();
         }}
       >
         <input
           value={draft}
           maxLength={280}
-          placeholder={loggedIn ? m.live.writeLove : m.feed.login}
-          disabled={!loggedIn}
+          placeholder={loggedIn ? m.live.writeLove : m.live.writeLove}
+          readOnly={!loggedIn}
+          onFocus={() => {
+            if (!loggedIn) setSignIn(true);
+          }}
           onChange={(event) => setDraft(event.target.value)}
           aria-label={m.live.chat}
         />
@@ -214,6 +223,7 @@ export function LiveChatPanel({
           <button type="button" onClick={() => setMenu(null)}>{m.gifts.close}</button>
         </div>
       ) : null}
+      {signIn ? <SignInSheet reason="write" onClose={() => setSignIn(false)} /> : null}
     </>
   );
 }

@@ -19,7 +19,7 @@ test("only the room creator can publish in a solo room", () => {
   assert.equal(canPublishToRoom("creator-user", audience), true);
   assert.equal(canPublishToRoom("another-creator", audience), false);
   assert.equal(canPublishToRoom("supporter", audience), false);
-  assert.equal(canPublishToRoom("", audience), false);
+  assert.equal(canPublishToRoom("guest_abc", audience), false);
 });
 
 test("a blessing circle lets every participant creator publish and nobody else", () => {
@@ -93,4 +93,21 @@ test("mocked LiveKit token, no live server: an accepted co-host can publish and 
   const viewerGrant = await readVideoGrant(viewer.token, credentials.apiKey, credentials.apiSecret);
   assert.equal(cohostGrant?.canPublish, true);
   assert.equal(viewerGrant?.canPublish, false);
+});
+
+test("an anonymous guest can watch and cannot publish picture or room data", async () => {
+  const audience = { hostUserId: "creator-user", circlePublisherUserIds: null };
+  const guest = await tokenForParticipant({
+    credentials,
+    userId: "guest_watch",
+    name: "Hosť",
+    room: "room-guest",
+    audience,
+  });
+  assert.equal(guest.canPublish, false);
+  const grant = await readVideoGrant(guest.token, credentials.apiKey, credentials.apiSecret);
+  assert.equal(grant?.roomJoin, true);
+  assert.equal(grant?.canSubscribe, true);
+  assert.equal(grant?.canPublish, false);
+  assert.equal(grant?.canPublishData, false);
 });
