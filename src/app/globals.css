@@ -24,8 +24,7 @@
   --header-h: 58px;
   --nav-h: 68px;
   --radius: 22px;
-  --font-sans: "Outfit", "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: var(--font-body), var(--font-arabic), var(--font-ethiopic), sans-serif;
   color-scheme: light;
 }
 [data-theme="diamond"] {
@@ -108,7 +107,9 @@ html, body { margin: 0; padding: 0; overflow-x: hidden; }
 body {
   min-height: 100dvh;
   color: var(--ink);
-  font-family: var(--font-sans), var(--font-arabic), var(--font-ethiopic), "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
   background:
     radial-gradient(900px 420px at 80% -40px, rgba(255, 220, 236, 0.9), transparent 50%),
     radial-gradient(700px 380px at 10% 10%, rgba(210, 245, 230, 0.8), transparent 46%),
@@ -180,11 +181,11 @@ img, video { max-width: 100%; display: block; }
 }
 .brand { display: flex; flex-direction: column; text-decoration: none; min-width: 0; }
 .brand-name {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 560;
-  font-size: 1.2rem;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
 }
 .brand-tag {
   font-size: 0.72rem;
@@ -241,7 +242,8 @@ main { min-height: calc(100dvh - var(--header-h)); padding-bottom: calc(var(--na
   justify-content: center;
   gap: 2px;
   color: var(--muted);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
+  line-height: 1.15;
   min-height: 44px;
   text-align: center;
   padding: 0 2px;
@@ -249,11 +251,12 @@ main { min-height: calc(100dvh - var(--header-h)); padding-bottom: calc(var(--na
 .nav-link svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; stroke-linecap: round; }
 .nav-link.active { color: var(--gold-deep); }
 
-h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 560; letter-spacing: -0.03em; margin: 0; }
-h1 { font-size: 2rem; line-height: 1.05; }
-h2 { font-size: 1.35rem; }
-.kicker { margin: 0 0 6px; color: var(--gold-deep); letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem; font-weight: 650; }
-.lede { color: var(--muted); line-height: 1.45; margin: 8px 0 0; }
+h1, h2, h3 { font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; font-weight: 600; letter-spacing: 0.005em; margin: 0; }
+h1 { font-size: 1.9rem; line-height: 1.15; }
+h2 { font-size: 1.35rem; line-height: 1.25; }
+h3 { font-size: 1.15rem; line-height: 1.3; }
+.kicker { margin: 0 0 6px; color: var(--gold-deep); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.72rem; font-weight: 600; font-family: var(--font-sans); line-height: 1.3; }
+.lede { color: var(--muted); line-height: 1.5; margin: 8px 0 0; }
 .muted { color: var(--muted); }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
@@ -370,7 +373,7 @@ textarea { min-height: 96px; resize: vertical; }
 .video-copy h2 { font-size: 1.45rem; text-shadow: 0 1px 0 rgba(0,0,0,0.2); }
 .video-copy p { margin: 6px 0 0; line-height: 1.35; font-size: 0.92rem; }
 .creator-line { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-.creator-line a { color: white; font-weight: 650; text-decoration: none; }
+.creator-line a { color: white; font-weight: 600; text-decoration: none; font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; letter-spacing: 0.01em; }
 .avatar, .avatar-lg { width: 36px; height: 36px; border-radius: 50%; background: #f4e7cf; border: 2px solid rgba(255,250,243,0.8); object-fit: cover; }
 .avatar-lg { width: 72px; height: 72px; border-color: var(--line); }
 .place { color: rgba(255,250,243,0.82); font-size: 0.78rem; }
@@ -409,10 +412,11 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .gift-option.on { border-color: var(--gold-deep); background: var(--glass-strong); color: var(--ink); }
 .gift-option span { font-size: 1.3rem; }
-.gift-option small { font-size: 0.68rem; color: var(--muted); }
+.gift-option small { font-size: 0.72rem; line-height: 1.25; color: var(--muted); font-family: var(--font-sans); }
+.gift-option small:first-of-type { font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em; color: var(--ink); }
 
 .net-hero { display: flex; flex-direction: column; align-items: flex-start; margin: 8px 0 12px; }
-.net-hero span { font-family: var(--font-display), Georgia, serif; font-size: 3.2rem; line-height: 0.9; color: var(--gold-deep); }
+.net-hero span { font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; font-size: 3rem; line-height: 1; font-weight: 600; color: var(--gold-deep); }
 .net-hero strong { font-size: 1.35rem; }
 .split { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
 .split-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
@@ -426,7 +430,7 @@ textarea { min-height: 96px; resize: vertical; }
     linear-gradient(160deg, #f8e7c4, #f7fbfe 55%, #e7f3ea);
   border: 1px solid var(--line);
 }
-.money-xl { font-family: var(--font-display), Georgia, serif; font-size: 2.2rem; margin: 4px 0; }
+.money-xl { font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; font-size: 2.1rem; line-height: 1.1; font-weight: 600; margin: 4px 0; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .comment { padding: 8px 0; border-top: 1px solid var(--line); }
 .comment strong { display: block; font-size: 0.86rem; }
@@ -620,7 +624,7 @@ textarea { min-height: 96px; resize: vertical; }
 }
 .halo img, .creator-pill img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; background: var(--field); }
 .creator-id { min-width: 0; display: flex; flex-direction: column; }
-.creator-id strong { font-size: 0.92rem; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.creator-id strong { font-size: 0.95rem; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display), var(--font-body), var(--font-ethiopic-serif), var(--font-arabic), Georgia, serif; font-weight: 600; letter-spacing: 0.01em; }
 .live-badge {
   align-self: flex-start; margin-top: 2px; border-radius: 999px; padding: 1px 6px;
   font-size: 0.62rem; letter-spacing: 0.08em; font-weight: 700;
@@ -673,7 +677,8 @@ textarea { min-height: 96px; resize: vertical; }
   display: flex; align-items: flex-start; gap: 4px;
   background: transparent; color: #fffaf3; border: 0; border-radius: 0;
   box-shadow: none; backdrop-filter: none;
-  font-size: 13px; line-height: 1.25; padding: 1px 0;
+  font-family: var(--font-sans);
+  font-size: 13px; line-height: 1.35; padding: 1px 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
   pointer-events: auto;
 }
