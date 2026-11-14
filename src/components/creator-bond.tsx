@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SignInSheet } from "./sign-in-sheet";
 import { useI18n } from "./providers";
 
 export function CreatorBond({
@@ -23,6 +24,7 @@ export function CreatorBond({
   const [thanks, setThanks] = useState("");
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [signIn, setSignIn] = useState<"follow" | "support" | null>(null);
 
   async function toggleFollow() {
     setBusy(true);
@@ -101,11 +103,15 @@ export function CreatorBond({
 
   return (
     <section className="stack" data-screen="creator-bond">
-      {loggedIn && !self ? (
+      {self ? null : loggedIn ? (
         <button type="button" className={following ? "btn-ghost" : "btn-primary"} disabled={busy} onClick={() => void toggleFollow()}>
           {following ? m.bond.unfollow : m.bond.follow}
         </button>
-      ) : null}
+      ) : (
+        <button type="button" className="btn-primary" onClick={() => setSignIn("follow")}>
+          {m.bond.follow}
+        </button>
+      )}
       <h2>{m.bond.updates}</h2>
       {posts.map((post) => (
         <article key={post.id} className="card">
@@ -150,6 +156,7 @@ export function CreatorBond({
         </form>
       ) : null}
       {note ? <p className="notice">{note}</p> : null}
+      {signIn ? <SignInSheet reason={signIn} onClose={() => setSignIn(null)} /> : null}
     </section>
   );
 }

@@ -27,6 +27,7 @@ import { useI18n } from "./providers";
 import { CollabPanel } from "./collab-panel";
 import { LiveChatPanel } from "./live-chat-panel";
 import { Sheet } from "./sheet";
+import { SignInSheet, type SignInReason } from "./sign-in-sheet";
 
 const captureResolution = {
   width: LIVE_CAPTURE.width,
@@ -186,6 +187,7 @@ function Broadcast({
   const [chatNote, setChatNote] = useState<string | null>(null);
   const [giftOpen, setGiftOpen] = useState(false);
   const [collabOpen, setCollabOpen] = useState(false);
+  const [signIn, setSignIn] = useState<SignInReason | null>(null);
   const [slug, setSlug] = useState(gifts[0]?.slug ?? "");
   const [anonymous, setAnonymous] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -390,9 +392,11 @@ function Broadcast({
     if (heartStamps.current.length >= 6) return;
     heartStamps.current.push(now);
     const id = `${now}-${Math.random().toString(36).slice(2, 7)}`;
-    const payload = new TextEncoder().encode(JSON.stringify({ type: "heart", id }));
-    await room.localParticipant.publishData(payload, { reliable: false }).catch(() => undefined);
-    setHearts((current) => [...current.slice(-12), { id, x: 18 + Math.round(Math.random() * 36) }]);
+    if (loggedIn) {
+      const payload = new TextEncoder().encode(JSON.stringify({ type: "heart", id }));
+      await room.localParticipant.publishData(payload, { reliable: false }).catch(() => undefined);
+    }
+    setHearts((current) => [...current.slice(-8), { id, x: 18 + Math.round(Math.random() * 36) }]);
     window.setTimeout(() => setHearts((current) => current.filter((heart) => heart.id !== id)), 2600);
   }
 
@@ -544,7 +548,7 @@ function Broadcast({
             <strong>{hostName}</strong>
             <span className="live-badge">{m.live.badge}</span>
           </span>
-          <LiveFollow hostUserId={hostUserId} loggedIn={loggedIn} isHost={isHost} />
+          <LiveFollow hostUserId={hostUserId} loggedIn={loggedIn} isHost={isHost} onNeedAccount={() => setSignIn("follow")} />
           <span className="viewer-stack" aria-label={`${people.length} ${m.live.viewers}`}>
             {people.slice(0, 3).map((person) => (
               <span className="viewer-dot" key={person.identity}>
@@ -619,9 +623,20 @@ function Broadcast({
             <button type="button" className="live-round" aria-label={m.bond.cohosts} onClick={() => setCollabOpen(true)}>
               ☺
             </button>
-          ) : null}
-          {loggedIn && !isHost ? (
-            <button type="button" className="live-round gift-btn" aria-label={m.live.gift} onClick={() => { setReceipt(null); setGiftOpen(true); }}>
+          ) : (
+            <button type="button" className="live-round" aria-label={m.bond.cohosts} onClick={() => setSignIn("post")}>
+              ☺
+            </button>
+          )}
+          {!isHost ? (
+            <button type="button" className="live-round gift-btn" aria-label={m.live.gift} onClick={() => {
+              if (!loggedIn) {
+                setSignIn("support");
+                return;
+              }
+              setReceipt(null);
+              setGiftOpen(true);
+            }}>
               ✦
             </button>
           ) : null}
@@ -767,11 +782,22 @@ function Broadcast({
           </div>
         </Sheet>
       ) : null}
+      {signIn ? <SignInSheet reason={signIn} onClose={() => setSignIn(null)} /> : null}
     </div>
   );
 }
 
-function LiveFollow({ hostUserId, loggedIn, isHost }: { hostUserId: string; loggedIn: boolean; isHost: boolean }) {
+function LiveFollow({
+  hostUserId,
+  loggedIn,
+  isHost,
+  onNeedAccount,
+}: {
+  hostUserId: string;
+  loggedIn: boolean;
+  isHost: boolean;
+  onNeedAccount: () => void;
+}) {
   const { messages: m } = useI18n();
   const [following, setFollowing] = useState(false);
 
@@ -790,7 +816,14 @@ function LiveFollow({ hostUserId, loggedIn, isHost }: { hostUserId: string; logg
     };
   }, [hostUserId, isHost, loggedIn]);
 
-  if (!loggedIn || isHost) return null;
+  if (isHost) return null;
+  if (!loggedIn) {
+    return (
+      <button type="button" className="follow-compact" onClick={onNeedAccount}>
+        {m.bond.follow}
+      </button>
+    );
+  }
 
   async function toggle() {
     const response = following

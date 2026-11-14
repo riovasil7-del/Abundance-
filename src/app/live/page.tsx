@@ -61,11 +61,6 @@ export default async function LiveIndexPage({
       ) : (
         <p className="notice">{messages.live.supporters}</p>
       )}
-      {!user ? (
-        <Link className="btn-primary" href="/login">
-          {messages.auth.login}
-        </Link>
-      ) : null}
       <LiveNowList initial={sessions} category={category} />
     </div>
   );

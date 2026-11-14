@@ -13,6 +13,8 @@ import { GiftFundNote, GiftPicker } from "./gift-picker";
 import { LightsStatus, paymentNote } from "./lights";
 import { useI18n } from "./providers";
 import { Sheet } from "./sheet";
+import { SignInSheet, type SignInReason } from "./sign-in-sheet";
+import { browserHeartStore, localHeartOn, toggleLocalHeart } from "@/lib/local-hearts";
 
 type FeedView = "forYou" | "following" | "community";
 const TOPICS = ["good_deed", "craft", "song", "gratitude", "weaving", "garden", "kitchen"] as const;
@@ -36,6 +38,11 @@ export function FeedExperience({
 }) {
   const { locale, messages: m } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const store = browserHeartStore();
+    if (!store) return;
+    setItems((current) => current.map((item) => (localHeartOn(item.id, store) ? { ...item, blessedByMe: true } : item)));
+  }, []);
   const [items, setItems] = useState(videos);
   const [view, setView] = useState<FeedView>("forYou");
   const [category, setCategory] = useState("");
@@ -43,6 +50,7 @@ export function FeedExperience({
   const [active, setActive] = useState(0);
   const [muted, setMuted] = useState(true);
   const [sheet, setSheet] = useState<null | "gift" | "comments" | "report" | "why" | "tune">(null);
+  const [signIn, setSignIn] = useState<SignInReason | null>(null);
   const [giftSlug, setGiftSlug] = useState(gifts[0]?.slug ?? "");
   const [anonymous, setAnonymous] = useState(false);
   const [forwardId, setForwardId] = useState("");
@@ -151,7 +159,7 @@ export function FeedExperience({
 
   async function openTune() {
     if (!loggedIn) {
-      window.location.href = "/login";
+      setSignIn("post");
       return;
     }
     const response = await fetch("/api/feed/preferences");
@@ -171,7 +179,7 @@ export function FeedExperience({
       body: JSON.stringify(body),
     });
     if (response.status === 401) {
-      window.location.href = "/login";
+      setSignIn("post");
       return;
     }
     if (!response.ok) return;
@@ -209,7 +217,10 @@ export function FeedExperience({
 
   async function bless(video: FeedVideo) {
     if (!loggedIn) {
-      window.location.href = "/login";
+      const store = browserHeartStore();
+      if (!store) return;
+      const on = toggleLocalHeart(video.id, store);
+      setItems((prev) => prev.map((item) => (item.id === video.id ? { ...item, blessedByMe: on } : item)));
       return;
     }
     const response = await fetch(`/api/videos/${video.id}/bless`, { method: "POST" });
@@ -270,6 +281,10 @@ export function FeedExperience({
 
   async function sendComment() {
     if (!current) return;
+    if (!loggedIn) {
+      setSignIn("write");
+      return;
+    }
     setBusy(true);
     setCommentNote(null);
     try {
@@ -485,7 +500,7 @@ export function FeedExperience({
                 className="action-btn"
                 onClick={() => {
                   if (!loggedIn) {
-                    window.location.href = "/login";
+                    setSignIn("support");
                     return;
                   }
                   setReceipt(null);
@@ -496,7 +511,7 @@ export function FeedExperience({
                 <strong>✦</strong>
                 {m.feed.gift}
               </button>
-              <button type="button" className="action-btn" onClick={() => (loggedIn ? openComments(video.id) : (window.location.href = "/login"))}>
+              <button type="button" className="action-btn" onClick={() => openComments(video.id)}>
                 <strong>{video.commentCount}</strong>
                 {m.feed.comments}
               </button>
@@ -505,7 +520,7 @@ export function FeedExperience({
                 className="action-btn"
                 onClick={() => {
                   if (!loggedIn) {
-                    window.location.href = "/login";
+                    setSignIn("post");
                     return;
                   }
                   setReportNote(null);
@@ -709,6 +724,7 @@ export function FeedExperience({
             ) : null}
         </Sheet>
       ) : null}
+      {signIn ? <SignInSheet reason={signIn} onClose={() => setSignIn(null)} /> : null}
       {items.length === 0 ? <p className="empty page">{feedNote ?? m.feed.empty}</p> : null}
     </div>
     </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SupportSignInButton } from "@/components/sign-in-sheet";
 import { CircleDonate } from "@/components/circle-donate";
 import { JoinCircleButton } from "@/components/admin-panel";
 import { StartLiveButton } from "@/components/start-live-button";
@@ -110,9 +111,7 @@ export default async function CirclePage({ params }: { params: Promise<{ id: str
           enabled={recipients.length > 0 && !recipients.some((recipient) => recipient.creatorId === user.creatorProfile?.id)}
         />
       ) : (
-        <Link className="btn-primary" href="/login">
-          {messages.auth.login}
-        </Link>
+        <SupportSignInButton label={messages.gifts.title} />
       )}
     </div>
   );
