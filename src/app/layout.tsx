@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Inter, Noto_Sans_Arabic, Noto_Sans_Ethiopic, Noto_Serif_Ethiopic } from "next/font/google";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { APP_NAME } from "@/config/app";
@@ -16,46 +15,8 @@ import { getCurrentUser } from "@/server/auth";
 import { LANGUAGE_META, messagesFor } from "@/i18n";
 import { followsDeviceLanguage, getLocale } from "@/i18n/get-locale";
 import { THEME_COOKIE, parseTheme, themeBootScript } from "@/lib/theme";
+import { arabic, cormorantExt, cormorantLatin, cormorantVi, ethiopic, ethiopicSerif, interExt, interLatin, interVi } from "./fonts";
 import "./globals.css";
-
-const display = Cormorant_Garamond({
-  subsets: ["latin", "latin-ext"],
-  weight: ["600", "700"],
-  display: "swap",
-  variable: "--font-display",
-  preload: true,
-});
-
-const body = Inter({
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-  variable: "--font-body",
-  preload: true,
-});
-
-const arabic = Noto_Sans_Arabic({
-  subsets: ["arabic"],
-  weight: ["400", "600"],
-  display: "swap",
-  variable: "--font-arabic",
-  preload: false,
-});
-
-const ethiopic = Noto_Sans_Ethiopic({
-  subsets: ["ethiopic"],
-  weight: ["400", "600"],
-  display: "swap",
-  variable: "--font-ethiopic",
-  preload: false,
-});
-
-const ethiopicSerif = Noto_Serif_Ethiopic({
-  subsets: ["ethiopic"],
-  weight: ["600"],
-  display: "swap",
-  variable: "--font-ethiopic-serif",
-  preload: false,
-});
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -97,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       dir={dir}
       data-theme={theme ?? undefined}
       data-low={user?.lowData ? "1" : undefined}
-      className={`${display.variable} ${body.variable} ${arabic.variable} ${ethiopic.variable} ${ethiopicSerif.variable}`}
+      className={`${interLatin.variable} ${interExt.variable} ${interVi.variable} ${cormorantLatin.variable} ${cormorantExt.variable} ${cormorantVi.variable} ${arabic.variable} ${ethiopic.variable} ${ethiopicSerif.variable}`}
       suppressHydrationWarning
     >
       <head>
